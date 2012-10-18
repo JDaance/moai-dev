@@ -30,7 +30,7 @@
 SUPPRESS_EMPTY_FILE_WARNING
 #if USE_CHIPMUNK
 
-#define LINE_COLOR 0.0f, 0.0f, 0.0f
+#define LINE_COLOR 0.5f, 0.5f, 0.5f
 #define COLLISION_COLOR 1.0f, 0.0f, 0.0f
 #define BODY_COLOR 0.0f, 0.0f, 1.0f
 #define BB_COLOR 0.3f, 0.5f, 0.3f
@@ -247,11 +247,15 @@ static void drawSegmentShape ( cpBody* body, cpSegmentShape* seg, cpSpace* space
 		gfxDevice.SetPrimType ( GL_LINES );
 		gfxDevice.SetPenColor ( USColor::PackRGBA ( LINE_COLOR, 1.0f ));
 		
-		gfxDevice.WriteVtx (( float )a.x, ( float )a.y, 0.0f );
-		gfxDevice.WriteFinalColor4b ();
+		gfxDevice.BeginPrim ();
+
+			gfxDevice.WriteVtx (( float )a.x, ( float )a.y, 0.0f );
+			gfxDevice.WriteFinalColor4b ();
 		
-		gfxDevice.WriteVtx (( float )b.x, ( float )b.y, 0.0f );
-		gfxDevice.WriteFinalColor4b ();
+			gfxDevice.WriteVtx (( float )b.x, ( float )b.y, 0.0f );
+			gfxDevice.WriteFinalColor4b ();
+		
+		gfxDevice.EndPrim ();
 		
 		gfxDevice.Flush ();
 	}
