@@ -168,8 +168,8 @@ USMatrix4x4 MOAICamera::GetProjMtx ( const MOAIViewport& viewport ) const {
 		float xs = Cot (( this->mFieldOfView * ( float )D2R ) / 2.0f );
 		float ys = xs * viewport.GetAspect ();
 		
-		xs *= viewScale.mX;
-		ys *= viewScale.mY;
+		//xs *= viewScale.mX;
+		//ys *= viewScale.mY;
 		
 		mtx.Perspective ( xs, ys, this->mNearPlane, this->mFarPlane );
 	}
