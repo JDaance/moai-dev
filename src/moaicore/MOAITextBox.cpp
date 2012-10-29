@@ -377,7 +377,7 @@ int MOAITextBox::_setLineSpacing ( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAITextBox, "U" )
 	
 	float lineSpacing = state.GetValue < float >( 2, 0.0f );
-	self->mLineSpacing = lineSpacing < 0.0f ? 0.0f : lineSpacing;
+	self->mLineSpacing = lineSpacing;// < 0.0f ? 0.0f : lineSpacing;
 	self->ScheduleLayout ();
 	
 	return 0;
