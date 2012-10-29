@@ -18,7 +18,7 @@ SUPPRESS_EMPTY_FILE_WARNING
 
 //----------------------------------------------------------------//
 /**   @name addChain
-@text Create and add a set of collision edges to teh body.
+@text Create and add a set of collision edges to the body.
  
 @in         MOAIBox2DBody self
 @in         table verts Array containing vertex coordinate components ( t[1] = x0, t[2] = y0, t[3] = x1, t[4] = y1... )
@@ -104,7 +104,7 @@ int MOAIBox2DBody::_addCircle ( lua_State* L ) {
 
 //----------------------------------------------------------------//
 /**	@name	addEdges
- @text	Create and add a polygon fixture to the body.
+ @text	Create and add edge fixtures to the body.
  
  @in		MOAIBox2DBody self
  @in		table verts Array containing vertex coordinate components in units, world coordinates, converted to meters ( t[1] = x0, t[2] = y0, t[3] = x1, t[4] = y1... )
