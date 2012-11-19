@@ -118,9 +118,9 @@ void MOAIPartitionCell::GatherProps ( MOAIPartitionResultBuffer& results, const 
 		if ( prop == ignore ) continue;
 		
 		if (( mask == 0 ) || ( prop->mMask & mask )) {	
-			if ( !frustum.Cull ( prop->mBounds )) {
+			//if ( !frustum.Cull ( prop->mBounds )) {
 				prop->AddToSortBuffer ( results );
-			}
+			//}
 		}
 	}
 }
