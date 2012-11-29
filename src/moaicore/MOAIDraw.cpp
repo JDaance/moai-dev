@@ -137,6 +137,22 @@ int MOAIDraw::_drawLine ( lua_State* L ) {
 	return 0;
 }
 
+int MOAIDraw::_drawLine3 ( lua_State* L ) {
+
+	MOAILuaState state ( L );
+	
+	float x0		= state.GetValue < float >( 1, 0.0f );
+	float y0		= state.GetValue < float >( 2, 0.0f );
+	float z0		= state.GetValue < float >( 3, 0.0f );
+	float x1		= state.GetValue < float >( 4, 0.0f );
+	float y1		= state.GetValue < float >( 5, 0.0f );
+	float z1		= state.GetValue < float >( 6, 0.0f );
+
+	MOAIDraw::DrawLine(x0, y0, z0, x1, y1, z1);
+
+	return 0;
+}
+
 //----------------------------------------------------------------//
 /**	@name	drawPoints
 	@text	Draw a list of points.
@@ -814,6 +830,7 @@ void MOAIDraw::RegisterLuaClass ( MOAILuaState& state ) {
 		{ "drawEllipse",			_drawEllipse },
 		//{ "drawGrid",				_drawGrid }, // TODO
 		{ "drawLine",				_drawLine },
+		{ "drawLine3",				_drawLine3 },
 		{ "drawPoints",				_drawPoints },
 		{ "drawRay",				_drawRay },
 		{ "drawRect",				_drawRect },

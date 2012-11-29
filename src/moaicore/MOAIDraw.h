@@ -28,6 +28,7 @@ private:
 	static int				_drawEllipse		( lua_State* L );
 	static int				_drawGrid			( lua_State* L );
 	static int				_drawLine			( lua_State* L );
+	static int				_drawLine3			( lua_State* L );
 	static int				_drawPoints			( lua_State* L );
 	static int				_drawRay			( lua_State* L );
 	static int				_drawRect			( lua_State* L );
