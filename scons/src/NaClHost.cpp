@@ -353,12 +353,9 @@ void* moai_main ( void *_instance ) {
 
 	AKURunBytecode ( moai_lua, moai_lua_SIZE );
 
-	AKURunScript ( "main.lua" );
+	AKURunScript ( "editor/editor.lua" );
 
 	NACL_LOG ( "Main Lua\n" );
-
-	AKURunScript ( "config.lua" );
-	AKURunScript ( "game.lua" );
 
 	//NaClGetUID ();
 
@@ -512,6 +509,11 @@ void MoaiInstance::DidChangeView ( const pp::Rect& position, const pp::Rect& cli
 	//MOAIGfxDevice::Get ().SetDeviceScale ( g_width / MOAIGfxDevice::Get ().GetWidth ());
 
 	NACL_LOG ( "AKUOpenWindowFunc: %d, %d\n", g_expectedWidth, g_width );
+
+	NACL_LOG ( "AKUSetScreenSize: %d, %d\n", g_width, g_height );
+	AKUSetScreenSize ( g_width, g_height );
+	NACL_LOG ( "AKUSetViewSize: %d, %d\n", g_width, g_height );
+	AKUSetViewSize ( g_width, g_height );
 
 	if ( g_expectedWidth && g_width ) {
 		MOAIGfxDevice::Get ().SetBufferScale ( g_width / ( float )g_expectedWidth );
