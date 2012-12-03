@@ -34,7 +34,7 @@ extern "C" {
 #include "ppapi/cpp/size.h"
 #include "ppapi/cpp/var.h"
 
-#include <aku/AKU-fmod-ex.h>
+//#include <aku/AKU-fmod-ex.h>
 
 #include "moaicore/MOAIGfxDevice.h"
 #include "MOAIApp.h"
@@ -248,7 +248,7 @@ void NaClGetUID () {
 //----------------------------------------------------------------//
 void RenderMainThread ( void* userData, int32_t result ) {
 
-	AKUFmodExUpdate ();
+	//AKUFmodExUpdate ();
 
 	g_instance->DrawSelf ();
 
@@ -348,6 +348,8 @@ void* moai_main ( void *_instance ) {
 	g_instance = ( MoaiInstance * ) _instance;
 	g_FileSystem->Init ();
 	NACL_LOG ( "File System Initialized\n" );
+	
+	g_FileSystem->setWorkingDir("lua");
 
 	AKURunBytecode ( moai_lua, moai_lua_SIZE );
 
@@ -490,8 +492,8 @@ void MoaiInstance::DidChangeView ( const pp::Rect& position, const pp::Rect& cli
 
 		NACL_LOG ( "AKU functions registered Initialized\n" );
 
-		AKUFmodExInit ();
-		NACL_LOG ( "Fmod Initialized\n" );
+		//AKUFmodExInit ();
+		//NACL_LOG ( "Fmod Initialized\n" );
 
 		AKUDetectGfxContext ();
 		NACL_LOG ( "AKUDetectGfxContext\n" );

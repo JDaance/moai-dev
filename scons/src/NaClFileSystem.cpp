@@ -24,6 +24,8 @@ NaClFileSystem *NaClFileSystem::mSingletonInstance = NULL;
 NaClFileSystem::~NaClFileSystem () {
 	mCore = NULL;
 	mInstance = NULL;
+	
+	mWorkingDir = "";
 }
 
 //----------------------------------------------------------------//
@@ -35,6 +37,8 @@ NaClFileSystem::NaClFileSystem ( pp::Core* core, pp::Instance *instance ) :
 	mInstance = instance;
 	mSingletonInstance = this;
 	mFileSystemOpened = false;
+
+	mWorkingDir = "";
 }
 
 //----------------------------------------------------------------//
@@ -77,15 +81,23 @@ void NaClFileSystem::OpenFileSystemCallback ( int32_t result ) {
 	}
 }
 
+void NaClFileSystem::setWorkingDir ( const char * path ) {
+	mWorkingDir = new char[1024];
+	snprintf(mWorkingDir, sizeof mWorkingDir, "%s/", path);
+	NACL_LOG("NaClFileSystem::setWorkingDir %s\n", mWorkingDir );
+}
+
 //----------------------------------------------------------------//
 NaClFile * NaClFileSystem::fopen ( const char * path, const char *mode ) {
 
 	//AJV support binary and text read/write? nacl file system makes no distinction, until then...
 	//int modeLen = strlen ( mode );
+	char buffer[1024];
+	snprintf(buffer, sizeof buffer, "%s%s", mWorkingDir, path);
 
 	//AJV hack to differentiate local files from hosted
 	char *NaClFilePath = strstr ( path, "/NaClFileSys" );
-	const char *redirectPath = path;
+	const char *redirectPath = buffer;
 	bool isOnDisk = false;
 
 	if ( NaClFilePath ) {
@@ -256,8 +268,11 @@ void NaClFileSystem::OpenFileCallback ( void * userData, int32_t result ) {
 //----------------------------------------------------------------//
 int NaClFileSystem::stat ( const char *path, struct stat *buf ) {
 
+	char buffer[1024];
+	snprintf(buffer, sizeof buffer, "%s%s", mWorkingDir, path);
+	
 	NaClFile * newFile = new NaClFile ();
-	newFile->mPath = path;
+	newFile->mPath = buffer;
 
 	//TODO, check if file is cached
 	pp::CompletionCallback cc ( RequestURLStatsMainThread, newFile );

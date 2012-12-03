@@ -46,6 +46,8 @@ public:
 
 	//TODO - cache file to HD on open
 	NaClFile * fopen ( const char * path, const char *mode );
+	
+	void setWorkingDir(const char *path);
 
 	int fclose ( NaClFile *file );
 
@@ -85,6 +87,8 @@ private:
 
 	pp::Core* mCore;
 	pp::Instance *mInstance;
+	
+	char * mWorkingDir;
 	
 	bool mFileSystemOpened;
 
