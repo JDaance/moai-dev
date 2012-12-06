@@ -517,7 +517,23 @@ void MOAIApp::PushPaymentTransaction ( int transactionResult, lua_State *L ) {
 }
 
 //----------------------------------------------------------------//
+void MOAIApp::HandleLuaMessage ( std::string & message ) {
+
+	MOAILuaRef& callback = this->mListeners [ MESSAGE ];
+
+	if ( callback ) {
+	
+		MOAILuaStateHandle L = callback.GetSelf ();
+		lua_newtable ( L );
+		lua_pushstring ( L, message.c_str() );
+		L.DebugCall ( 1, 0 );
+	}
+}
+
+//----------------------------------------------------------------//
 void MOAIApp::RegisterLuaClass ( MOAILuaState& state ) {
+	
+	NACL_LOG("MOAIApp::RegisterLuaClass enter");
 
 	state.SetField ( -1, "PAYMENT_QUEUE_TRANSACTION",	( u32 )PAYMENT_QUEUE_TRANSACTION );
 	state.SetField ( -1, "PAYMENT_QUEUE_ERROR",			( u32 )PAYMENT_QUEUE_ERROR );
@@ -531,6 +547,8 @@ void MOAIApp::RegisterLuaClass ( MOAILuaState& state ) {
 	state.SetField ( -1, "TRANSACTION_STATE_FAILED",    ( u32 )TRANSACTION_STATE_FAILED );
 	state.SetField ( -1, "TRANSACTION_STATE_RESTORED",  ( u32 )TRANSACTION_STATE_RESTORED );
 	state.SetField ( -1, "TRANSACTION_STATE_CANCELLED", ( u32 )TRANSACTION_STATE_CANCELLED );
+
+	state.SetField ( -1, "MESSAGE", ( u32 )MESSAGE );
 	
 	luaL_Reg regTable[] = {
 		{ "alert",								_alert },
@@ -548,4 +566,6 @@ void MOAIApp::RegisterLuaClass ( MOAILuaState& state ) {
 	};
 
 	luaL_register( state, 0, regTable );
+	
+	NACL_LOG("MOAIApp::RegisterLuaClass exit");
 }

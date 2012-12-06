@@ -35,6 +35,10 @@ private:
 		DOMAIN_APP_SUPPORT = 1,
 	};
 	
+	enum {
+		MESSAGE
+	};
+	
 	MOAILuaRef				mListeners [ TOTAL ];
 	//MOAIStoreKitListener*	mStoreKitListener;
 	//int						mNumRequests;
@@ -79,6 +83,8 @@ public:
 	void		DidReceivePaymentQueueError									( cc8 *extraInfo );
 	void		PaymentQueueUpdatedTransactions								( int transactionResult, const char *extraInfo );
 	void		ProductsRequestDidReceiveResponse							();
+	void 		HandleLuaMessage											( std::string & message );
+	
 	void		RegisterLuaClass											( MOAILuaState& state );
 
 	static void HandleStoreMessage											( std::string & message );
