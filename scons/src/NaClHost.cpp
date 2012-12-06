@@ -222,6 +222,8 @@ void HandleSocialMessage ( std::string & message ) {
 		MOAIEnvironment::Get().SetValue ( MOAI_ENV_udid, message.c_str () + responseStartIndex );
 
 		g_generate_uid = false;
+	} else if ( message.find ( "LUA:" ) != std::string::npos ) {
+		
 	}
 }
 
