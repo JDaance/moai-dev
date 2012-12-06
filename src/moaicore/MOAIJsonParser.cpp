@@ -91,7 +91,7 @@ void _jsonToLua ( lua_State* L, json_t* json ) {
 			break;
 		
 		case JSON_NULL:
-			lua_pushlightuserdata ( L, 0 );
+			lua_pushnil ( L );
 			break;
 	};
 }
@@ -121,7 +121,7 @@ json_t* _luaToJSON ( lua_State* L, int idx ) {
 			return json_real ( real );
 		}
 		
-		case LUA_TLIGHTUSERDATA: {
+		case LUA_TNIL: {
 		
 			return json_null ();
 		}
