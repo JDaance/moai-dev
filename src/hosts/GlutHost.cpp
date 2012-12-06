@@ -9,6 +9,8 @@
 #include <GlutHost.h>
 #include <string.h>
 
+#include "Shiny.h"
+
 #define UNUSED(p) (( void )p)
 
 #ifdef GLUTHOST_USE_DEBUGGER
@@ -60,6 +62,7 @@ namespace GlutInputDeviceSensorID {
 		MOUSE_LEFT,
 		MOUSE_MIDDLE,
 		MOUSE_RIGHT,
+		WHEEL,
 		TOTAL,
 	};
 }
@@ -177,6 +180,7 @@ static void _onMouseButton ( int button, int state, int x, int y ) {
 		case GLUT_RIGHT_BUTTON:
 			AKUEnqueueButtonEvent ( GlutInputDeviceID::DEVICE, GlutInputDeviceSensorID::MOUSE_RIGHT, ( state == GLUT_DOWN ));
 		break;
+
 	}
 }
 
@@ -334,6 +338,12 @@ static void _cleanup () {
 	// possible to fix?
 	//AKUClearMemPool ();
 	
+	/*PROFILE_END();
+
+	PROFILE_UPDATE(); // update all profiles
+	PROFILE_OUTPUT("F:\\dev\\projekt\\skyways\\doc\\profile.txt"); // print to terminal
+	*/
+	
 	AKUFinalize ();
 	
 	if ( sDynamicallyReevaluateLuaFiles ) {
@@ -381,11 +391,14 @@ int GlutHost ( int argc, char** argv ) {
 			FWWatchFolder( lastScript );
 		#endif
 	}
-	
+
+	//PROFILE_BEGIN(GLUTHOSTMAIN_PROFILE); // profile until PROFILE_END()
+
 	if ( sHasWindow ) {
 		glutTimerFunc ( 0, _onTimer, 0 );
 		glutMainLoop ();
 	}
+
 	return 0;
 }
 
