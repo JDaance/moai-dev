@@ -496,6 +496,22 @@ void MoaiInstance::DidChangeView ( const pp::Rect& position, const pp::Rect& cli
 
 		AKUDetectGfxContext ();
 		NACL_LOG ( "AKUDetectGfxContext\n" );
+		
+		MOAIEnvironment& environment = MOAIEnvironment::Get ();
+			
+		/*environment.SetValue ( MOAI_ENV_appDisplayName,		appName );
+		environment.SetValue ( MOAI_ENV_appID,				appId );
+		environment.SetValue ( MOAI_ENV_appVersion,			appVersion );
+		environment.SetValue ( MOAI_ENV_cpuabi,				abi );
+		environment.SetValue ( MOAI_ENV_devBrand,			devBrand );
+		environment.SetValue ( MOAI_ENV_devName,			devName );
+		environment.SetValue ( MOAI_ENV_devManufacturer,	devManufacturer );
+		environment.SetValue ( MOAI_ENV_devModel,			devModel );*/
+		environment.SetValue ( MOAI_ENV_devProduct,			"Chrome" );
+		/*environment.SetValue ( MOAI_ENV_numProcessors,		jnumProcessors );
+		environment.SetValue ( MOAI_ENV_osBrand,			osBrand );
+		environment.SetValue ( MOAI_ENV_osVersion,			osVersion );
+		environment.SetValue ( MOAI_ENV_udid,				udid );*/
 
 		REGISTER_LUA_CLASS ( MOAIApp )
 
