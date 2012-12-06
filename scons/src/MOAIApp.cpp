@@ -321,6 +321,23 @@ int MOAIApp::_openURLPOP ( lua_State* L ) {
 	
 	return 0;
 }
+
+int MOAIApp::_postMessageToWeb ( lua_State* L ) {
+	MOAILuaState state ( L );
+	
+	cc8* message	= state.GetValue < cc8* >( 1, NULL );
+	
+	NACL_LOG ("MOAIApp _postMessageToWeb: '%s' length: %d\n", message, strlen(message) );
+
+	int bufSize = strlen(message) + 10;
+	char buffer[bufSize];
+	memset ( buffer, 0, bufSize );
+	sprintf ( buffer, "LUA:%s", message );
+
+	NaClPostMessage ( buffer );
+	
+	return 0;
+}
  
 
 //----------------------------------------------------------------//
@@ -519,7 +536,7 @@ void MOAIApp::PushPaymentTransaction ( int transactionResult, lua_State *L ) {
 //----------------------------------------------------------------//
 void MOAIApp::HandleLuaMessage ( std::string & message ) {
 
-	MOAILuaRef& callback = this->mListeners [ MESSAGE ];
+	MOAILuaRef& callback = this->mListeners [ MESSAGE_FROM_WEB ];
 
 	if ( callback ) {
 	
@@ -549,7 +566,7 @@ void MOAIApp::RegisterLuaClass ( MOAILuaState& state ) {
 	state.SetField ( -1, "TRANSACTION_STATE_RESTORED",  ( u32 )TRANSACTION_STATE_RESTORED );
 	state.SetField ( -1, "TRANSACTION_STATE_CANCELLED", ( u32 )TRANSACTION_STATE_CANCELLED );
 
-	state.SetField ( -1, "MESSAGE", ( u32 )MESSAGE );
+	state.SetField ( -1, "MESSAGE_FROM_WEB", ( u32 )MESSAGE_FROM_WEB );
 	
 	luaL_Reg regTable[] = {
 		{ "alert",								_alert },
@@ -563,6 +580,9 @@ void MOAIApp::RegisterLuaClass ( MOAILuaState& state ) {
 		{ "getDirectoryInDomain",				_getDirectoryInDomain },
 		{ "openURL",							_openURL },
 		{ "openURLPOP",							_openURLPOP },
+
+		{ "postMessageToWeb",					_postMessageToWeb },
+		
 		{ NULL, NULL }
 	};
 

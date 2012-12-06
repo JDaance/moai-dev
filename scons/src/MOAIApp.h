@@ -36,7 +36,7 @@ private:
 	};
 	
 	enum {
-		MESSAGE
+		MESSAGE_FROM_WEB
 	};
 	
 	MOAILuaRef				mListeners [ TOTAL ];
@@ -56,6 +56,8 @@ private:
 	static int		_getDirectoryInDomain					( lua_State* L );
 	static int		_openURL								( lua_State* L );
 	static int		_openURLPOP								( lua_State* L );
+
+	static int		_postMessageToWeb						( lua_State* L );
 
 	//----------------------------------------------------------------//
 	//void			PushPaymentTransaction					( lua_State* L, SKPaymentTransaction* transaction );
