@@ -524,8 +524,9 @@ void MOAIApp::HandleLuaMessage ( std::string & message ) {
 	if ( callback ) {
 	
 		MOAILuaStateHandle L = callback.GetSelf ();
-		lua_newtable ( L );
-		lua_pushstring ( L, message.c_str() );
+		
+		lua_pushstring ( L, message.substr(4).c_str() );		
+		
 		L.DebugCall ( 1, 0 );
 	}
 }

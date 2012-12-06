@@ -223,7 +223,7 @@ void HandleSocialMessage ( std::string & message ) {
 
 		g_generate_uid = false;
 	} else if ( message.find ( "LUA:" ) != std::string::npos ) {
-		
+		MOAIApp::Get().HandleLuaMessage(message);
 	}
 }
 
