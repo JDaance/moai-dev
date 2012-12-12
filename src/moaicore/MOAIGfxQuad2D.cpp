@@ -175,6 +175,12 @@ int MOAIGfxQuad2D::_transformUV ( lua_State* L ) {
 	return 0;
 }
 
+int MOAIGfxQuad2D::_setColor ( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIGfxQuad2D, "UNNN" )
+	self->mColor = state.GetColor32 ( 2, 0.0f, 0.0f, 0.0f, 1.0f );
+	return 0;
+}
+
 //================================================================//
 // MOAIGfxQuad2D
 //================================================================//
@@ -194,6 +200,7 @@ void MOAIGfxQuad2D::DrawIndex ( u32 idx, float xOff, float yOff, float zOff, flo
 	
 	gfxDevice.SetVertexMtxMode ( MOAIGfxDevice::VTX_STAGE_MODEL, MOAIGfxDevice::VTX_STAGE_PROJ );
 	gfxDevice.SetUVMtxMode ( MOAIGfxDevice::UV_STAGE_MODEL, MOAIGfxDevice::UV_STAGE_TEXTURE );
+	gfxDevice.SetAmbientColor(mColor);
 	
 	this->mQuad.Draw ( xOff, yOff, zOff, xScl, yScl );
 }
@@ -208,7 +215,8 @@ USBox MOAIGfxQuad2D::GetItemBounds ( u32 idx ) {
 }
 
 //----------------------------------------------------------------//
-MOAIGfxQuad2D::MOAIGfxQuad2D () {
+MOAIGfxQuad2D::MOAIGfxQuad2D () :
+	mColor ( 0xffffffff ) {
 
 	RTTI_BEGIN
 		RTTI_EXTEND ( MOAIDeck )
@@ -248,6 +256,7 @@ void MOAIGfxQuad2D::RegisterLuaFuncs ( MOAILuaState& state ) {
 		{ "setUVRect",			_setUVRect },
 		{ "transform",			_transform },
 		{ "transformUV",		_transformUV },
+		{ "setColor",			_setColor },
 		{ NULL, NULL }
 	};
 

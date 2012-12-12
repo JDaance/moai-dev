@@ -21,6 +21,7 @@ class MOAIGfxQuad2D :
 private:
 
 	MOAIQuadBrush mQuad;
+	u32		      mColor;
 
 	//----------------------------------------------------------------//
 	static int		_setQuad			( lua_State* L );
@@ -29,6 +30,7 @@ private:
 	static int		_setUVRect			( lua_State* L );
 	static int		_transform			( lua_State* L );
 	static int		_transformUV		( lua_State* L );
+	static int		_setColor			( lua_State* L );
 
 	//----------------------------------------------------------------//
 	USBox			ComputeMaxBounds		();
