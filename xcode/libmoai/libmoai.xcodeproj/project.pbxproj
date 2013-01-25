@@ -1441,6 +1441,8 @@
 		07F59347143E318B00C6D185 /* MOAIUntzSampleBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 07F59343143E318B00C6D185 /* MOAIUntzSampleBuffer.h */; };
 		07FAC91613B8F1CA00AFD0B3 /* moaicore-pch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07FAC91513B8F1CA00AFD0B3 /* moaicore-pch.cpp */; };
 		07FAC91813B8F1E000AFD0B3 /* uslscore-pch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07FAC91713B8F1E000AFD0B3 /* uslscore-pch.cpp */; };
+		2BE5941016B2C70B001608E5 /* MOAITakeCameraListener.h in Headers */ = {isa = PBXBuildFile; fileRef = 2BE5940E16B2C70B001608E5 /* MOAITakeCameraListener.h */; };
+		2BE5941116B2C70B001608E5 /* MOAITakeCameraListener.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2BE5940F16B2C70B001608E5 /* MOAITakeCameraListener.mm */; };
 		660EBB04160D184A000B1203 /* Crittercism.h in Headers */ = {isa = PBXBuildFile; fileRef = 660EBB03160D184A000B1203 /* Crittercism.h */; };
 		660EBB05160D184A000B1203 /* Crittercism.h in Headers */ = {isa = PBXBuildFile; fileRef = 660EBB03160D184A000B1203 /* Crittercism.h */; };
 		660EBB22160D1859000B1203 /* CrashReporter.h in Headers */ = {isa = PBXBuildFile; fileRef = 660EBB06160D1859000B1203 /* CrashReporter.h */; };
@@ -1549,8 +1551,6 @@
 		6637040F161280E1002D0D27 /* USHashWriter.h in Headers */ = {isa = PBXBuildFile; fileRef = 6637040B161280E1002D0D27 /* USHashWriter.h */; };
 		663704171612813D002D0D27 /* whirlpool.h in Headers */ = {isa = PBXBuildFile; fileRef = 663704111612812C002D0D27 /* whirlpool.h */; };
 		663704191612813E002D0D27 /* whirlpool.h in Headers */ = {isa = PBXBuildFile; fileRef = 663704111612812C002D0D27 /* whirlpool.h */; };
-		663BA375159D09C000F80FE9 /* MOAIVungleIOS.h in Headers */ = {isa = PBXBuildFile; fileRef = 663BA373159D09C000F80FE9 /* MOAIVungleIOS.h */; };
-		663BA376159D09C000F80FE9 /* MOAIVungleIOS.mm in Sources */ = {isa = PBXBuildFile; fileRef = 663BA374159D09C000F80FE9 /* MOAIVungleIOS.mm */; };
 		663BA378159D09F800F80FE9 /* vunglepub.h in Headers */ = {isa = PBXBuildFile; fileRef = 663BA377159D09F800F80FE9 /* vunglepub.h */; };
 		66459FB41511638B0075BF13 /* AKU-audiosampler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 66459FB31511638B0075BF13 /* AKU-audiosampler.cpp */; };
 		66459FB51511638B0075BF13 /* AKU-audiosampler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 66459FB31511638B0075BF13 /* AKU-audiosampler.cpp */; };
@@ -1587,8 +1587,6 @@
 		669E287815914B320037E24C /* RiffFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 669E287215914B320037E24C /* RiffFile.h */; };
 		669E287A15914B320037E24C /* WaveFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 669E287415914B320037E24C /* WaveFile.h */; };
 		669E287C15914B320037E24C /* WaveFileAudioSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 669E287615914B320037E24C /* WaveFileAudioSource.h */; };
-		66A0F97615A24B110019CE7F /* AKU-vungle.h in Headers */ = {isa = PBXBuildFile; fileRef = 66A0F97515A24B110019CE7F /* AKU-vungle.h */; };
-		66A0F97915A24B1B0019CE7F /* AKU-vungle.mm in Sources */ = {isa = PBXBuildFile; fileRef = 66A0F97815A24B1B0019CE7F /* AKU-vungle.mm */; };
 		66A644CE15462EC0009796A3 /* acountry.c in Sources */ = {isa = PBXBuildFile; fileRef = 66A643F115462EC0009796A3 /* acountry.c */; };
 		66A644CF15462EC0009796A3 /* adig.c in Sources */ = {isa = PBXBuildFile; fileRef = 66A643F315462EC0009796A3 /* adig.c */; };
 		66A644D015462EC0009796A3 /* ahost.c in Sources */ = {isa = PBXBuildFile; fileRef = 66A643F515462EC0009796A3 /* ahost.c */; };
@@ -4360,6 +4358,8 @@
 		07F59343143E318B00C6D185 /* MOAIUntzSampleBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MOAIUntzSampleBuffer.h; path = "moaiext-untz/MOAIUntzSampleBuffer.h"; sourceTree = "<group>"; };
 		07FAC91513B8F1CA00AFD0B3 /* moaicore-pch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "moaicore-pch.cpp"; sourceTree = "<group>"; };
 		07FAC91713B8F1E000AFD0B3 /* uslscore-pch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "uslscore-pch.cpp"; sourceTree = "<group>"; };
+		2BE5940E16B2C70B001608E5 /* MOAITakeCameraListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MOAITakeCameraListener.h; path = "moaiext-iphone/MOAITakeCameraListener.h"; sourceTree = "<group>"; };
+		2BE5940F16B2C70B001608E5 /* MOAITakeCameraListener.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MOAITakeCameraListener.mm; path = "moaiext-iphone/MOAITakeCameraListener.mm"; sourceTree = "<group>"; };
 		660EBB03160D184A000B1203 /* Crittercism.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Crittercism.h; path = "../../3rdparty/crittercismiOS-3.3.3/CrittercismSDK-crashonly/Crittercism.h"; sourceTree = "<group>"; };
 		660EBB06160D1859000B1203 /* CrashReporter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CrashReporter.h; path = "../../3rdparty/crittercismiOS-3.3.3/CrittercismSDK-crashonly/CrashReporter.h"; sourceTree = "<group>"; };
 		660EBB07160D1859000B1203 /* CrittercismJSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CrittercismJSONKit.h; path = "../../3rdparty/crittercismiOS-3.3.3/CrittercismSDK-crashonly/CrittercismJSONKit.h"; sourceTree = "<group>"; };
@@ -4415,8 +4415,6 @@
 		6637040B161280E1002D0D27 /* USHashWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = USHashWriter.h; sourceTree = "<group>"; };
 		663704111612812C002D0D27 /* whirlpool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = whirlpool.h; path = ../../3rdparty/contrib/whirlpool.h; sourceTree = "<group>"; };
 		663BA372159D041D00F80FE9 /* libmoai-ios-vungle.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libmoai-ios-vungle.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		663BA373159D09C000F80FE9 /* MOAIVungleIOS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MOAIVungleIOS.h; path = "moaiext-iphone/MOAIVungleIOS.h"; sourceTree = "<group>"; };
-		663BA374159D09C000F80FE9 /* MOAIVungleIOS.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MOAIVungleIOS.mm; path = "moaiext-iphone/MOAIVungleIOS.mm"; sourceTree = "<group>"; };
 		663BA377159D09F800F80FE9 /* vunglepub.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vunglepub.h; path = ../../3rdparty/vungle11/lib/vunglepub/vunglepub.h; sourceTree = "<group>"; };
 		66459FB31511638B0075BF13 /* AKU-audiosampler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "AKU-audiosampler.cpp"; sourceTree = "<group>"; };
 		66459FB81511641F0075BF13 /* MOAIAudioSampler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MOAIAudioSampler.cpp; sourceTree = "<group>"; };
@@ -4437,8 +4435,6 @@
 		669E287215914B320037E24C /* RiffFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RiffFile.h; path = ../../3rdparty/untz/src/native/android/RiffFile.h; sourceTree = "<group>"; };
 		669E287415914B320037E24C /* WaveFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WaveFile.h; path = ../../3rdparty/untz/src/native/android/WaveFile.h; sourceTree = "<group>"; };
 		669E287615914B320037E24C /* WaveFileAudioSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WaveFileAudioSource.h; path = ../../3rdparty/untz/src/native/android/WaveFileAudioSource.h; sourceTree = "<group>"; };
-		66A0F97515A24B110019CE7F /* AKU-vungle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "AKU-vungle.h"; path = "aku/AKU-vungle.h"; sourceTree = "<group>"; };
-		66A0F97815A24B1B0019CE7F /* AKU-vungle.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "AKU-vungle.mm"; path = "aku/AKU-vungle.mm"; sourceTree = "<group>"; };
 		66A643F115462EC0009796A3 /* acountry.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = acountry.c; sourceTree = "<group>"; };
 		66A643F315462EC0009796A3 /* adig.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = adig.c; sourceTree = "<group>"; };
 		66A643F515462EC0009796A3 /* ahost.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahost.c; sourceTree = "<group>"; };
@@ -8425,10 +8421,11 @@
 				CDF2C614151B146F0009D47D /* MOAIBillingIOS.mm */,
 				E98DBDC71537A2BF00514387 /* MOAIChartBoostIOS.h */,
 				E98DBDC91537A2CB00514387 /* MOAIChartBoostIOS.mm */,
-				E9A41AB5151AAA5400650276 /* MOAICrittercismIOS.h */,
 				E9A41AB6151AAA5400650276 /* MOAICrittercismIOS.mm */,
+				E9A41AB5151AAA5400650276 /* MOAICrittercismIOS.h */,
 				CDF2C615151B146F0009D47D /* MOAIDialogIOS.h */,
 				CDF2C616151B146F0009D47D /* MOAIDialogIOS.mm */,
+				CDD06ECA1398BA6200AB0420 /* moaiext-iphone.h */,
 				E9A41ADA151ABEDC00650276 /* MOAIFacebookIOS.h */,
 				E9A41ADB151ABEDC00650276 /* MOAIFacebookIOS.mm */,
 				E9CA1E54151C7D71005F39B7 /* MOAIGameCenterIOS.h */,
@@ -8443,17 +8440,16 @@
 				CDF2C618151B146F0009D47D /* MOAISafariIOS.mm */,
 				CDD06ECB1398BA6200AB0420 /* MOAIStoreKitListener.h */,
 				CDD06ECC1398BA6200AB0420 /* MOAIStoreKitListener.mm */,
+				2BE5940E16B2C70B001608E5 /* MOAITakeCameraListener.h */,
+				2BE5940F16B2C70B001608E5 /* MOAITakeCameraListener.mm */,
 				E9A41ABE151AAE6600650276 /* MOAITapjoyIOS.h */,
 				E9A41ABF151AAE6600650276 /* MOAITapjoyIOS.mm */,
 				CDF2C619151B146F0009D47D /* MOAITwitterIOS.h */,
 				CDF2C61A151B146F0009D47D /* MOAITwitterIOS.mm */,
-				663BA373159D09C000F80FE9 /* MOAIVungleIOS.h */,
-				663BA374159D09C000F80FE9 /* MOAIVungleIOS.mm */,
 				CDF2C628151B17540009D47D /* MOAIWebViewDelegate.h */,
 				CDF2C629151B17540009D47D /* MOAIWebViewDelegate.mm */,
 				E9CA1E58151C8578005F39B7 /* MOAIWebViewIOS.h */,
 				E9CA1E59151C8578005F39B7 /* MOAIWebViewIOS.mm */,
-				CDD06ECA1398BA6200AB0420 /* moaiext-iphone.h */,
 			);
 			name = "moaiext-iphone";
 			sourceTree = "<group>";
@@ -9765,8 +9761,6 @@
 				E98DBDD41537A33100514387 /* AKU-chartboost.mm */,
 				CD1D0BA213599FD200802A3C /* AKU-iphone.h */,
 				CD1D0BA313599FD200802A3C /* AKU-iphone.mm */,
-				66A0F97515A24B110019CE7F /* AKU-vungle.h */,
-				66A0F97815A24B1B0019CE7F /* AKU-vungle.mm */,
 			);
 			name = aku;
 			sourceTree = "<group>";
@@ -11324,6 +11318,7 @@
 				66E62C3A16AE312A009B9C29 /* MOAIMutex_posix.h in Headers */,
 				66E62C3E16AE312A009B9C29 /* MOAIMutex_win32.h in Headers */,
 				66E62C4216AE312A009B9C29 /* MOAIMutex.h in Headers */,
+				2BE5941016B2C70B001608E5 /* MOAITakeCameraListener.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -11468,8 +11463,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				663BA378159D09F800F80FE9 /* vunglepub.h in Headers */,
-				663BA375159D09C000F80FE9 /* MOAIVungleIOS.h in Headers */,
-				66A0F97615A24B110019CE7F /* AKU-vungle.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13859,6 +13852,7 @@
 				66E62C3816AE312A009B9C29 /* MOAIMutex_posix.cpp in Sources */,
 				66E62C3C16AE312A009B9C29 /* MOAIMutex_win32.cpp in Sources */,
 				66E62C4016AE312A009B9C29 /* MOAIMutex.cpp in Sources */,
+				2BE5941116B2C70B001608E5 /* MOAITakeCameraListener.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -13944,8 +13938,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				663BA376159D09C000F80FE9 /* MOAIVungleIOS.mm in Sources */,
-				66A0F97915A24B1B0019CE7F /* AKU-vungle.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
