@@ -19,6 +19,7 @@
 #include <moaicore/MOAISurfaceSampler2D.h>
 #include <moaicore/MOAITexture.h>
 #include <moaicore/MOAITextureBase.h>
+#include <moaicore/MOAITransformList.h>
 
 //================================================================//
 // local

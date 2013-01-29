@@ -12,6 +12,7 @@
 #include <moaicore/MOAIShaderMgr.h>
 #include <moaicore/MOAISim.h>
 #include <moaicore/MOAITexture.h>
+#include <moaicore/MOAITransformList.h>
 #include <moaicore/MOAIVertexFormat.h>
 #include <moaicore/MOAIVertexFormatMgr.h>
 #include <moaicore/MOAIViewport.h>

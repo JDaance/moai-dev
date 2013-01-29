@@ -8,6 +8,7 @@
 #include <moaicore/MOAILogMessages.h>
 #include <moaicore/MOAIShader.h>
 #include <moaicore/MOAITransformBase.h>
+#include <moaicore/MOAITransform.h>
 #include <moaicore/MOAITransformList.h>
 
 //================================================================//
@@ -427,8 +428,8 @@ void MOAIShaderUniform::SetValue ( MOAITransformList* transforms ) {
 				// and layout as what we're going to feed OpenGL in a bit
 				// and let it do our bind pose multiplication.
 				
-				USMatrix4x4	*M = (USMatrix4x4*)m;
-				M->Prepend(t->GetInvBindPoseMtx());
+				//USMatrix4x4	*M = (USMatrix4x4*)m;
+				//M->Prepend(t->GetInvBindPoseMtx());
 			}
 		}
 		
@@ -996,6 +997,13 @@ void MOAIShader::UpdatePipelineTransforms ( const USMatrix4x4& world, const USMa
 	// reload the uniform values
 	for ( u32 i = 0; i < this->mUniforms.Size (); ++i ) {
 		this->mUniforms [ i ].BindPipelineTransforms ( world, view, proj );
+	}
+}
+
+//----------------------------------------------------------------//
+void MOAIShader::UpdateWorldTransformList ( MOAITransformList *transforms ) {
+	for ( u32 i = 0; i < this->mUniforms.Size (); ++i ) {
+		this->mUniforms [ i ].BindWorldTransformList( transforms );
 	}
 }
 

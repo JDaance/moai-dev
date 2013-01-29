@@ -17,6 +17,7 @@ class MOAIMultiTexture;
 class MOAIShader;
 class MOAITexture;
 class MOAITextureBase;
+class MOAITransformList;
 class MOAIVertexFormat;
 class MOAIViewport;
 

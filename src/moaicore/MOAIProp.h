@@ -27,6 +27,7 @@ class MOAIScissorRect;
 class MOAIShader;
 class MOAISurfaceSampler2D;
 class MOAITextureBase;
+class MOAITransformList;
 
 //================================================================//
 // MOAIProp
