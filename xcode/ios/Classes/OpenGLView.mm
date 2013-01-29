@@ -65,11 +65,11 @@
 		glFramebufferRenderbufferOES ( GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES, GL_RENDERBUFFER_OES, mRenderbuffer );
 		
 		// set us up the depth buffer
-		//glGenRenderbuffersOES ( 1, &mDepthbuffer );
-		//glBindRenderbufferOES ( GL_RENDERBUFFER_OES, mDepthbuffer );
+		glGenRenderbuffersOES ( 1, &mDepthbuffer );
+		glBindRenderbufferOES ( GL_RENDERBUFFER_OES, mDepthbuffer );
 
-		//glRenderbufferStorageOES ( GL_RENDERBUFFER_OES, GL_DEPTH_COMPONENT16_OES, mWidth, mHeight );
-		//glFramebufferRenderbufferOES ( GL_FRAMEBUFFER_OES, GL_DEPTH_ATTACHMENT_OES, GL_RENDERBUFFER_OES, mDepthbuffer );
+		glRenderbufferStorageOES ( GL_RENDERBUFFER_OES, GL_DEPTH_COMPONENT16_OES, mWidth, mHeight );
+		glFramebufferRenderbufferOES ( GL_FRAMEBUFFER_OES, GL_DEPTH_ATTACHMENT_OES, GL_RENDERBUFFER_OES, mDepthbuffer );
 		
 		if ( glCheckFramebufferStatusOES ( GL_FRAMEBUFFER_OES ) != GL_FRAMEBUFFER_COMPLETE_OES ) {
 			NSLog ( @"failed to make complete framebuffer object %x", glCheckFramebufferStatusOES ( GL_FRAMEBUFFER_OES ));
