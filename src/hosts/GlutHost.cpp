@@ -9,8 +9,6 @@
 #include <GlutHost.h>
 #include <string.h>
 
-#include "Shiny.h"
-
 #define UNUSED(p) (( void )p)
 
 #ifdef GLUTHOST_USE_DEBUGGER
