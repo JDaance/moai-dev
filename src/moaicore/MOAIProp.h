@@ -118,6 +118,7 @@ private:
 	static int		_setRemapper		( lua_State* L );
 	static int		_setScissorRect		( lua_State* L );
 	static int		_setShader			( lua_State* L );
+	static int		_setSkeleton		( lua_State* L );
 	static int		_setTexture			( lua_State* L );
 	static int		_setUVTransform		( lua_State* L );
 	static int		_setVisible			( lua_State* L );
@@ -142,6 +143,7 @@ protected:
 	MOAILuaSharedPtr < MOAIGfxState >		mTexture;
 	MOAILuaSharedPtr < MOAITransformBase >	mUVTransform;
 	MOAILuaSharedPtr < MOAIScissorRect >	mScissorRect;
+	MOAILuaSharedPtr < MOAITransformList >  mSkeleton;
 	
 	int										mCullMode;
 	int										mDepthTest;
