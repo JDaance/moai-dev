@@ -8,6 +8,7 @@
 #include <moaicore/MOAILogMessages.h>
 #include <moaicore/MOAIShader.h>
 #include <moaicore/MOAITransformBase.h>
+#include <moaicore/MOAITransformList.h>
 
 //================================================================//
 // MOAIShaderUniform
@@ -69,9 +70,22 @@ void MOAIShaderUniform::Bind () {
 			
 			case UNIFORM_VIEW_PROJ:
 			case UNIFORM_WORLD:
+			case UNIFORM_VIEW:
+			case UNIFORM_PROJ:
+			case UNIFORM_WORLD_VIEW:
 			case UNIFORM_WORLD_VIEW_PROJ:
 			case UNIFORM_TRANSFORM:
 				glUniformMatrix4fv ( this->mAddr, 1, false, this->mBuffer );
+				break;
+				
+			case UNIFORM_WORLD_MATRIX_ARRAY_COUNT:
+				glUniform1i ( this->mAddr, this->mInt );
+				break;
+				
+			case UNIFORM_WORLD_MATRIX_ARRAY:
+				if( this->mInt > 0 && this->mBuffer.Size() > 0 ) {
+					glUniformMatrix4fv ( this->mAddr, this->mInt, false, this->mBuffer );
+				}
 				break;
 		}
 	}
@@ -107,6 +121,25 @@ void MOAIShaderUniform::BindPipelineTransforms ( const USMatrix4x4& world, const
 			this->Bind ();
 			break;
 		}
+		case UNIFORM_VIEW: {
+			
+			this->SetValue ( view );
+			this->Bind ();
+			break;
+		}
+		case UNIFORM_PROJ: {
+			
+			this->SetValue ( proj );
+			this->Bind ();
+			break;
+		}
+		case UNIFORM_WORLD_VIEW: {
+			
+			USMatrix4x4 mtx = world;
+			mtx.Append( view );
+			this->SetValue( mtx );
+			this->Bind ();
+		}
 		case UNIFORM_WORLD_VIEW_PROJ: {
 			
 			USMatrix4x4 mtx = world;
@@ -116,6 +149,22 @@ void MOAIShaderUniform::BindPipelineTransforms ( const USMatrix4x4& world, const
 			this->Bind ();
 			break;
 		}
+	}
+}
+
+//----------------------------------------------------------------//
+void MOAIShaderUniform::BindWorldTransformList ( MOAITransformList *transforms ) {
+	
+	switch ( this->mType ) {
+		case UNIFORM_WORLD_MATRIX_ARRAY:
+			this->SetValue(transforms);
+			this->Bind();
+			break;
+		
+		case UNIFORM_WORLD_MATRIX_ARRAY_COUNT:
+			this->SetValue(transforms ? (int)transforms->Size() : 0);
+			this->Bind();
+			break;
 	}
 }
 
@@ -173,6 +222,9 @@ void MOAIShaderUniform::SetType ( u32 type ) {
 		}
 		case UNIFORM_VIEW_PROJ:
 		case UNIFORM_WORLD:
+		case UNIFORM_VIEW:
+		case UNIFORM_PROJ:
+		case UNIFORM_WORLD_VIEW:
 		case UNIFORM_WORLD_VIEW_PROJ:
 		case UNIFORM_TRANSFORM: {
 		
@@ -231,6 +283,23 @@ void MOAIShaderUniform::SetValue ( const MOAIAttrOp& attrOp ) {
 			USAffine3D* affine = attrOp.GetValue < USAffine3D* >( 0 );
 			if ( affine ) {
 				this->SetValue ( *affine );
+			}
+			break;
+		}
+		case UNIFORM_WORLD_MATRIX_ARRAY_COUNT: {
+			MOAITransformList* transforms = attrOp.GetValue < MOAITransformList* >( 0 );
+			if ( transforms ) {
+				this->SetValue( (int)transforms->Size() );
+			}
+			else {
+				this->SetValue( 0 );
+			}
+			break;
+		}
+		case UNIFORM_WORLD_MATRIX_ARRAY: {
+			MOAITransformList* transforms = attrOp.GetValue < MOAITransformList* >( 0 );
+			if ( transforms ) {
+				this->SetValue( transforms );
 			}
 			break;
 		}
@@ -306,6 +375,67 @@ void MOAIShaderUniform::SetValue ( const USMatrix4x4& value ) {
 	this->SetBuffer ( m, sizeof ( m ));
 }
 
+//----------------------------------------------------------------//
+void MOAIShaderUniform::SetValue ( MOAITransformList* transforms ) {
+
+	// Bypass the normal SetBuffer() to avoid doing an extra memcmp and memcpy.
+	this->mIsDirty = true;
+
+	if( !transforms ) {
+		this->mBuffer.Clear();
+	}
+	else {
+		
+		u32 sz = (u32)this->mInt;
+		u32 n = transforms->Size();
+		if( sz < n ) {
+			// Make sure we don't clobber other uniforms (or worse, crash)
+			// by mistakenly being given a skeleton with more transforms
+			// than we can handle.
+			n = sz;
+		}
+		this->mBuffer.Grow ( 16 * n );
+	
+		for (u32 i = 0; i < n; i++) {
+			MOAITransform* t = transforms->GetTransform(i);
+			if( t ) {
+				float *m = this->mBuffer.Data() + 16 * i;
+				
+				const USAffine3D &value = t->GetLocalToWorldMtx();
+				
+				m [ 0 ]		= value.m [ AffineElem3D::C0_R0 ];
+				m [ 1 ]		= value.m [ AffineElem3D::C0_R1 ];
+				m [ 2 ]		= value.m [ AffineElem3D::C0_R2 ];
+				m [ 3 ]		= 0;
+				
+				m [ 4 ]		= value.m [ AffineElem3D::C1_R0 ];
+				m [ 5 ]		= value.m [ AffineElem3D::C1_R1 ];
+				m [ 6 ]		= value.m [ AffineElem3D::C1_R2 ];
+				m [ 7 ]		= 0;
+				
+				m [ 8 ]		= value.m [ AffineElem3D::C2_R0 ];
+				m [ 9 ]		= value.m [ AffineElem3D::C2_R1 ];
+				m [ 10 ]	= value.m [ AffineElem3D::C2_R2 ];
+				m [ 11 ]	= 0;
+				
+				m [ 12 ]	= value.m [ AffineElem3D::C3_R0 ];
+				m [ 13 ]	= value.m [ AffineElem3D::C3_R1 ];
+				m [ 14 ]	= value.m [ AffineElem3D::C3_R2 ];
+				m [ 15 ]	= 1;
+				
+				// We rely on the fact that USMatrix4x4 is the same size
+				// and layout as what we're going to feed OpenGL in a bit
+				// and let it do our bind pose multiplication.
+				
+				USMatrix4x4	*M = (USMatrix4x4*)m;
+				M->Prepend(t->GetInvBindPoseMtx());
+			}
+		}
+		
+	}
+
+}
+
 //================================================================//
 // local
 //================================================================//
@@ -347,7 +477,22 @@ int MOAIShader::_declareUniform ( lua_State* L ) {
 	STLString name		= state.GetValue < cc8* >( 3, "" );
 	u32  type			= state.GetValue < u32 >( 4, MOAIShaderUniform::UNIFORM_NONE );
 	
-	self->DeclareUniform ( idx, name, type );
+	// Some uniform types require extra information (such as array size or index information).
+	switch( type ) {
+		case MOAIShaderUniform::UNIFORM_WORLD_MATRIX_ARRAY: {
+			// TODO: might it be easier (and more robust) to query the compiled shader for
+			// the size of the uniform an infer the number of matrices by dividing? Does GL
+			// even expose this information? For now, let's make it explicit in decl and make
+			// the user keep it sync'd.
+			self->DeclareUniform ( idx, name, type, state.GetValue<int>( 5, 0 ) );
+			break;
+		}
+			
+		default: {
+			self->DeclareUniform ( idx, name, type );
+			break;
+		}
+	}
 
 	return 0;
 }
@@ -454,6 +599,22 @@ int MOAIShader::_reserveUniforms ( lua_State* L ) {
 	
 	u32 nUniforms = state.GetValue < u32 >( 2, 0 );
 	self->ReserveUniforms ( nUniforms );
+	
+	return 0;
+}
+
+int MOAIShader::_setUniformValue ( lua_State* L ) {
+	
+	MOAI_LUA_SETUP ( MOAIShader, "UN" )
+	
+	GLuint idx				= state.GetValue < GLuint >( 2, 1 ) - 1;
+	
+	if ( idx < self->mUniforms.Size ()) {
+		// TODO: allow setting of other uniform types...
+		if( self->mUniforms[ idx ].mType == MOAIShaderUniform::UNIFORM_FLOAT ) {
+			self->mUniforms [ idx ].SetValue ( state.GetValue < float >(3, 0) );
+		}
+	}
 	
 	return 0;
 }
@@ -759,15 +920,20 @@ void MOAIShader::RegisterLuaClass ( MOAILuaState& state ) {
 	MOAINode::RegisterLuaClass ( state );
 	MOAIGfxResource::RegisterLuaClass ( state );
 	
-	state.SetField ( -1, "UNIFORM_COLOR",				( u32 )MOAIShaderUniform::UNIFORM_COLOR );
-	state.SetField ( -1, "UNIFORM_FLOAT",				( u32 )MOAIShaderUniform::UNIFORM_FLOAT );
-	state.SetField ( -1, "UNIFORM_INT",					( u32 )MOAIShaderUniform::UNIFORM_INT );
-	state.SetField ( -1, "UNIFORM_PEN_COLOR",			( u32 )MOAIShaderUniform::UNIFORM_PEN_COLOR );
-	state.SetField ( -1, "UNIFORM_SAMPLER",				( u32 )MOAIShaderUniform::UNIFORM_SAMPLER );
-	state.SetField ( -1, "UNIFORM_TRANSFORM",			( u32 )MOAIShaderUniform::UNIFORM_TRANSFORM );
-	state.SetField ( -1, "UNIFORM_VIEW_PROJ",			( u32 )MOAIShaderUniform::UNIFORM_VIEW_PROJ );
-	state.SetField ( -1, "UNIFORM_WORLD",				( u32 )MOAIShaderUniform::UNIFORM_WORLD );
-	state.SetField ( -1, "UNIFORM_WORLD_VIEW_PROJ",		( u32 )MOAIShaderUniform::UNIFORM_WORLD_VIEW_PROJ );
+	state.SetField ( -1, "UNIFORM_COLOR",					( u32 )MOAIShaderUniform::UNIFORM_COLOR );
+	state.SetField ( -1, "UNIFORM_FLOAT",					( u32 )MOAIShaderUniform::UNIFORM_FLOAT );
+	state.SetField ( -1, "UNIFORM_INT",						( u32 )MOAIShaderUniform::UNIFORM_INT );
+	state.SetField ( -1, "UNIFORM_PEN_COLOR",				( u32 )MOAIShaderUniform::UNIFORM_PEN_COLOR );
+	state.SetField ( -1, "UNIFORM_SAMPLER",					( u32 )MOAIShaderUniform::UNIFORM_SAMPLER );
+	state.SetField ( -1, "UNIFORM_TRANSFORM",				( u32 )MOAIShaderUniform::UNIFORM_TRANSFORM );
+	state.SetField ( -1, "UNIFORM_VIEW_PROJ",				( u32 )MOAIShaderUniform::UNIFORM_VIEW_PROJ );
+	state.SetField ( -1, "UNIFORM_WORLD",					( u32 )MOAIShaderUniform::UNIFORM_WORLD );
+	state.SetField ( -1, "UNIFORM_VIEW",					( u32 )MOAIShaderUniform::UNIFORM_VIEW );
+	state.SetField ( -1, "UNIFORM_PROJ",					( u32 )MOAIShaderUniform::UNIFORM_PROJ );
+	state.SetField ( -1, "UNIFORM_WORLD_VIEW",				( u32 )MOAIShaderUniform::UNIFORM_WORLD_VIEW );
+	state.SetField ( -1, "UNIFORM_WORLD_VIEW_PROJ",			( u32 )MOAIShaderUniform::UNIFORM_WORLD_VIEW_PROJ );
+	state.SetField ( -1, "UNIFORM_WORLD_MATRIX_ARRAY",		( u32 )MOAIShaderUniform::UNIFORM_WORLD_MATRIX_ARRAY );
+	state.SetField ( -1, "UNIFORM_WORLD_MATRIX_ARRAY_COUNT",( u32 )MOAIShaderUniform::UNIFORM_WORLD_MATRIX_ARRAY_COUNT );
 }
 
 //----------------------------------------------------------------//

@@ -10,6 +10,7 @@
 
 class MOAIColor;
 class MOAITransformBase;
+class MOAITransformList;
 	
 #define		OPENGL_PREPROC		"#define LOWP\n #define MEDP\n"
 #define		OPENGL_ES_PREPROC	"#define LOWP lowp\n #define MEDP mediump\n"
@@ -40,6 +41,7 @@ private:
 	void		Bind						();
 	void		BindPenColor				( float r, float g, float b, float a );
 	void		BindPipelineTransforms		( const USMatrix4x4& world, const USMatrix4x4& view, const USMatrix4x4& proj );
+	void		BindWorldTransformList		( MOAITransformList *transforms );
 	void		Clear						();
 	void		SetBuffer					( void* buffer, size_t size );
 	void		SetType						( u32 type );
@@ -49,6 +51,7 @@ private:
 	void		SetValue					( const USColorVec& value );
 	void		SetValue					( const USAffine3D& value );
 	void		SetValue					( const USMatrix4x4& value );
+	void		SetValue					( MOAITransformList* value );
 
 public:
 
@@ -62,8 +65,13 @@ public:
 		UNIFORM_SAMPLER,
 		UNIFORM_TRANSFORM,
 		UNIFORM_VIEW_PROJ,
+		UNIFORM_VIEW,
+		UNIFORM_PROJ,
 		UNIFORM_WORLD,
+		UNIFORM_WORLD_VIEW,
 		UNIFORM_WORLD_VIEW_PROJ,
+		UNIFORM_WORLD_MATRIX_ARRAY,
+		UNIFORM_WORLD_MATRIX_ARRAY_COUNT
 	};
 
 				MOAIShaderUniform			();
@@ -111,6 +119,7 @@ protected:
 	static int		_declareUniformSampler	( lua_State* L );
 	static int		_load					( lua_State* L );
 	static int		_reserveUniforms		( lua_State* L );
+	static int		_setUniformValue		( lua_State* L );
 	static int		_setVertexAttribute		( lua_State* L );
 	
 	//----------------------------------------------------------------//
@@ -126,6 +135,7 @@ protected:
 	void			OnLoad						();
 	void			UpdatePenColor				( float r, float g, float b, float a );
 	void			UpdatePipelineTransforms	( const USMatrix4x4& world, const USMatrix4x4& view, const USMatrix4x4& proj );
+	void			UpdateWorldTransformList	( MOAITransformList *transforms );
 	bool			Validate					();
 
 public:
