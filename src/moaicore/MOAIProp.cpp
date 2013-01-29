@@ -1162,6 +1162,7 @@ void MOAIProp::RegisterLuaFuncs ( MOAILuaState& state ) {
 		{ "setRemapper",		_setRemapper },
 		{ "setScissorRect",		_setScissorRect },
 		{ "setShader",			_setShader },
+		{ "setSkeleton",		_setSkeleton },
 		{ "setTexture",			_setTexture },
 		{ "setUVTransform",		_setUVTransform },
 		{ "setVisible",			_setVisible },
