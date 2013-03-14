@@ -75,6 +75,7 @@ void MOAIShaderUniform::Bind () {
 			case UNIFORM_PROJ:
 			case UNIFORM_WORLD_VIEW:
 			case UNIFORM_WORLD_VIEW_PROJ:
+			case UNIFORM_WORLD_VIEW_PROJ_INVERSE:
 			case UNIFORM_TRANSFORM:
 				glUniformMatrix4fv ( this->mAddr, 1, false, this->mBuffer );
 				break;
@@ -146,6 +147,16 @@ void MOAIShaderUniform::BindPipelineTransforms ( const USMatrix4x4& world, const
 			USMatrix4x4 mtx = world;
 			mtx.Append ( view );
 			mtx.Append ( proj );
+			this->SetValue ( mtx );
+			this->Bind ();
+			break;
+		}
+		case UNIFORM_WORLD_VIEW_PROJ_INVERSE: {
+			
+			USMatrix4x4 mtx = world;
+			mtx.Append ( view );
+			mtx.Append ( proj );
+			mtx.Inverse();
 			this->SetValue ( mtx );
 			this->Bind ();
 			break;
@@ -227,6 +238,7 @@ void MOAIShaderUniform::SetType ( u32 type ) {
 		case UNIFORM_PROJ:
 		case UNIFORM_WORLD_VIEW:
 		case UNIFORM_WORLD_VIEW_PROJ:
+		case UNIFORM_WORLD_VIEW_PROJ_INVERSE:
 		case UNIFORM_TRANSFORM: {
 		
 			this->mBuffer.Init ( 16 );
@@ -933,6 +945,7 @@ void MOAIShader::RegisterLuaClass ( MOAILuaState& state ) {
 	state.SetField ( -1, "UNIFORM_PROJ",					( u32 )MOAIShaderUniform::UNIFORM_PROJ );
 	state.SetField ( -1, "UNIFORM_WORLD_VIEW",				( u32 )MOAIShaderUniform::UNIFORM_WORLD_VIEW );
 	state.SetField ( -1, "UNIFORM_WORLD_VIEW_PROJ",			( u32 )MOAIShaderUniform::UNIFORM_WORLD_VIEW_PROJ );
+	state.SetField ( -1, "UNIFORM_WORLD_VIEW_PROJ_INVERSE",	( u32 )MOAIShaderUniform::UNIFORM_WORLD_VIEW_PROJ_INVERSE );
 	state.SetField ( -1, "UNIFORM_WORLD_MATRIX_ARRAY",		( u32 )MOAIShaderUniform::UNIFORM_WORLD_MATRIX_ARRAY );
 	state.SetField ( -1, "UNIFORM_WORLD_MATRIX_ARRAY_COUNT",( u32 )MOAIShaderUniform::UNIFORM_WORLD_MATRIX_ARRAY_COUNT );
 }
