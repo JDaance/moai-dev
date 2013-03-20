@@ -645,6 +645,81 @@ int MOAIBox2DWorld::_getTimeToSleep ( lua_State* L ) {
 }
 
 //----------------------------------------------------------------//
+/**	@name	rayCastForClosest
+	@text	Will cast a box2d ray at each fixture and return information for the closest fixture
+	
+	@in		MOAIBox2DWorld self
+	@in		an array of fixtures
+	@in		number x
+	@in		number y
+	@in		number dx
+	@in		number dy
+	@out	MOAIBox2DFixture the closest fixture
+	@out	number x the ray collision point
+	@out	number y the ray collision point
+	@out	number nx the ray collision normal
+	@out	number ny the ray collision normal
+*/
+int MOAIBox2DWorld::_rayCastForClosest ( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIBox2DWorld, "UTNNNN" )
+		
+	USLeanArray < MOAIBox2DFixture* > fixtures;
+	u32 fixtureCount = lua_objlen(L, 2);
+	fixtures.Init(fixtureCount);
+
+	u32 counter = 0;
+	lua_pushnil ( L );
+    while ( lua_next ( L, 2 ) != 0 ) {
+		MOAIBox2DFixture* fixture = state.GetLuaObject < MOAIBox2DFixture >( -1, true );
+		fixtures[counter] = fixture;
+		++counter;
+		lua_pop ( L, 1 );
+	}
+
+	float x = state.GetValue < float >( 3, 0.0f );
+	float y = state.GetValue < float >( 4, 0.0f );
+	
+	float dx = state.GetValue < float >( 5, 0.0f );
+	float dy = state.GetValue < float >( 6, 0.0f );
+	
+	b2RayCastInput input;
+	input.p1 = b2Vec2(x, y);
+	input.p2 = b2Vec2(x + dx, y + dy);
+	input.maxFraction = 1;
+
+	float closestFraction = 1;
+	MOAIBox2DFixture* closestFixture = NULL;
+	b2Vec2 intersectionNormal(0,0);
+
+	for ( u32 i = 0; i < fixtureCount; ++i ) {
+		MOAIBox2DFixture* fixture = fixtures [ i ];
+		
+        b2RayCastOutput output;
+        if ( ! fixture->mFixture->RayCast( &output, input, 0 ) )
+            continue;
+
+		if ( output.fraction < closestFraction ) {
+            closestFraction = output.fraction;
+			closestFixture = fixture;
+            intersectionNormal = output.normal;
+        }
+	}
+
+	if (closestFixture) {
+		state.Push( closestFixture );
+		b2Vec2 intersectionPoint = input.p1 + closestFraction * input.p2;
+		state.Push( intersectionPoint.x );
+		state.Push( intersectionPoint.y );
+		state.Push( intersectionNormal.x );
+		state.Push( intersectionNormal.y );
+
+		return 5;
+	} else {
+		return 0;
+	}
+}
+
+//----------------------------------------------------------------//
 /**	@name	setAngularSleepTolerance
 	@text	See Box2D documentation.
 	
@@ -988,6 +1063,7 @@ void MOAIBox2DWorld::RegisterLuaFuncs ( MOAILuaState& state ) {
 		{ "getGravity",					_getGravity },
 		{ "getLinearSleepTolerance",	_getLinearSleepTolerance },
 		{ "getTimeToSleep",				_getTimeToSleep },
+		{ "rayCastForClosest",			_rayCastForClosest },
 		{ "setAngularSleepTolerance",	_setAngularSleepTolerance },
 		{ "setAutoClearForces",			_setAutoClearForces },
 		{ "setDebugDrawEnabled",		_setDebugDrawEnabled },
