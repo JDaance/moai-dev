@@ -847,7 +847,7 @@ void MOAIShader::OnCreate () {
     // link program.
 	glLinkProgram ( this->mProgram );
 	
-	this->PrintProgramLog ( this->mProgram );
+	this->PrintProgramLog ( this->mProgram, this->mVertexShaderSource, this->mFragmentShaderSource );
 	
 	GLint status;
 	glGetProgramiv ( this->mProgram, GL_LINK_STATUS, &status );
@@ -914,7 +914,7 @@ void MOAIShader::PrintShaderLog ( GLuint shader ) {
 }
 
 //----------------------------------------------------------------//
-void MOAIShader::PrintProgramLog ( GLuint shader ) {
+void MOAIShader::PrintProgramLog ( GLuint shader, cc8* vertexSource, cc8* fragmentSource ) {
 	
 	int logLength;
 	glGetProgramiv ( shader, GL_INFO_LOG_LENGTH, &logLength );
@@ -923,6 +923,8 @@ void MOAIShader::PrintProgramLog ( GLuint shader ) {
 		char* log = ( char* )malloc ( logLength );
 		glGetProgramInfoLog ( shader, logLength, &logLength, log );
 		MOAILog ( 0, MOAILogMessages::MOAIShader_ShaderInfoLog_S, log );
+		MOAIPrint(vertexSource, "\n");
+		MOAIPrint(fragmentSource, "\n");
 		free ( log );
 	}
 }
