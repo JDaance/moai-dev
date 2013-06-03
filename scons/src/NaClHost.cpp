@@ -355,7 +355,7 @@ void* moai_main ( void *_instance ) {
 
 	AKURunBytecode ( moai_lua, moai_lua_SIZE );
 
-	AKURunScript ( "editor/editor.lua" );
+	AKURunScript ( "main-editor.lua" );
 
 	NACL_LOG ( "Main Lua\n" );
 
@@ -407,8 +407,8 @@ bool MoaiInstance::HandleInputEvent	( const pp::InputEvent & event ) {
 }
 
 void MoaiInstance::DidChangeFocus (	bool has_focus ) {
-	NACL_LOG ( "NaCl DidChangeFocus %d\n", has_focus );
-	g_pauseUpdate = !has_focus;
+	//NACL_LOG ( "NaCl DidChangeFocus %d\n", has_focus );
+	//g_pauseUpdate = !has_focus;
 }
 
 //----------------------------------------------------------------//

@@ -513,6 +513,7 @@ moai_sources = [ os.path.join('moaicore', src_file) for src_file in [
 				'MOAITouchSensor.cpp'            ,
 				'MOAITransform.cpp'              ,
 				'MOAITransformBase.cpp'          ,
+				'MOAITransformList.cpp'          ,
 				'MOAIUrlMgrNaCl.cpp'       	 	   ,
 				'MOAIVertexBuffer.cpp'           ,
 				'MOAIVertexFormat.cpp'           ,
