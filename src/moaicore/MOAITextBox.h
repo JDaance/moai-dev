@@ -220,6 +220,8 @@ private:
 	
 	USRect				mFrame;
 
+	float				mLetterSpacing;
+
 	STLString			mText;
 	u32					mTextLength;
 	
@@ -281,6 +283,7 @@ private:
 	static int			_setGlyphScale			( lua_State* L );
 	static int			_setHighlight			( lua_State* L );
 	static int			_setLineSpacing			( lua_State* L );
+	static int			_setLetterSpacing		( lua_State* L );
 	static int			_setRect				( lua_State* L );
 	static int			_setReveal				( lua_State* L );
 	static int			_setSpeed				( lua_State* L );

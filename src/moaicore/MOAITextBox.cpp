@@ -384,6 +384,24 @@ int MOAITextBox::_setLineSpacing ( lua_State* L ) {
 }
 
 //----------------------------------------------------------------//
+/**	@name	setLetterSpacing
+	@text	Sets additional space between letters in text units. '0' uses
+			the default spacing.
+
+	@in		MOAITextBox self
+	@in		number letterSpacing		Default value is 0.
+*/
+int MOAITextBox::_setLetterSpacing ( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAITextBox, "U" )
+	
+	float letterSpacing = state.GetValue < float >( 2, 0.0f );
+	self->mLetterSpacing = letterSpacing;
+	self->ScheduleLayout ();
+	
+	return 0;
+}
+
+//----------------------------------------------------------------//
 /**	@name	setRect
 	@text	Sets the rectangular area for this text box.
 
@@ -1069,6 +1087,7 @@ void MOAITextBox::Layout () {
 //----------------------------------------------------------------//
 MOAITextBox::MOAITextBox () :
 	mLineSpacing ( 0.0f ),
+	mLetterSpacing ( 0.0f ),
 	mText ( "" ),
 	mTextLength ( 0 ),
 	mHAlign ( LEFT_JUSTIFY ),
@@ -1281,6 +1300,7 @@ void MOAITextBox::RegisterLuaFuncs ( MOAILuaState& state ) {
 		{ "setGlyphScale",			_setGlyphScale },
 		{ "setHighlight",			_setHighlight },
 		{ "setLineSpacing",			_setLineSpacing },
+		{ "setLetterSpacing",		_setLetterSpacing },
 		{ "setRect",				_setRect },
 		{ "setReveal",				_setReveal },
 		{ "setSpeed",				_setSpeed },

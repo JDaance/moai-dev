@@ -192,7 +192,7 @@ void MOAITextDesigner::BuildLayout () {
 			else {
 				
 				float glyphBottom = this->mPen.mY + ( this->mDeck->mHeight * scale );
-				float glyphRight = this->mPen.mX + (( glyph->mBearingX + glyph->mWidth ) * scale );
+				float glyphRight = this->mPen.mX + (( glyph->mBearingX + glyph->mWidth) * scale );
 				
 				// handle new token
 				if ( this->mTokenSize == 0 ) {
@@ -225,7 +225,7 @@ void MOAITextDesigner::BuildLayout () {
 			}
 			
 			// advance the pen
-			this->mPen.mX += glyph->mAdvanceX * scale;
+			this->mPen.mX += (glyph->mAdvanceX + this->mLetterSpacing) * scale;
 		}
 		
 		// if we overrun this->mHeight, then back up to the start of the current line
@@ -269,6 +269,8 @@ void MOAITextDesigner::Init ( MOAITextBox& textBox ) {
 	
 	this->mWidth = this->mTextBox->mFrame.Width ();
 	this->mHeight = this->mTextBox->mFrame.Height ();
+
+	this->mLetterSpacing = this->mTextBox->mLetterSpacing;
 	
 	this->mLineIdx = this->mIdx;
 	this->mLineSpriteID = 0;

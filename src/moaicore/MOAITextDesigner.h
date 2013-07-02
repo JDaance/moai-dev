@@ -28,6 +28,8 @@ private:
 	
 	float	mWidth;
 	float	mHeight;
+
+	float	mLetterSpacing;
 	
 	int		mLineIdx;
 	u32		mLineSpriteID;
