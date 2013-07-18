@@ -64,6 +64,7 @@ pp::Core* g_core = NULL;
 bool g_pauseUpdate;
 int g_expectedWidth = 0;
 int g_expectedHeight = 0;
+int sModifiers;
 #include <stdint.h>
 
 extern "C" {
@@ -102,6 +103,20 @@ namespace NaClInputDeviceSensorID {
 	};
 }
 
+static void _updateModifiers (uint32_t newModifiers) {
+	int changedModifiers = newModifiers ^ sModifiers;
+	if ( changedModifiers & PP_INPUTEVENT_MODIFIER_SHIFTKEY ) {
+		AKUEnqueueKeyboardShiftEvent ( NaClInputDeviceID::DEVICE, NaClInputDeviceSensorID::KEYBOARD, (newModifiers & PP_INPUTEVENT_MODIFIER_SHIFTKEY) != 0 );
+	}
+	if ( changedModifiers & PP_INPUTEVENT_MODIFIER_CONTROLKEY  ) {
+		AKUEnqueueKeyboardControlEvent ( NaClInputDeviceID::DEVICE, NaClInputDeviceSensorID::KEYBOARD, (newModifiers & PP_INPUTEVENT_MODIFIER_CONTROLKEY ) != 0 );
+	}
+	if ( changedModifiers & PP_INPUTEVENT_MODIFIER_ALTKEY  ) {
+		AKUEnqueueKeyboardAltEvent ( NaClInputDeviceID::DEVICE, NaClInputDeviceSensorID::KEYBOARD, (newModifiers & PP_INPUTEVENT_MODIFIER_ALTKEY ) != 0 );
+	}
+	sModifiers = newModifiers;
+}
+
 //----------------------------------------------------------------//
 void NaClHandleInputEvent ( const pp::InputEvent & event ) {
 	
@@ -111,6 +126,8 @@ void NaClHandleInputEvent ( const pp::InputEvent & event ) {
 		case PP_INPUTEVENT_TYPE_MOUSEUP: {
 
 			pp::MouseInputEvent mouse_event ( event );
+
+			_updateModifiers(event.GetModifiers());
 
 			bool mouseDown = false;
 			if( event.GetType() == PP_INPUTEVENT_TYPE_MOUSEDOWN ) {
@@ -135,6 +152,9 @@ void NaClHandleInputEvent ( const pp::InputEvent & event ) {
 
 		case PP_INPUTEVENT_TYPE_MOUSEMOVE: {
 			pp::MouseInputEvent mouse_event ( event );
+
+			_updateModifiers(event.GetModifiers());
+			
 			AKUEnqueuePointerEvent ( NaClInputDeviceID::DEVICE, NaClInputDeviceSensorID::POINTER, mouse_event.GetPosition ().x () / MOAIGfxDevice::Get ().GetDeviceScale (), mouse_event.GetPosition ().y () / MOAIGfxDevice::Get ().GetDeviceScale () );
 			//AKUEnqueuePointerEvent ( NaClInputDeviceID::DEVICE, NaClInputDeviceSensorID::POINTER, mouse_event.GetPosition ().x () , mouse_event.GetPosition ().y ());
 			break;
@@ -143,6 +163,8 @@ void NaClHandleInputEvent ( const pp::InputEvent & event ) {
 		case PP_INPUTEVENT_TYPE_WHEEL: {
 			pp::WheelInputEvent wheel_event ( event );
 
+			_updateModifiers(event.GetModifiers());
+			
 			AKUEnqueueWheelEvent ( NaClInputDeviceID::DEVICE, NaClInputDeviceSensorID::WHEEL, wheel_event.GetTicks ().y ());
 
 			break;
@@ -153,13 +175,15 @@ void NaClHandleInputEvent ( const pp::InputEvent & event ) {
 
 			pp::KeyboardInputEvent keyboard_event ( event );
 
+			_updateModifiers(event.GetModifiers());
+			
 			bool keyDown = false;
 			if( event.GetType() == PP_INPUTEVENT_TYPE_KEYDOWN ) {
 				keyDown = true;
 			}
 
 			int keycode = keyboard_event.GetKeyCode ();
-
+			
 			AKUEnqueueKeyboardEvent ( NaClInputDeviceID::DEVICE, NaClInputDeviceSensorID::KEYBOARD, keycode, keyDown );
 
 			break;
