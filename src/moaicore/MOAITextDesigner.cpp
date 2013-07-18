@@ -225,7 +225,7 @@ void MOAITextDesigner::BuildLayout () {
 			}
 			
 			// advance the pen
-			this->mPen.mX += (glyph->mAdvanceX + this->mLetterSpacing) * scale;
+			this->mPen.mX += glyph->mAdvanceX * scale + this->mLetterSpacing;
 		}
 		
 		// if we overrun this->mHeight, then back up to the start of the current line
