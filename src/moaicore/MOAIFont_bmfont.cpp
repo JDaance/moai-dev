@@ -90,16 +90,16 @@ static char* parseKeyVal ( char *p, char **key, char **val, bool *endl ) {
 
 //----------------------------------------------------------------//
 void MOAIFont::InitWithBMFont ( cc8* filename ) {
-
 	USFileStream stream;
 	if ( !stream.OpenRead ( filename )) return;
 
 	STLString absFilePath = USFileSys::GetAbsoluteFilePath ( filename );
 	STLString absDirPath = USFileSys::TruncateFilename ( absFilePath );
 
-	u32 len = stream.GetLength ();
-	char* buf = ( char* )malloc ( len + 1 );
-	stream.ReadBytes ( buf, len );
+	u32 len = 65536; // hack
+	char* buf = ( char* )malloc ( len );
+	len = stream.ReadBytes ( buf, len );
+	MOAIPrint("Read bm font file %s with size %d", filename, len);
 	buf [ len ] = '\0';
 	stream.Close ();
 
@@ -221,6 +221,7 @@ void MOAIFont::InitWithBMFont ( cc8* filename ) {
 			
 		}
 		else if ( strcmp ( key, "kernings" ) == 0 ) {
+
 			//kernings count=560
 			do {
 				p = parseKeyVal ( p, &key, &val, &endl );
