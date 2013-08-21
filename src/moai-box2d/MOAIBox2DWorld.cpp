@@ -661,10 +661,10 @@ int MOAIBox2DWorld::_getTimeToSleep ( lua_State* L ) {
 int MOAIBox2DWorld::_rayCastForClosest ( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIBox2DWorld, "UTNNNN" )
 		
-	USLeanArray < MOAIBox2DFixture* > fixtures;
+	ZLLeanArray < MOAIBox2DFixture* > fixtures;
 	u32 fixtureCount = lua_objlen(L, 2);
 	fixtures.Init(fixtureCount);
-
+	
 	u32 counter = 0;
 	lua_pushnil ( L );
     while ( lua_next ( L, 2 ) != 0 ) {

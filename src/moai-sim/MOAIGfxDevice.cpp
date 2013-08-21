@@ -12,7 +12,7 @@
 #include <moai-sim/MOAIShaderMgr.h>
 #include <moai-sim/MOAISim.h>
 #include <moai-sim/MOAITexture.h>
-#include <moaicore/MOAITransformList.h>
+#include <moai-sim/MOAITransformList.h>
 #include <moai-sim/MOAIVertexFormat.h>
 #include <moai-sim/MOAIVertexFormatMgr.h>
 #include <moai-sim/MOAIViewport.h>
@@ -1315,7 +1315,6 @@ void MOAIGfxDevice::SetVertexTransform ( u32 id, const ZLMatrix4x4& transform ) 
 }
 
 //----------------------------------------------------------------//
-void MOAIGfxDevice::SetViewRect () {
 
 void MOAIGfxDevice::SetVertexTransformList( MOAITransformList* transforms )
 {
@@ -1328,7 +1327,7 @@ void MOAIGfxDevice::SetVertexTransformList( MOAITransformList* transforms )
 }
 
 //----------------------------------------------------------------//
-void MOAIGfxDevice::SetViewport () {
+void MOAIGfxDevice::SetViewRect () {
 
 	float width = ( float )this->mFrameBuffer->mBufferWidth;
 	float height = ( float )this->mFrameBuffer->mBufferHeight;

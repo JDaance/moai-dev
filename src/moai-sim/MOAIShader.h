@@ -126,8 +126,8 @@ protected:
 	//----------------------------------------------------------------//
 	u32				CompileShader				( u32 type, cc8* source );
 	bool			IsRenewable					();
-	void			PrintProgramLog				( GLuint program, cc8* vertexSource, cc8* fragmentSource );
-	void			PrintShaderLog				( GLuint shader );
+	void			PrintProgramLog				( u32 program );
+	void			PrintShaderLog				( u32 shader );
 	void			OnBind						();
 	void			OnClear						();
 	void			OnCreate					();

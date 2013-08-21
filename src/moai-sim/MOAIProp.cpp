@@ -2,26 +2,6 @@
 // http://getmoai.com
 
 #include "pch.h"
-<<<<<<< HEAD:src/moaicore/MOAIProp.cpp
-#include <moaicore/MOAICollisionShape.h>
-#include <moaicore/MOAIDeck.h>
-#include <moaicore/MOAIDeckRemapper.h>
-#include <moaicore/MOAIDebugLines.h>
-#include <moaicore/MOAIGfxDevice.h>
-#include <moaicore/MOAIGrid.h>
-#include <moaicore/MOAILayoutFrame.h>
-#include <moaicore/MOAILogMessages.h>
-#include <moaicore/MOAIPartition.h>
-#include <moaicore/MOAIPartitionResultBuffer.h>
-#include <moaicore/MOAIProp.h>
-#include <moaicore/MOAIScissorRect.h>
-#include <moaicore/MOAIShader.h>
-#include <moaicore/MOAIShaderMgr.h>
-#include <moaicore/MOAISurfaceSampler2D.h>
-#include <moaicore/MOAITexture.h>
-#include <moaicore/MOAITextureBase.h>
-#include <moaicore/MOAITransformList.h>
-=======
 #include <moai-sim/MOAICollisionShape.h>
 #include <moai-sim/MOAIDeck.h>
 #include <moai-sim/MOAIDeckRemapper.h>
@@ -38,7 +18,7 @@
 #include <moai-sim/MOAISurfaceSampler2D.h>
 #include <moai-sim/MOAITexture.h>
 #include <moai-sim/MOAITextureBase.h>
->>>>>>> upstream/master:src/moai-sim/MOAIProp.cpp
+#include <moai-sim/MOAITransformList.h>
 
 //================================================================//
 // local

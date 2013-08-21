@@ -7,8 +7,8 @@
 #include <moai-sim/MOAIGfxDevice.h>
 #include <moai-sim/MOAIShader.h>
 #include <moai-sim/MOAITransformBase.h>
-#include <moaicore/MOAITransform.h>
-#include <moaicore/MOAITransformList.h>
+#include <moai-sim/MOAITransform.h>
+#include <moai-sim/MOAITransformList.h>
 
 //================================================================//
 // MOAIShaderUniform
@@ -80,12 +80,12 @@ void MOAIShaderUniform::Bind () {
 				break;
 				
 			case UNIFORM_WORLD_MATRIX_ARRAY_COUNT:
-				glUniform1i ( this->mAddr, this->mInt );
+				zglUniform1i ( this->mAddr, this->mInt );
 				break;
 				
 			case UNIFORM_WORLD_MATRIX_ARRAY:
 				if( this->mInt > 0 && this->mBuffer.Size() > 0 ) {
-					glUniformMatrix4fv ( this->mAddr, this->mInt, false, this->mBuffer );
+					zglUniformMatrix4fv ( this->mAddr, this->mInt, false, this->mBuffer );
 				}
 				break;
 		}
@@ -414,7 +414,7 @@ void MOAIShaderUniform::SetValue ( MOAITransformList* transforms ) {
 			if( t ) {
 				float *m = this->mBuffer.Data() + 16 * i;
 				
-				const USAffine3D &value = t->GetLocalToWorldMtx();
+				const ZLAffine3D &value = t->GetLocalToWorldMtx();
 				
 				m [ 0 ]		= value.m [ AffineElem3D::C0_R0 ];
 				m [ 1 ]		= value.m [ AffineElem3D::C0_R1 ];
@@ -620,7 +620,7 @@ int MOAIShader::_setUniformValue ( lua_State* L ) {
 	
 	MOAI_LUA_SETUP ( MOAIShader, "UN" )
 	
-	GLuint idx				= state.GetValue < GLuint >( 2, 1 ) - 1;
+	u32 idx				= state.GetValue < u32 >( 2, 1 ) - 1;
 	
 	if ( idx < self->mUniforms.Size ()) {
 		// TODO: allow setting of other uniform types...
@@ -915,17 +915,15 @@ void MOAIShader::PrintShaderLog ( u32 shader ) {
 }
 
 //----------------------------------------------------------------//
-void MOAIShader::PrintProgramLog ( GLuint shader, cc8* vertexSource, cc8* fragmentSource ) {
-	
+void MOAIShader::PrintProgramLog ( u32 program ) {
+
 	s32 logLength;
 	zglGetProgramiv ( program, ZGL_SHADER_INFO_LOG_LENGTH, &logLength );
-	
+
 	if ( logLength > 1 ) {
 		char* log = ( char* )malloc ( logLength );
 		zglGetProgramInfoLog ( program, logLength, ( u32* )&logLength, log );
 		MOAILog ( 0, MOAILogMessages::MOAIShader_ShaderInfoLog_S, log );
-		MOAIPrint(vertexSource, "\n");
-		MOAIPrint(fragmentSource, "\n");
 		free ( log );
 	}
 }
