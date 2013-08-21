@@ -105,6 +105,7 @@ private:
 	static int		_getIndex			( lua_State* L );
 	static int		_getPriority		( lua_State* L );
 	static int		_getWorldBounds		( lua_State* L );
+	static int		_isVisible			( lua_State* L );
 	static int		_inside				( lua_State* L );
 	static int		_setBillboard		( lua_State* L );
 	static int		_setBlendEquation	( lua_State* L );
@@ -232,6 +233,7 @@ public:
 	bool				GetCellRect				( ZLRect* cellRect, ZLRect* paddedRect = 0 );
 	virtual void		GetCollisionShape		( MOAICollisionShape& shape );
 	virtual bool		Inside					( ZLVec3D vec, float pad );
+	bool				IsVisible				();
 						MOAIProp				();
 	virtual				~MOAIProp				();
 	void				OnDepNodeUpdate			();

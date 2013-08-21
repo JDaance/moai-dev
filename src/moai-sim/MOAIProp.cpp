@@ -169,6 +169,22 @@ int MOAIProp::_getPriority ( lua_State* L ) {
 }
 
 //----------------------------------------------------------------//
+/**	@name	isVisible
+	@text	Returns true if the given prop is visible.
+	
+	@in		MOAIProp self
+	@out	boolean is visible
+*/
+int	MOAIProp::_isVisible ( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIProp, "U" )
+
+	bool result = self->IsVisible();
+	lua_pushboolean ( state, result );
+	
+	return 1;
+}
+
+//----------------------------------------------------------------//
 /**	@name	inside
 	@text	Returns true if the given world space point falls inside
 			the prop's bounds.
@@ -316,7 +332,7 @@ int MOAIProp::_setBlendMode ( lua_State* L ) {
 int MOAIProp::_setBounds ( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIProp, "U" )
 
-	if ( state.CheckParams ( 2, "NNNNNN" )) {
+	if ( state.CheckParams ( 2, "NNNNNN", false )) {
 
 		self->mBoundsOverride = state.GetBox ( 2 );
 		self->mFlags |= FLAGS_OVERRIDE_BOUNDS;
@@ -500,7 +516,7 @@ int MOAIProp::_setParent ( lua_State* L ) {
 	
 	self->SetAttrLink ( PACK_ATTR ( MOAIColor, INHERIT_COLOR ), parent, PACK_ATTR ( MOAIColor, COLOR_TRAIT ));
 	self->SetAttrLink ( PACK_ATTR ( MOAITransform, INHERIT_TRANSFORM ), parent, PACK_ATTR ( MOAITransformBase, TRANSFORM_TRAIT ));
-	self->SetAttrLink ( PACK_ATTR ( MOAIProp, ATTR_VISIBLE ), parent, PACK_ATTR ( MOAIProp, ATTR_VISIBLE ));
+	self->SetAttrLink ( PACK_ATTR ( MOAIProp, INHERIT_VISIBLE ), parent, PACK_ATTR ( MOAIProp, ATTR_VISIBLE ));
 	
 	//MOAILog ( state, MOAILogMessages::MOAI_FunctionDeprecated_S, "setParent" );
 	
@@ -730,7 +746,7 @@ bool MOAIProp::ApplyAttrOp ( u32 attrID, MOAIAttrOp& attrOp, u32 op ) {
 				this->SetVisible ( ZLFloat::ToBoolean ( attrOp.ApplyNoAdd ( ZLFloat::FromBoolean (( this->mFlags & FLAGS_LOCAL_VISIBLE ) != 0 ), op, MOAIAttrOp::ATTR_READ_WRITE )));
 				return true;
 			case ATTR_VISIBLE:
-				attrOp.ApplyNoAdd ( ZLFloat::FromBoolean (( this->mFlags & FLAGS_VISIBLE ) != 0 ), op , MOAIAttrOp::ATTR_READ );
+				attrOp.ApplyNoAdd ( ZLFloat::FromBoolean ( this->IsVisible () ), op , MOAIAttrOp::ATTR_READ );
 				return true;
 			//case FRAME_TRAIT:
 			//	attrOp.Apply < ZLBox >( &this->mFrame, op, MOAIAttrOp::ATTR_READ );
@@ -746,7 +762,7 @@ bool MOAIProp::ApplyAttrOp ( u32 attrID, MOAIAttrOp& attrOp, u32 op ) {
 void MOAIProp::Draw ( int subPrimID ) {
 	UNUSED ( subPrimID );
 
-	if ( !( this->mFlags & FLAGS_VISIBLE )) return;
+	if ( !this->IsVisible () ) return;
 	if ( !this->mDeck ) return;
 
 	this->LoadGfxState ();
@@ -1032,6 +1048,11 @@ bool MOAIProp::Inside ( ZLVec3D vec, float pad ) {
 }
 
 //----------------------------------------------------------------//
+bool MOAIProp::IsVisible() {
+	return this->mFlags & FLAGS_LOCAL_VISIBLE && this->mFlags & FLAGS_VISIBLE;
+}
+
+//----------------------------------------------------------------//
 void MOAIProp::LoadGfxState () {
 
 	MOAIGfxDevice& gfxDevice = MOAIGfxDevice::Get ();
@@ -1194,6 +1215,7 @@ void MOAIProp::RegisterLuaFuncs ( MOAILuaState& state ) {
 		{ "getIndex",			_getIndex },
 		{ "getPriority",		_getPriority },
 		{ "getWorldBounds",		_getWorldBounds },
+		{ "isVisible",			_isVisible },
 		{ "inside",				_inside },
 		{ "setBillboard",		_setBillboard },
 		{ "setBlendEquation",		_setBlendEquation },
