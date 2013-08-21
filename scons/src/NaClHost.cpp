@@ -25,7 +25,7 @@ extern "C" {
 }
 
 #include "zlcore/zlcore.h"
-#include <aku/AKU.h>
+#include <moaicore/AKU.h>
 
 #include "ppapi/gles2/gl2ext_ppapi.h"
 #include <GLES2/gl2.h>

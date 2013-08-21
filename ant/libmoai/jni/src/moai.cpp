@@ -288,6 +288,9 @@
 		MOAIMoviePlayerAndroid::Affirm ();
 		REGISTER_LUA_CLASS ( MOAIMoviePlayerAndroid );
 
+		MOAIKeyboardAndroid::Affirm ();
+		REGISTER_LUA_CLASS ( MOAIKeyboardAndroid );
+		
 #ifndef DISABLE_ADCOLONY
 		MOAIAdColonyAndroid::Affirm ();
 		REGISTER_LUA_CLASS ( MOAIAdColonyAndroid );
@@ -321,6 +324,16 @@
 #ifndef DISABLE_TAPJOY
 		MOAITapjoyAndroid::Affirm ();
 		REGISTER_LUA_CLASS ( MOAITapjoyAndroid );
+#endif
+
+#ifndef DISABLE_TSTOREWALL
+		MOAITstoreWallAndroid::Affirm ();
+		REGISTER_LUA_CLASS ( MOAITstoreWallAndroid );
+#endif
+
+#ifndef DISABLE_TSTOREGAMECENTER
+		MOAITstoreWallAndroid::Affirm ();
+		REGISTER_LUA_CLASS ( MOAITstoreGamecenterAndroid );
 #endif
 
 		AKURunBytecode ( moai_lua, moai_lua_SIZE );

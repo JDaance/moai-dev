@@ -13,17 +13,17 @@
 //	#include <lualib.h>
 //}
 
-#import <aku/AKU-iphone.h>
-#import <aku/AKU-luaext.h>
-#import <aku/AKU-audiosampler.h>
+#import <moaiext-iphone/AKU-iphone.h>
+#import <moaiext-luaext/AKU-luaext.h>
+#import <moaiext-audiosampler/AKU-audiosampler.h>
 #import <lua-headers/moai_lua.h>
 
 #ifdef USE_UNTZ
-#import <aku/AKU-untz.h>
+#import <moaiext-untz/AKU-untz.h>
 #endif
 
 #ifdef USE_FMOD_EX
-#include <aku/AKU-fmod-ex.h>
+#include <moaiext-fmod-ex/AKU-fmod-ex.h>
 #endif
 
 #import "LocationObserver.h"
@@ -200,9 +200,10 @@ namespace MoaiInputDeviceSensorID {
 		CGFloat screenHeight = screenRect.size.height * scale;
 		
 		AKUSetScreenSize ( screenWidth, screenHeight );
+		AKUSetScreenDpi([ self guessScreenDpi ]);
 		AKUSetViewSize ( mWidth, mHeight );
 		
-		AKUSetDefaultFrameBuffer ( mFramebuffer );
+        AKUSetFrameBuffer ( mFramebuffer );
 		AKUDetectGfxContext ();
 		
 		mAnimInterval = 1; // 1 for 60fps, 2 for 30fps
@@ -225,11 +226,30 @@ namespace MoaiInputDeviceSensorID {
 	}
 	
 	//----------------------------------------------------------------//
+	-( int ) guessScreenDpi {
+		float dpi;
+		float scale = 1;
+		if ([[ UIScreen mainScreen ] respondsToSelector:@selector(scale) ]) {
+			scale = [[ UIScreen mainScreen ] scale];
+		}
+		if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+			//Not working for iPad Mini, but appropriate solution doesn't exist yet
+			dpi = 132 * scale;
+		}else{
+			dpi = 163 * scale;
+		}
+		return dpi;
+	}
+
+    //----------------------------------------------------------------//
 	-( void ) onUpdateAnim {
 		
 		[ self openContext ];
 		AKUSetContext ( mAku );
 		AKUUpdate ();
+		#ifdef USE_FMOD_EX
+			AKUFmodExUpdate ();
+		#endif
 		[ self drawView ];
         
         //sometimes the input handler will get 'locked out' by the render, this will allow it to run
