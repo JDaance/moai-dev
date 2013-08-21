@@ -22,6 +22,9 @@ text = 'The <foo>quick</> brown <bar>fox</> jumps over the lazy dog.'
 
 font = MOAIFont.new ()
 font:load ( 'Dwarves.TTF' )
+assert(MOAIFreeTypeFontReader)
+font:setReader ( MOAIFreeTypeFontReader )
+font:setCache(MOAIGlyphCache.new())
 font:preloadGlyphs ( charcodes, 24 )
 font:preloadGlyphs ( charcodes, 32 )
 font:preloadGlyphs ( charcodes, 42 )
@@ -29,6 +32,7 @@ font:preloadGlyphs ( charcodes, 42 )
 function newStyle ( font, size )
 	local style = MOAITextStyle.new ()
 	style:setFont ( font )
+	style:setColor ( 1, 1, 1, 1 )
 	style:setSize ( size )
 	return style;
 end

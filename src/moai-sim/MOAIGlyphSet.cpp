@@ -40,7 +40,6 @@ MOAIGlyph& MOAIGlyphSet::EditGlyph ( u32 c ) {
 
 //----------------------------------------------------------------//
 MOAIGlyph* MOAIGlyphSet::GetGlyph ( u32 c ) {
-
 	return &this->mGlyphMap [ c ];
 }
 
