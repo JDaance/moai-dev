@@ -393,6 +393,7 @@
     <ClCompile Include="..\..\src\moaicore\MOAIShader.cpp" />
     <ClCompile Include="..\..\src\moaicore\MOAITransform.cpp" />
     <ClCompile Include="..\..\src\moaicore\MOAITransformBase.cpp" />
+    <ClCompile Include="..\..\src\moaicore\MOAITransformList.cpp" />
     <ClCompile Include="..\..\src\moaicore\MOAIUrlMgrCurl.cpp" />
     <ClCompile Include="..\..\src\moaicore\MOAIUrlMgrNaCl.cpp" />
     <ClCompile Include="..\..\src\moaicore\MOAIVertexBuffer.cpp" />
@@ -590,6 +591,7 @@
     <ClInclude Include="..\..\src\moaicore\MOAIShader.h" />
     <ClInclude Include="..\..\src\moaicore\MOAITransform.h" />
     <ClInclude Include="..\..\src\moaicore\MOAITransformBase.h" />
+    <ClInclude Include="..\..\src\moaicore\MOAITransformList.h" />
     <ClInclude Include="..\..\src\moaicore\MOAIUrlMgrCurl.h" />
     <ClInclude Include="..\..\src\moaicore\MOAIUrlMgrNaCl.h" />
     <ClInclude Include="..\..\src\moaicore\MOAIVertexBuffer.h" />
