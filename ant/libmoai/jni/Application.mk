@@ -11,3 +11,6 @@
 	APP_CFLAGS		:= -w -DANDROID_NDK -DDISABLE_IMPORTGL
 	APP_PLATFORM 	:= $(MY_APP_PLATFORM)
 	APP_STL 		:= gnustl_static
+
+	#jblo added
+	APP_OPTIM 		:= release
