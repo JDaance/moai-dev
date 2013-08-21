@@ -157,28 +157,44 @@ static void _onKeyUp ( unsigned char key, int x, int y ) {
 
 //----------------------------------------------------------------//
 static void _onSpecialFunc ( int key, int x, int y ) {
-	( void )x;
-	( void )y;
-	
-	_updateModifiers ();
+        ( void )x;
+        ( void )y;
 
-	if ( key == GLUT_KEY_F1 ) {
-	
-		static bool toggle = true;
-		
-		if ( toggle ) {
-			AKUReleaseGfxContext ();
-		}
-		else {
-			AKUDetectGfxContext ();
-		}
-		toggle = !toggle;
-	}
-	
-	if ( key == GLUT_KEY_F2 ) {
-	
-		AKUSoftReleaseGfxResources ( 0 );
-	}
+        _updateModifiers ();
+
+        if ( key == GLUT_KEY_F1 ) {
+
+                static bool toggle = true;
+
+                if ( toggle ) {
+                        AKUReleaseGfxContext ();
+                }
+                else {
+                        AKUDetectGfxContext ();
+                }
+                toggle = !toggle;
+        }
+
+        else if ( key == GLUT_KEY_F2 ) {
+
+                AKUSoftReleaseGfxResources ( 0 );
+        }
+
+        else {
+
+                AKUEnqueueKeyboardEvent ( GlutInputDeviceID::DEVICE, GlutInputDeviceSensorID::KEYBOARD, key, true );
+
+        }
+}
+
+//----------------------------------------------------------------//
+static void _onSpecialUpFunc ( int key, int x, int y ) {
+        ( void )x;
+        ( void )y;
+
+        _updateModifiers ();
+
+        AKUEnqueueKeyboardEvent ( GlutInputDeviceID::DEVICE, GlutInputDeviceSensorID::KEYBOARD, key, false );
 }
 
 //----------------------------------------------------------------//
@@ -322,6 +338,7 @@ void _AKUOpenWindowFunc ( const char* title, int width, int height ) {
 	glutKeyboardFunc ( _onKeyDown );
 	glutKeyboardUpFunc ( _onKeyUp );
 	glutSpecialFunc ( _onSpecialFunc );
+	glutSpecialUpFunc ( _onSpecialUpFunc );
 	
 	glutMouseFunc ( _onMouseButton );
 	glutMotionFunc ( _onMouseDrag );
