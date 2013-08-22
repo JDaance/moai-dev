@@ -107,7 +107,7 @@ void AKUIphoneInit ( UIApplication* application ) {
 	#endif
 	
 	#ifndef DISABLE_PLAYHAVEN
-		REGISTER_LUA_CLASS ( MOAIPlayhavenIOS )
+		//REGISTER_LUA_CLASS ( MOAIPlayhavenIOS )
 	#endif
 		
 	REGISTER_LUA_CLASS ( MOAIHttpTaskNSURL )
