@@ -30,6 +30,10 @@ extern "C" {
 #include <moai-core/host.h>
 #include <moai-sim/headers.h>
 #include <moai-sim/host.h>
+#include <moai-util/headers.h>
+#include <moai-util/host.h>
+#include <moai-http-client/headers.h>
+#include <moai-http-client/host.h>
 
 #include "ppapi/gles2/gl2ext_ppapi.h"
 #include <GLES2/gl2.h>
@@ -42,8 +46,6 @@ extern "C" {
 
 #include "moai-sim/MOAIGfxDevice.h"
 #include "MOAIApp.h"
-
-#include <lua-headers/moai_lua.h>
 
 namespace {
 
@@ -381,7 +383,7 @@ void* moai_main ( void *_instance ) {
 	
 	g_FileSystem->setWorkingDir("lua");
 
-	AKURunData ( moai_lua, moai_lua_SIZE, AKU_DATA_STRING, AKU_DATA_ZIPPED );
+	//AKURunData ( moai_lua, moai_lua_SIZE, AKU_DATA_STRING, AKU_DATA_ZIPPED );
 
 	AKURunScript ( "main-editor.lua" );
 
@@ -492,6 +494,10 @@ void MoaiInstance::DidChangeView ( const pp::Rect& position, const pp::Rect& cli
 
 		AKUCreateContext ();
 		NACL_LOG ( "AKUContext Created\n" );
+		
+		AKUInitializeUtil ();
+		AKUInitializeSim ();
+		AKUInitializeHttpClient ();
 
 		AKUSetInputConfigurationName ( "AKUNaCl" );
 

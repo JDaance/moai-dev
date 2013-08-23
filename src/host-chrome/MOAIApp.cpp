@@ -540,7 +540,7 @@ void MOAIApp::HandleLuaMessage ( std::string & message ) {
 
 	if ( callback ) {
 	
-		MOAILuaStateHandle L = callback.GetSelf ();
+		MOAIScopedLuaState L = callback.GetSelf ();
 		
 		lua_pushstring ( L, message.substr(4).c_str() );		
 		

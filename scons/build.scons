@@ -342,6 +342,8 @@ box2d_sources = [ os.path.join( box2d_path, src_file ) for src_file in [
 moai_sources = [ os.path.join(src_file) for src_file in [
         'moai-core/host.cpp',
         'moai-sim/host.cpp',
+        'moai-util/host.cpp',
+        'moai-http-client/host.cpp',
 			  'moai-sim/MOAIAction.cpp'                 ,
 				'moai-sim/MOAIActionMgr.cpp'              ,
 				'moai-sim/MOAIAnim.cpp'                   ,
@@ -514,6 +516,7 @@ moai_sources = [ os.path.join(src_file) for src_file in [
 				'moai-sim/MOAITouchSensor.cpp'            ,
 				'moai-sim/MOAITransform.cpp'              ,
 				'moai-sim/MOAITransformBase.cpp'          ,
+				'moai-sim/MOAITransformList.cpp'          ,
 				'moai-http-client/MOAIUrlMgrNaCl.cpp'       	 	   ,
 				'moai-core/MOAIVersion.cpp'               ,
 				'moai-sim/MOAIVertexBuffer.cpp'           ,

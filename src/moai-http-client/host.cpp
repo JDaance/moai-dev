@@ -49,7 +49,7 @@ void AKUInitializeHttpClient () {
 	#endif
 
 	#if MOAI_OS_NACL
-		MOAIUrlMgrnaCl::Affirm ();
+		MOAIUrlMgrNaCl::Affirm ();
 		REGISTER_LUA_CLASS ( MOAIHttpTaskNaCl )
 	#endif
 }
