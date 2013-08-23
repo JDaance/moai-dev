@@ -9,11 +9,11 @@
 	#endif
 	
 	#ifndef MOAI_WITH_BOX2D
-		#define MOAI_WITH_BOX2D 1
+		#define MOAI_WITH_BOX2D 0
 	#endif
 
 	#ifndef MOAI_WITH_CHIPMUNK
-		#define MOAI_WITH_CHIPMUNK 1
+		#define MOAI_WITH_CHIPMUNK 0
 	#endif
 	
 	#ifndef MOAI_WITH_EXPAT

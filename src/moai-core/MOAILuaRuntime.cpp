@@ -10,6 +10,8 @@
 #include <moai-core/MOAILuaRef.h>
 #include <moai-core/MOAILuaState-impl.h>
 
+#define MOAI_WITH_LUAJIT 1
+
 #if !MOAI_WITH_LUAJIT
 	#include <lstate.h>
 #endif
