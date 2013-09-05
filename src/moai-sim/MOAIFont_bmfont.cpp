@@ -99,7 +99,7 @@ void MOAIFont::InitWithBMFont ( cc8* filename, const u32 numPreloadedTextures, M
 	u32 len = 65536; // hack
 	char* buf = ( char* )malloc ( len );
 	len = stream.ReadBytes ( buf, len );
-	MOAIPrint("Read bm font file %s with size %d", filename, len);
+	MOAIPrint("Read bm font file %s with size %d\n", filename, len);
 	buf [ len ] = '\0';
 	stream.Close ();
 
