@@ -20,7 +20,6 @@
 #include <moai-sim/MOAICamera.h>
 #include <moai-sim/MOAICameraAnchor2D.h>
 #include <moai-sim/MOAICameraFitter2D.h>
-#include <moai-sim/MOAIClipper.h>
 #include <moai-sim/MOAICollisionShape.h>
 #include <moai-sim/MOAIColor.h>
 #include <moai-sim/MOAICompassSensor.h>
@@ -96,6 +95,7 @@
 #include <moai-sim/MOAIShader.h>
 #include <moai-sim/MOAIShaderMgr.h>
 #include <moai-sim/MOAISim.h>
+#include <moai-sim/MOAISkyways.h>
 #include <moai-sim/MOAISpanList.h>
 #include <moai-sim/MOAIStretchPatch2D.h>
 #include <moai-sim/MOAISurfaceDeck2D.h>

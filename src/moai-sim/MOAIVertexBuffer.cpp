@@ -236,6 +236,11 @@ void MOAIVertexBuffer::Clear () {
 }
 
 //----------------------------------------------------------------//
+ZLByteStream* MOAIVertexBuffer::GetStream () {
+	return &this->mStream;
+}
+
+//----------------------------------------------------------------//
 u32 MOAIVertexBuffer::GetVertexCount () {
 
 	if ( this->mFormat ) {

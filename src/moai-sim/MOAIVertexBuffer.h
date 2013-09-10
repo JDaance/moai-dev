@@ -47,6 +47,7 @@ public:
 	
 	//----------------------------------------------------------------//
 	bool			Bind					();
+	ZLByteStream*	GetStream				();
 	u32				GetVertexCount			();
 	bool			IsValid					();
 					MOAIVertexBuffer		();
