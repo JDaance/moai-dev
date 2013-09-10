@@ -95,6 +95,7 @@ public:
 	int				Run						( void* data, size_t size, int nArgs, int nResults );
 	void			SetPath					( cc8* path );
 	void			SetTop					( int top );
+	void			StackDump				();
 	bool			TableItrNext			( int itr );
 					MOAILuaState			();
 					MOAILuaState			( lua_State* state );
