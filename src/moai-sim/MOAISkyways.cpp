@@ -60,6 +60,27 @@ void static readPolyLinesFromLua(FPolygons &polyLines, MOAILuaState state, lua_S
 	}
 }
 
+void static readIntersectionPointsFromLua(FPolygon &intersectionPoints, MOAILuaState state, lua_State* L, int tableIndex)
+{
+	int length = luaL_getn(L, tableIndex);
+	
+	float x, y;
+	intersectionPoints.clear();
+
+	lua_pushnil ( L );
+	int compCount = 0;
+	while ( lua_next ( L, tableIndex ) != 0 ) {
+		if ( compCount % 2 == 0 ) {
+			x = state.GetValue < float >( -1, 0.0f );
+		} else {
+			y = state.GetValue < float >( -1, 0.0f );
+			intersectionPoints.push_back(USVec2D(x, y));
+		}
+		++compCount;
+		lua_pop ( L, 1 );
+	}
+}
+
 void static pushPolygonsToLua(MOAILuaState state, lua_State* L, const FPolygons &polygons, const int polygonOrientations[])
 {
 	int count = polygons.size();
@@ -77,6 +98,24 @@ void static pushPolygonsToLua(MOAILuaState state, lua_State* L, const FPolygons 
 			lua_rawseti (L, -2, j * 2 + 2); // [bt, i, tt]
 		}
 		lua_settable(L, -3); // [bt[i=tt]
+	}
+}
+
+//================================================================//
+// INTERSECTION GEOMS
+//================================================================//
+
+void static createIntersectionGeometries(const FPolygon &intersectionPoints, FPolygons &intersectionGeometries, float delta)
+{
+	intersectionGeometries.clear();
+	for (int i = 0; i < intersectionPoints.size(); ++i) {
+		USVec2D p = intersectionPoints[i];
+		FPolygon geom;
+		geom.push_back(USVec2D(p.mX - delta, p.mY + delta));
+		geom.push_back(USVec2D(p.mX - delta, p.mY - delta));
+		geom.push_back(USVec2D(p.mX + delta, p.mY - delta));
+		geom.push_back(USVec2D(p.mX + delta, p.mY + delta));
+		intersectionGeometries.push_back(geom);
 	}
 }
 
@@ -110,19 +149,30 @@ void static	intToFloatScale(const Polygons &scaledPolys, FPolygons &polys, float
 	}
 }
 
-static int* offsetPolyLinesToPolygons(const FPolygons &polyLines, FPolygons &polygons, float delta) {
+static int* offsetPolyLinesToPolygons(const FPolygons &polyLines, FPolygons &intersectionGeometries, FPolygons &unionPolygons, FPolygons &cutPolygons, float delta) {
 	const float scale = 1000.0f; // scale for integers used by clipper
 
-	Polygons scaledPolyLines, scaledPolygons;
+	Polygons scaledPolyLines, scaledIntersectionGeometries, scaledPolygons, scaledUnionPolygons, scaledCutPolygons;
 	floatToIntScale(polyLines, scaledPolyLines, scale);
+	floatToIntScale(intersectionGeometries, scaledIntersectionGeometries, scale);
 	
  	OffsetPolyLines(scaledPolyLines, scaledPolygons, delta * scale, jtRound, etRound, 3.0);
 
-	int* polygonOrientations = new int[scaledPolygons.size()];
-	for (int i = 0; i < scaledPolygons.size(); ++i)
-		polygonOrientations[i] = Orientation(scaledPolygons[i]);
+    Clipper clpr;
+    clpr.AddPolygons(scaledPolygons, ptSubject);
+	clpr.AddPolygons(scaledIntersectionGeometries, ptClip);
 
-	intToFloatScale(scaledPolygons, polygons, 1.0f/scale);
+	MOAIPrint("Orientation scaledIntersectionGeometries[0]: %d\n", Orientation(scaledIntersectionGeometries[0]));
+
+    clpr.Execute(ctUnion, scaledUnionPolygons, pftPositive, pftPositive);
+    clpr.Execute(ctDifference, scaledCutPolygons, pftPositive, pftPositive);
+
+	int* polygonOrientations = new int[scaledUnionPolygons.size()];
+	for (int i = 0; i < scaledUnionPolygons.size(); ++i)
+		polygonOrientations[i] = Orientation(scaledUnionPolygons[i]);
+
+	intToFloatScale(scaledUnionPolygons, unionPolygons, 1.0f/scale);
+	intToFloatScale(scaledCutPolygons, cutPolygons, 1.0f/scale);
 
 	return polygonOrientations;
 }
@@ -305,28 +355,34 @@ void static	writeTopFacesToVBO(MOAIVertexBuffer* vbo, const FPolygons &polygons,
 
 int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 	MOAILuaState state ( L );
-	if ( !state.CheckParams(1, "UTNNN") ) return 0;
+	if ( !state.CheckParams(1, "UTTNNN") ) return 0;
 	
-	MOAIVertexBuffer* vbo		= state.GetLuaObject < MOAIVertexBuffer >( 1, true );
-	int tableIndex				= 2;
-	float delta					= state.GetValue<float>(3, 0.15f);
-	u32 hand					= state.GetValue < u32 >( 4, MOAISkyways::HAND_LEFT );
-	float missingDimValue		= state.GetValue < float >( 5, 0.0f );
+	MOAIVertexBuffer* vbo				= state.GetLuaObject < MOAIVertexBuffer >( 1, true );
+	int lineTableIndex					= 2;
+	int intersectionPointsTableIndex	= 3;
+	float delta							= state.GetValue<float>(4, 0.15f);
+	u32 hand							= state.GetValue < u32 >( 5, MOAISkyways::HAND_LEFT );
+	float missingDimValue				= state.GetValue < float >( 6, 0.0f );
 
-	FPolygons polyLines, polygons;
-	readPolyLinesFromLua(polyLines, state, L, tableIndex);
+	FPolygons polyLines, intersectionGeometries, unionPolygons, cutPolygons;
+	FPolygon intersectionPoints;
+
+	readPolyLinesFromLua(polyLines, state, L, lineTableIndex);
+	readIntersectionPointsFromLua(intersectionPoints, state, L, intersectionPointsTableIndex);
+
+	createIntersectionGeometries(intersectionPoints, intersectionGeometries, delta);
 	
-	int* polygonOrientations = offsetPolyLinesToPolygons(polyLines, polygons, delta);
+	int* polygonOrientations = offsetPolyLinesToPolygons(polyLines, intersectionGeometries, unionPolygons, cutPolygons, delta);
 	
 	FPolygons triangles;
-	tesselatePolygons(polygons, triangles);
+	tesselatePolygons(cutPolygons, triangles);
 
 	writeTrianglesToVBO(vbo, triangles, hand, missingDimValue + delta, 1.0f);
 	writeTrianglesToVBO(vbo, triangles, hand, missingDimValue - delta, -1.0f);
 
-	writeTopFacesToVBO(vbo, polygons, polygonOrientations, hand, missingDimValue, delta);
+	writeTopFacesToVBO(vbo, cutPolygons, polygonOrientations, hand, missingDimValue, delta);
 	
-	pushPolygonsToLua(state, L, polygons, polygonOrientations);
+	pushPolygonsToLua(state, L, unionPolygons, polygonOrientations);
 	
 	return 1;
 }
