@@ -25,14 +25,7 @@ using namespace ClipperLib;
 // STRUCT
 //================================================================//
 
-struct FloatPoint {
-public:
-  float X;
-  float Y;
-  FloatPoint(float x = 0, float y = 0): X(x), Y(y) {};
-};
-
-typedef std::vector< FloatPoint > FPolygon;
+typedef std::vector< USVec2D > FPolygon;
 typedef std::vector< FPolygon > FPolygons;
 
 //================================================================//
@@ -56,7 +49,7 @@ void static readPolyLinesFromLua(FPolygons &polyLines, MOAILuaState state, lua_S
 				x = state.GetValue < float >( -1, 0.0f );
 			} else {
 				y = state.GetValue < float >( -1, 0.0f );
-				polyLine.push_back(FloatPoint(x, y));
+				polyLine.push_back(USVec2D(x, y));
 			}
 			++compCount;
 			lua_pop ( L, 1 );
@@ -67,20 +60,20 @@ void static readPolyLinesFromLua(FPolygons &polyLines, MOAILuaState state, lua_S
 	}
 }
 
-void static pushTrianglesToLua(MOAILuaState state, lua_State* L, const FPolygons &triangles)
+void static pushPolygonsToLua(MOAILuaState state, lua_State* L, const FPolygons &polygons, const int polygonOrientations[])
 {
-	int count = triangles.size();
+	int count = polygons.size();
 	lua_createtable(L, count, 0); // [bt]
-	for (int i = 0; i < triangles.size(); ++i) {
-		FPolygon triangle = triangles[i];
+	for (int i = 0; i < count; ++i) {
+		FPolygon polygon = polygons[i];
 
-		int compCount = triangle.size();
+		int compCount = polygon.size();
 		lua_pushinteger(L, i + 1); // [bt, i]
 		lua_createtable(L, compCount * 2, 0); // [bt, i, tt]
 		for (int j = 0; j < compCount; j++) {
-			lua_pushnumber(L, triangle[j].X); // [bt, i, tt, x]
+			lua_pushnumber(L, polygon[j].mX); // [bt, i, tt, x]
 			lua_rawseti (L, -2, j * 2 + 1); // [bt, i, tt]
-			lua_pushnumber(L, triangle[j].Y); // [bt, i, tt, y]
+			lua_pushnumber(L, polygon[j].mY); // [bt, i, tt, y]
 			lua_rawseti (L, -2, j * 2 + 2); // [bt, i, tt]
 		}
 		lua_settable(L, -3); // [bt[i=tt]
@@ -97,8 +90,8 @@ void static	floatToIntScale(const FPolygons &polys, Polygons &scaledPolys, float
 		FPolygon poly = polys[i];
 		ClipperLib::Polygon scaledPoly;
 		for (int j = 0; j < poly.size(); ++j) {
-			FloatPoint p = poly[j];
-			scaledPoly.push_back(IntPoint(p.X * scale, p.Y * scale));
+			USVec2D p = poly[j];
+			scaledPoly.push_back(IntPoint(p.mX * scale, p.mY * scale));
 		}
 		scaledPolys.push_back(scaledPoly);
 	}
@@ -111,7 +104,7 @@ void static	intToFloatScale(const Polygons &scaledPolys, FPolygons &polys, float
 		FPolygon poly;
 		for (int j = 0; j < scaledPoly.size(); ++j) {
 			IntPoint p = scaledPoly[j];
-			poly.push_back(FloatPoint(p.X * scale, p.Y * scale));
+			poly.push_back(USVec2D(p.X * scale, p.Y * scale));
 		}
 		polys.push_back(poly);
 	}
@@ -166,8 +159,8 @@ void static tesselatePolygons(const FPolygons &polygons, FPolygons &triangles) {
 		int count = polygon.size();
 		float *comps = new float[count * 2];
 		for (int j = 0; j < count; ++j) {
-			comps[j * 2] = polygon[j].X;
-			comps[j * 2 + 1] = polygon[j].Y;
+			comps[j * 2] = polygon[j].mX;
+			comps[j * 2 + 1] = polygon[j].mY;
 		}
 		tessAddContour(tess, 2, comps, sizeof(float)*2, count);
 	}
@@ -190,7 +183,7 @@ void static tesselatePolygons(const FPolygons &polygons, FPolygons &triangles) {
 		const int* p = &elems[i*3];
 		FPolygon poly;
 		for (int j = 0; j < 3 && p[j] != TESS_UNDEF; ++j)
-			poly.push_back(FloatPoint(verts[p[j]*2], verts[p[j]*2+1]));
+			poly.push_back(USVec2D(verts[p[j]*2], verts[p[j]*2+1]));
 		triangles.push_back(poly);
 	}
 
@@ -221,16 +214,16 @@ void static writeTrianglesToVBO(MOAIVertexBuffer* vbo, const FPolygons &triangle
 		for (int j = 0; j < compCount; j++) {
 			if (hand == MOAISkyways::HAND_LEFT) {
 				p.mX = missingDimValue;
-				p.mY = triangle[j].X;
+				p.mY = triangle[j].mX;
 
 				n.mX = normalSign; n.mY = 0.0f; n.mZ = 0.0f;
 			} else {
-				p.mX = triangle[j].X;
+				p.mX = triangle[j].mX;
 				p.mY = missingDimValue;
 
 				n.mX = 0.0f; n.mY = normalSign; n.mZ = 0.0f;
 			}
-			p.mZ = triangle[j].Y;
+			p.mZ = triangle[j].mY;
 
 			writePointToVBO(vbo, p);
 			writePointToVBO(vbo, n);
@@ -252,42 +245,42 @@ void static writeTriToVBO(MOAIVertexBuffer* vbo, const ZLVec3D &p1, const ZLVec3
 	writePointToVBO(vbo, n);
 }
 
-void static	writeTopFaceToVBO(MOAIVertexBuffer* vbo, const FloatPoint &p1, const FloatPoint &p2, int orientation, u32 hand, float missingDimValue, float delta)
+void static	writeTopFaceToVBO(MOAIVertexBuffer* vbo, const USVec2D &p1, const USVec2D &p2, int orientation, u32 hand, float missingDimValue, float delta)
 {
 	ZLVec3D nl, nr, sr, sl; // north/left/south/right
 
 	if (hand == MOAISkyways::HAND_LEFT) {
 		nl.mX = missingDimValue - delta;
-		nl.mY = p2.X;
-		nl.mZ = p2.Y;
+		nl.mY = p2.mX;
+		nl.mZ = p2.mY;
 		
 		nr.mX = missingDimValue + delta;
-		nr.mY = p2.X;
-		nr.mZ = p2.Y;
+		nr.mY = p2.mX;
+		nr.mZ = p2.mY;
 		
 		sr.mX = missingDimValue + delta;
-		sr.mY = p1.X;
-		sr.mZ = p1.Y;
+		sr.mY = p1.mX;
+		sr.mZ = p1.mY;
 		
 		sl.mX = missingDimValue - delta;
-		sl.mY = p1.X;
-		sl.mZ = p1.Y;
+		sl.mY = p1.mX;
+		sl.mZ = p1.mY;
 	} else {
-		nl.mX = p2.X;
+		nl.mX = p2.mX;
 		nl.mY = missingDimValue + delta;
-		nl.mZ = p2.Y;
+		nl.mZ = p2.mY;
 		
-		nr.mX = p2.X;
+		nr.mX = p2.mX;
 		nr.mY = missingDimValue - delta;
-		nr.mZ = p2.Y;
+		nr.mZ = p2.mY;
 		
-		sr.mX = p1.X;
+		sr.mX = p1.mX;
 		sr.mY = missingDimValue - delta;
-		sr.mZ = p1.Y;
+		sr.mZ = p1.mY;
 		
-		sl.mX = p1.X;
+		sl.mX = p1.mX;
 		sl.mY = missingDimValue + delta;
-		sl.mZ = p1.Y;
+		sl.mZ = p1.mY;
 	}
 
 	writeTriToVBO(vbo, nl, sr, sl);
@@ -299,8 +292,8 @@ void static	writeTopFacesToVBO(MOAIVertexBuffer* vbo, const FPolygons &polygons,
 	for (int iP = 0; iP < polygons.size(); ++iP) {
 		FPolygon polygon = polygons[iP];
 		for (int iV = 0; iV < polygon.size(); ++iV) {
-			FloatPoint p1 = polygon[iV];
-			FloatPoint p2 = polygon[(iV + 1) % polygon.size()];
+			USVec2D p1 = polygon[iV];
+			USVec2D p2 = polygon[(iV + 1) % polygon.size()];
 			writeTopFaceToVBO(vbo, p1, p2, polygonOrientations[iP], hand, missingDimValue, delta);
 		}
 	}
@@ -333,7 +326,7 @@ int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 
 	writeTopFacesToVBO(vbo, polygons, polygonOrientations, hand, missingDimValue, delta);
 	
-	pushTrianglesToLua(state, L, triangles);
+	pushPolygonsToLua(state, L, polygons, polygonOrientations);
 	
 	return 1;
 }
