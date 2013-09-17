@@ -59,6 +59,20 @@ int MOAICamera::_getFocalLength ( lua_State* L ) {
 }
 
 //----------------------------------------------------------------//
+int MOAICamera::_getHeading ( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAITransform, "U" )
+
+	ZLAffine3D localToWorld = self->GetLocalToWorldMtx();
+	ZLVec3D heading(0.0f, 0.0f, -1.0f);
+	localToWorld.TransformVec(heading);
+	heading.NormSafe();
+	lua_pushnumber ( state, heading.mX );
+	lua_pushnumber ( state, heading.mY );
+	lua_pushnumber ( state, heading.mZ );
+	return 3;
+}
+
+//----------------------------------------------------------------//
 /**	@name	getNearPlane
 	@text	Returns the camera's near plane.
 
@@ -225,6 +239,7 @@ void MOAICamera::RegisterLuaFuncs ( MOAILuaState& state ) {
 		{ "getFarPlane",		_getFarPlane },
 		{ "getFieldOfView",		_getFieldOfView },
 		{ "getFocalLength",		_getFocalLength },
+		{ "getHeading",			_getHeading },
 		{ "getNearPlane",		_getNearPlane },
 		{ "setFarPlane",		_setFarPlane },
 		{ "setFieldOfView",		_setFieldOfView },
