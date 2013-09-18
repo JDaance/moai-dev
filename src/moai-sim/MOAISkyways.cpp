@@ -105,9 +105,9 @@ void static pushPolygonsToLua(MOAILuaState state, lua_State* L, const FPolygons 
 // INTERSECTION GEOMS
 //================================================================//
 
-void static createIntersectionGeometries(const FPolygon &intersectionPoints, FPolygons &intersectionGeometries, float delta)
+void static createIntersectionGeometries(const FPolygon &intersectionPoints, FPolygons &unionIntersectionGeometries, FPolygons &cutIntersectionGeometries, float delta)
 {
-	intersectionGeometries.clear();
+	unionIntersectionGeometries.clear();
 	for (int i = 0; i < intersectionPoints.size(); ++i) {
 		USVec2D p = intersectionPoints[i];
 		FPolygon geom;
@@ -115,7 +115,18 @@ void static createIntersectionGeometries(const FPolygon &intersectionPoints, FPo
 		geom.push_back(USVec2D(p.mX - delta, p.mY - delta));
 		geom.push_back(USVec2D(p.mX + delta, p.mY - delta));
 		geom.push_back(USVec2D(p.mX + delta, p.mY + delta));
-		intersectionGeometries.push_back(geom);
+		unionIntersectionGeometries.push_back(geom);
+	}
+	
+	cutIntersectionGeometries.clear();
+	for (int i = 0; i < intersectionPoints.size(); ++i) {
+		USVec2D p = intersectionPoints[i];
+		FPolygon geom;
+		geom.push_back(USVec2D(p.mX - delta, p.mY + delta * 1.2));
+		geom.push_back(USVec2D(p.mX - delta, p.mY - delta * 1.2));
+		geom.push_back(USVec2D(p.mX + delta, p.mY - delta * 1.2));
+		geom.push_back(USVec2D(p.mX + delta, p.mY + delta * 1.2));
+		cutIntersectionGeometries.push_back(geom);
 	}
 }
 
@@ -149,22 +160,26 @@ void static	intToFloatScale(const Polygons &scaledPolys, FPolygons &polys, float
 	}
 }
 
-static int* offsetPolyLinesToPolygons(const FPolygons &polyLines, FPolygons &intersectionGeometries, FPolygons &unionPolygons, FPolygons &cutPolygons, float delta) {
+static int* offsetPolyLinesToPolygons(const FPolygons &polyLines, FPolygons &unionIntersectionGeometries, FPolygons &cutIntersectionGeometries, FPolygons &unionPolygons, FPolygons &cutPolygons, float delta) {
 	const float scale = 1000.0f; // scale for integers used by clipper
 
-	Polygons scaledPolyLines, scaledIntersectionGeometries, scaledPolygons, scaledUnionPolygons, scaledCutPolygons;
+	Polygons scaledPolyLines, scaledUnionIntersectionGeometries, scaledCutIntersectionGeometries, scaledPolygons, scaledUnionPolygons, scaledCutPolygons;
 	floatToIntScale(polyLines, scaledPolyLines, scale);
-	floatToIntScale(intersectionGeometries, scaledIntersectionGeometries, scale);
+	floatToIntScale(unionIntersectionGeometries, scaledUnionIntersectionGeometries, scale);
+	floatToIntScale(cutIntersectionGeometries, scaledCutIntersectionGeometries, scale);
 	
  	OffsetPolyLines(scaledPolyLines, scaledPolygons, delta * scale, jtRound, etRound, 3.0);
+	
+	MOAIPrint("Orientation scaledIntersectionGeometries[0]: %d\n", Orientation(scaledCutIntersectionGeometries[0]));
 
     Clipper clpr;
     clpr.AddPolygons(scaledPolygons, ptSubject);
-	clpr.AddPolygons(scaledIntersectionGeometries, ptClip);
-
-	MOAIPrint("Orientation scaledIntersectionGeometries[0]: %d\n", Orientation(scaledIntersectionGeometries[0]));
-
+	clpr.AddPolygons(scaledUnionIntersectionGeometries, ptClip);
     clpr.Execute(ctUnion, scaledUnionPolygons, pftPositive, pftPositive);
+	
+	clpr.Clear();
+    clpr.AddPolygons(scaledPolygons, ptSubject);
+	clpr.AddPolygons(scaledCutIntersectionGeometries, ptClip);
     clpr.Execute(ctDifference, scaledCutPolygons, pftPositive, pftPositive);
 
 	int* polygonOrientations = new int[scaledUnionPolygons.size()];
@@ -364,15 +379,15 @@ int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 	u32 hand							= state.GetValue < u32 >( 5, MOAISkyways::HAND_LEFT );
 	float missingDimValue				= state.GetValue < float >( 6, 0.0f );
 
-	FPolygons polyLines, intersectionGeometries, unionPolygons, cutPolygons;
+	FPolygons polyLines, unionIntersectionGeometries, cutIntersectionGeometries, unionPolygons, cutPolygons;
 	FPolygon intersectionPoints;
 
 	readPolyLinesFromLua(polyLines, state, L, lineTableIndex);
 	readIntersectionPointsFromLua(intersectionPoints, state, L, intersectionPointsTableIndex);
 
-	createIntersectionGeometries(intersectionPoints, intersectionGeometries, delta);
+	createIntersectionGeometries(intersectionPoints, unionIntersectionGeometries, cutIntersectionGeometries, delta);
 	
-	int* polygonOrientations = offsetPolyLinesToPolygons(polyLines, intersectionGeometries, unionPolygons, cutPolygons, delta);
+	int* polygonOrientations = offsetPolyLinesToPolygons(polyLines, unionIntersectionGeometries, cutIntersectionGeometries, unionPolygons, cutPolygons, delta);
 	
 	FPolygons triangles;
 	tesselatePolygons(cutPolygons, triangles);
