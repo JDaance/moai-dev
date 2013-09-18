@@ -259,17 +259,26 @@ void static tesselatePolygons(const FPolygons &polygons, FPolygons &triangles) {
 // 3D
 //================================================================//
 
-void static writePointToVBO(MOAIVertexBuffer* vbo, const ZLVec3D &p)
+void static writePointToStream(ZLByteStream* stream, const ZLVec3D &p)
 {
-	ZLByteStream* stream = vbo->GetStream();
 	stream->Write<float>(p.mX);
 	stream->Write<float>(p.mY);
 	stream->Write<float>(p.mZ);
 }
 
+void static writeVertexToVBO(MOAIVertexBuffer* vbo, const ZLVec3D &p, const ZLVec3D &n, const u32 color)
+{
+	ZLByteStream* stream = vbo->GetStream();
+	writePointToStream(stream, p);
+	writePointToStream(stream, n);
+	stream->Write < u32 >( color );
+}
+
 void static writeTrianglesToVBO(MOAIVertexBuffer* vbo, const FPolygons &triangles, u32 hand, float missingDimValue, float normalSign)
 {
 	ZLVec3D p, n;
+	
+	u32 color = ZLColor::PackRGBA ( 0.0f, 0.0f, 0.0f, 1.0f );
 
 	int count = triangles.size();
 	for (int i = 0; i < triangles.size(); ++i) {
@@ -290,27 +299,23 @@ void static writeTrianglesToVBO(MOAIVertexBuffer* vbo, const FPolygons &triangle
 			}
 			p.mZ = triangle[j].mY;
 
-			writePointToVBO(vbo, p);
-			writePointToVBO(vbo, n);
+			writeVertexToVBO(vbo, p, n, color);
 		}
 	}
 }
 
-void static writeTriToVBO(MOAIVertexBuffer* vbo, const ZLVec3D &p1, const ZLVec3D &p2, const ZLVec3D &p3)
+void static writeTriToVBO(MOAIVertexBuffer* vbo, const ZLVec3D &p1, const ZLVec3D &p2, const ZLVec3D &p3, const u32 color)
 {
 	ZLVec3D n;
 	n.Cross(p2 - p1, p3 - p1);
 	n.Norm();
-
-	writePointToVBO(vbo, p1);
-	writePointToVBO(vbo, n);
-	writePointToVBO(vbo, p2);
-	writePointToVBO(vbo, n);
-	writePointToVBO(vbo, p3);
-	writePointToVBO(vbo, n);
+	
+	writeVertexToVBO(vbo, p1, n, color);
+	writeVertexToVBO(vbo, p2, n, color);
+	writeVertexToVBO(vbo, p3, n, color);
 }
 
-void static	writeTopFaceToVBO(MOAIVertexBuffer* vbo, const USVec2D &p1, const USVec2D &p2, int orientation, u32 hand, float missingDimValue, float delta)
+void static	writeTopFaceToVBO(MOAIVertexBuffer* vbo, const USVec2D &p1, const USVec2D &p2, int orientation, u32 hand, float missingDimValue, float delta, const u32 color)
 {
 	ZLVec3D nl, nr, sr, sl; // north/left/south/right
 
@@ -348,18 +353,20 @@ void static	writeTopFaceToVBO(MOAIVertexBuffer* vbo, const USVec2D &p1, const US
 		sl.mZ = p1.mY;
 	}
 
-	writeTriToVBO(vbo, nl, sr, sl);
-	writeTriToVBO(vbo, nl, nr, sr);
+	writeTriToVBO(vbo, nl, sr, sl, color);
+	writeTriToVBO(vbo, nl, nr, sr, color);
 }
 
 void static	writeTopFacesToVBO(MOAIVertexBuffer* vbo, const FPolygons &polygons, const int polygonOrientations[], u32 hand, float missingDimValue, float delta)
 {
+	u32 color = ZLColor::PackRGBA ( 0.0f, 0.0f, 0.0f, 1.0f );
+
 	for (int iP = 0; iP < polygons.size(); ++iP) {
 		FPolygon polygon = polygons[iP];
 		for (int iV = 0; iV < polygon.size(); ++iV) {
 			USVec2D p1 = polygon[iV];
 			USVec2D p2 = polygon[(iV + 1) % polygon.size()];
-			writeTopFaceToVBO(vbo, p1, p2, polygonOrientations[iP], hand, missingDimValue, delta);
+			writeTopFaceToVBO(vbo, p1, p2, polygonOrientations[iP], hand, missingDimValue, delta, color);
 		}
 	}
 }
