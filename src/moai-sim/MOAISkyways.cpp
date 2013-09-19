@@ -41,11 +41,11 @@ float static popTableFloat(MOAILuaState state, lua_State* L, int tableIndex)
 	return val;
 }
 
-void static readPolyLinesFromLua(FPolygons &polyLines, Colors &colors, MOAILuaState state, lua_State* L, int tableIndex)
+void static readPolyLinesFromLua(FPolygons &polyLines, /*Colors &colors, */MOAILuaState state, lua_State* L, int tableIndex)
 {
 	int length = luaL_getn(L, tableIndex);
 	
-	float x1, y1, x2, y2, r, g, b, a;
+	float x1, y1, x2, y2;//, r, g, b, a;
 
 	u32 lineCount = 0;
 	lua_pushnil ( L );
@@ -57,18 +57,18 @@ void static readPolyLinesFromLua(FPolygons &polyLines, Colors &colors, MOAILuaSt
 		y1	= popTableFloat(state, L, -2);
 		x2	= popTableFloat(state, L, -2);
 		y2	= popTableFloat(state, L, -2);
-		r	= popTableFloat(state, L, -2);
+		/*r	= popTableFloat(state, L, -2);
 		g	= popTableFloat(state, L, -2);
 		b	= popTableFloat(state, L, -2);
-		a	= popTableFloat(state, L, -2);
+		a	= popTableFloat(state, L, -2);*/
 		
 		FPolygon polyLine;
 		polyLine.push_back(USVec2D(x1, y1));
 		polyLine.push_back(USVec2D(x2, y2));
 		polyLines.push_back(polyLine);
 
-		u32 color = ZLColor::PackRGBA ( r, g, b, a );
-		colors.push_back(color);
+		/*u32 color = ZLColor::PackRGBA ( r, g, b, a );
+		colors.push_back(color);*/
 
 		++lineCount;
 		lua_pop ( L, 1 );
@@ -275,6 +275,7 @@ void static tesselatePolygons(const FPolygons &polygons, FPolygons &triangles) {
 // COLORIZE
 //================================================================//
 
+/*
 static float pointToLineDistanceSq(const USVec2D &center, const FPolygon &line)
 {
 	USVec2D dir = line[1] - line[0];
@@ -287,7 +288,7 @@ static float pointToLineDistanceSq(const USVec2D &center, const FPolygon &line)
 	closest.Scale(t); closest.Add(line[0]);
 
 	float distanceSq = ZLDist::PointToPointSqrd(center, closest);
-	return distanceSq;
+	return distanceSq;*/
 
 	/*
 	LUA:
@@ -304,7 +305,7 @@ static float pointToLineDistanceSq(const USVec2D &center, const FPolygon &line)
 	local closest = self.v1 + dir * t
 	local distance = (closest - v):len()
 	return closest, distance
-	*/
+	*//*
 }
 
 static u32 findClosestPolyLineColor(const USVec2D &center, const FPolygons &polyLines, const Colors &lineColors)
@@ -337,7 +338,7 @@ static void calculateTriangleColors(const FPolygons &triangles, Colors &triangle
 		u32 color = findClosestPolyLineColor(center, polyLines, lineColors);
 		triangleColors.push_back(color);
 	}
-}
+}*/
 
 //================================================================//
 // 3D
@@ -358,31 +359,31 @@ void static writeVertexToVBO(MOAIVertexBuffer* vbo, const ZLVec3D &p, const ZLVe
 	stream->Write < u32 >( color );
 }
 
-void static writeTrianglesToVBO(MOAIVertexBuffer* vbo, const FPolygons &triangles, const Colors &triangleColors, u32 hand, float missingDimValue, float normalSign)
+void static writeTrianglesToVBO(MOAIVertexBuffer* vbo, const FPolygons &triangles, const FPolygons &polyLines, u32 hand, float missingDimValue, float normalSign, const u32 color)
 {
-	ZLVec3D p, n;
+	ZLVec3D p3d, n;
 
 	int count = triangles.size();
 	for (int i = 0; i < triangles.size(); ++i) {
 		FPolygon triangle = triangles[i];
-		u32 color = triangleColors[i];
 
 		int compCount = triangle.size();
 		for (int j = 0; j < compCount; j++) {
+			USVec2D p2d = triangle[j];
 			if (hand == MOAISkyways::HAND_LEFT) {
-				p.mX = missingDimValue;
-				p.mY = triangle[j].mX;
+				p3d.mX = missingDimValue;
+				p3d.mY = p2d.mX;
 
 				n.mX = normalSign; n.mY = 0.0f; n.mZ = 0.0f;
 			} else {
-				p.mX = triangle[j].mX;
-				p.mY = missingDimValue;
+				p3d.mX = p2d.mX;
+				p3d.mY = missingDimValue;
 
 				n.mX = 0.0f; n.mY = normalSign; n.mZ = 0.0f;
 			}
-			p.mZ = triangle[j].mY;
+			p3d.mZ = p2d.mY;
 
-			writeVertexToVBO(vbo, p, n, color);
+			writeVertexToVBO(vbo, p3d, n, color);
 		}
 	}
 }
@@ -440,10 +441,8 @@ void static	writeTopFaceToVBO(MOAIVertexBuffer* vbo, const USVec2D &p1, const US
 	writeTriToVBO(vbo, nl, nr, sr, color);
 }
 
-void static	writeTopFacesToVBO(MOAIVertexBuffer* vbo, const FPolygons &polygons, const int polygonOrientations[], u32 hand, float missingDimValue, float delta)
+void static	writeTopFacesToVBO(MOAIVertexBuffer* vbo, const FPolygons &polygons, const int polygonOrientations[], u32 hand, float missingDimValue, float delta, const u32 color)
 {
-	u32 color = ZLColor::PackRGBA ( 0.0f, 0.0f, 0.0f, 1.0f );
-
 	for (int iP = 0; iP < polygons.size(); ++iP) {
 		FPolygon polygon = polygons[iP];
 		for (int iV = 0; iV < polygon.size(); ++iV) {
@@ -468,12 +467,17 @@ int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 	float delta							= state.GetValue<float>(4, 0.15f);
 	u32 hand							= state.GetValue < u32 >( 5, MOAISkyways::HAND_LEFT );
 	float missingDimValue				= state.GetValue < float >( 6, 0.0f );
+	float r								= state.GetValue < float >( 7, 0.0f );
+	float g								= state.GetValue < float >( 8, 0.0f );
+	float b								= state.GetValue < float >( 9, 0.0f );
+	float a								= state.GetValue < float >( 10, 0.0f );
+
+	u32 color = ZLColor::PackRGBA(r, g, b, a);
 	
-	Colors lineColors;
 	FPolygons polyLines, unionIntersectionGeometries, cutIntersectionGeometries, unionPolygons, cutPolygons;
 	FPolygon intersectionPoints;
 
-	readPolyLinesFromLua(polyLines, lineColors, state, L, lineTableIndex);
+	readPolyLinesFromLua(polyLines, state, L, lineTableIndex);
 	readIntersectionPointsFromLua(intersectionPoints, state, L, intersectionPointsTableIndex);
 
 	createIntersectionGeometries(intersectionPoints, unionIntersectionGeometries, cutIntersectionGeometries, delta);
@@ -483,13 +487,13 @@ int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 	FPolygons triangles;
 	tesselatePolygons(cutPolygons, triangles);
 	
-	Colors triangleColors;
-	calculateTriangleColors(triangles, triangleColors, polyLines, lineColors);
+	//Colors triangleColors;
+	//calculateTriangleColors(triangles, triangleColors, polyLines, lineColors);
 
-	writeTrianglesToVBO(vbo, triangles, triangleColors, hand, missingDimValue + delta, 1.0f);
-	writeTrianglesToVBO(vbo, triangles, triangleColors, hand, missingDimValue - delta, -1.0f);
+	writeTrianglesToVBO(vbo, triangles, polyLines, hand, missingDimValue + delta, 1.0f, color);
+	writeTrianglesToVBO(vbo, triangles, polyLines, hand, missingDimValue - delta, -1.0f, color);
 
-	writeTopFacesToVBO(vbo, cutPolygons, polygonOrientations, hand, missingDimValue, delta);
+	writeTopFacesToVBO(vbo, cutPolygons, polygonOrientations, hand, missingDimValue, delta, color);
 	
 	pushPolygonsToLua(state, L, unionPolygons, polygonOrientations);
 	
