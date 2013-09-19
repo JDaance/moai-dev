@@ -186,7 +186,7 @@ static int* offsetPolyLinesToPolygons(const FPolygons &polyLines, FPolygons &uni
 	
  	OffsetPolyLines(scaledPolyLines, scaledPolygons, delta * scale, jtRound, etRound, 3.0);
 	
-	MOAIPrint("Orientation scaledIntersectionGeometries[0]: %d\n", Orientation(scaledCutIntersectionGeometries[0]));
+	//MOAIPrint("Orientation scaledIntersectionGeometries[0]: %d\n", Orientation(scaledCutIntersectionGeometries[0]));
 
     Clipper clpr;
     clpr.AddPolygons(scaledPolygons, ptSubject);
@@ -248,7 +248,7 @@ void static tesselatePolygons(const FPolygons &polygons, FPolygons &triangles) {
 
 	tessTesselate(tess, TESS_WINDING_POSITIVE, TESS_POLYGONS, 3, 2, 0);
 
-	MOAIPrint("Memory used: %.1f kB\n", allocated/1024.0f);
+	//MOAIPrint("Memory used: %.1f kB\n", allocated/1024.0f);
 	
 	const float* verts = tessGetVertices(tess);
 	const int* vinds = tessGetVertexIndices(tess);
@@ -256,8 +256,8 @@ void static tesselatePolygons(const FPolygons &polygons, FPolygons &triangles) {
 	const int nverts = tessGetVertexCount(tess);
 	const int nelems = tessGetElementCount(tess);
 
-	MOAIPrint("tessGetElementCount %d\n", nverts);
-	MOAIPrint("tessGetVertexCount %d\n", nelems);
+	//MOAIPrint("tessGetElementCount %d\n", nverts);
+	//MOAIPrint("tessGetVertexCount %d\n", nelems);
 
 	for (int i = 0; i < nelems; ++i)
 	{
