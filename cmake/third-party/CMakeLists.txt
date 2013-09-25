@@ -5,6 +5,9 @@ project ( third-party )
 
 set ( CMAKE_CURRENT_SOURCE_DIR "${ROOT_DIR}../../../3rdparty" )
 
+add_subdirectory ( clipper )
+add_subdirectory ( libtess2 )
+
 add_subdirectory ( box2d )
 add_subdirectory ( chipmunk )
 add_subdirectory ( contrib )
@@ -36,6 +39,9 @@ else (BUILD_HTML)
 endif (BUILD_HTML)
 
 set ( THIRD_PARTY_INCLUDES 
+  
+  ${CLIPPER_INCLUDES}
+  ${LIBTESS2_INCLUDES}
   
   ${BOX2D_INCLUDES}
   ${CHIPMUNK_INCLUDES}
@@ -71,6 +77,10 @@ if ( BUILD_BLACKBERRY )
 endif ( BUILD_BLACKBERRY)
 
 add_library ( third-party STATIC 
+  
+  ${CLIPPER_SOURCES}
+  ${LIBTESS2_SOURCES}
+  
   ${BOX2D_SOURCES}
   ${CHIPMUNK_SOURCES}
   ${CONTRIB_SOURCES}
