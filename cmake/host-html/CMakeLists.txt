@@ -27,6 +27,7 @@ set ( CMAKE_CURRENT_SOURCE_DIR "../../src/host-html" )
 
 add_library ( moaishared SHARED
   ${CMAKE_CURRENT_SOURCE_DIR}/HtmlHost.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/MOAIApp.cpp
 )
 
 get_target_property( MOAIHTMLOUTPUT moaishared LOCATION)
