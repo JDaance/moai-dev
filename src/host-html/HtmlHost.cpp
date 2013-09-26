@@ -8,12 +8,12 @@
 #include <lua-headers/moai_lua.h>
 #include <host-html/HtmlHost.h>
 #include <string.h>
-#include "MOAIApp.h"
 
 #define UNUSED(p) (( void )p)
 
 #include <moai-sim/host.h>
 #include <moai-util/host.h>
+#include <host-html/MOAIApp.h>
 
 #if MOAI_WITH_BOX2D
 	#include <moai-box2d/host.h>
@@ -294,5 +294,7 @@ void RefreshContext () {
 	AKUSetFunc_ExitFullscreenMode ( _AKUExitFullscreenModeFunc );
 	AKUSetFunc_OpenWindow ( _AKUOpenWindowFunc );
 
-	AKURunData ( moai_lua, moai_lua_SIZE,  AKU_DATA_STRING, AKU_DATA_ZIPPED);
+	REGISTER_LUA_CLASS ( MOAIApp )	
+
+	//AKURunData ( moai_lua, moai_lua_SIZE,  AKU_DATA_STRING, AKU_DATA_ZIPPED);
 }

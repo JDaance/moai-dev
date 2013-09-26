@@ -1,4 +1,3 @@
-#include "moai-core/pch.h"
 #include "MOAIApp.h"
 #include "HtmlHost.h"
 
@@ -13,9 +12,7 @@
 int MOAIApp::_setOnJsMessageCallback ( lua_State* L ) {
 	MOAILuaState state ( L );
 	
-	if ( idx < TOTAL ) {
-		MOAIApp::Get ().onJsMessageCallback.SetStrongRef ( state, 1 );
-	}
+	MOAIApp::Get ().onJsMessageCallback.SetStrongRef ( state, 1 );
 	
 	return 0;
 }
@@ -58,7 +55,7 @@ void MOAIApp::Reset () {
 }
 
 //----------------------------------------------------------------//
-void MOAIApp::HandleMessageFromJs ( std::string & message ) {
+void MOAIApp::HandleMessageFromJs ( const char* jsonString ) {
 
 	MOAILuaRef& callback = MOAIApp::Get ().onJsMessageCallback;
 
@@ -66,7 +63,7 @@ void MOAIApp::HandleMessageFromJs ( std::string & message ) {
 	
 		MOAIScopedLuaState L = callback.GetSelf ();
 		
-		lua_pushstring ( L, message.c_str() );		
+		lua_pushstring ( L, jsonString );		
 		
 		L.DebugCall ( 1, 0 );
 	}
@@ -74,8 +71,6 @@ void MOAIApp::HandleMessageFromJs ( std::string & message ) {
 
 //----------------------------------------------------------------//
 void MOAIApp::RegisterLuaClass ( MOAILuaState& state ) {
-	
-	NACL_LOG("MOAIApp::RegisterLuaClass enter");
 	
 	luaL_Reg regTable[] = {
 		{ "_setOnJsMessageCallback",			_setOnJsMessageCallback },
@@ -85,6 +80,4 @@ void MOAIApp::RegisterLuaClass ( MOAILuaState& state ) {
 	};
 
 	luaL_register( state, 0, regTable );
-	
-	NACL_LOG("MOAIApp::RegisterLuaClass exit");
 }

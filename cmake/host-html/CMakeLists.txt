@@ -14,6 +14,7 @@ project(host-html)
 
 
 set ( INCLUDES_MOAIHOSTHTML 
+  ${THIRD_PARTY_INCLUDES}
   "../../src/"
   "../../src/config-default/"
   "../../src/host-html/"

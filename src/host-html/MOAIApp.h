@@ -26,7 +26,7 @@ public:
 	void		OnInit														();
 	void		Reset														();
 
-	void 		HandleMessageFromJs											( std::string & message );
+	void 		HandleMessageFromJs											( const char* jsonString );
 	
 	void		RegisterLuaClass											( MOAILuaState& state );
 };
