@@ -30,5 +30,9 @@ mergeInto(LibraryManager.library, {
   	  FS.createPath('/',dir,true,true);
   	  FS.createDataFile(dir,name,data,true,true);
     }
+  },
+
+  PushMessageToJs: function(jsonString) {
+    moaijs.PushMessageToJs(Module.Pointer_stringify(jsonString));
   }
 });

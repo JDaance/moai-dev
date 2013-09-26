@@ -8,6 +8,7 @@
 #include <lua-headers/moai_lua.h>
 #include <host-html/HtmlHost.h>
 #include <string.h>
+#include "MOAIApp.h"
 
 #define UNUSED(p) (( void )p)
 
@@ -160,6 +161,11 @@ void onTimer ( ) {
 	#if MOAI_HOST_USE_FMOD_DESIGNER
 		AKUFmodDesignerUpdate (( float )fSimStep );
 	#endif
+}
+
+//----------------------------------------------------------------//
+void onMessageFromJs ( const char* jsonString ) {
+	MOAIApp::Get().HandleMessageFromJs(jsonString);
 }
 
 //================================================================//
