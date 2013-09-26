@@ -165,7 +165,7 @@ void onTimer ( ) {
 
 //----------------------------------------------------------------//
 void onMessageFromJs ( const char* jsonString ) {
-	MOAIApp::Get().HandleMessageFromJs(jsonString);
+	MOAIApp::HandleMessageFromJs(jsonString);
 }
 
 //================================================================//

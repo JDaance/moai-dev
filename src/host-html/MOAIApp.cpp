@@ -1,4 +1,3 @@
-#include "moai-core/pch.h"
 #include "MOAIApp.h"
 #include "HtmlHost.h"
 
