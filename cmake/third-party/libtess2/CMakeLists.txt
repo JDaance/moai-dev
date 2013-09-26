@@ -1,7 +1,7 @@
 cmake_minimum_required ( VERSION 2.8.5 )
 project ( libtess2 )
 
-set ( CMAKE_CURRENT_SOURCE_DIR "../../3rdparty/libtess2/Source" )
+set ( CMAKE_CURRENT_SOURCE_DIR "../../3rdparty/libtess2/Source/" )
 
 set ( LIBTESS2_INCLUDES "../../3rdparty/libtess2/Include" CACHE INTERNAL "doc string" )
 
