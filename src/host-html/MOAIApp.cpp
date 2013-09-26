@@ -1,5 +1,6 @@
 #include "MOAIApp.h"
 #include "HtmlHost.h"
+#include "moai-util/MOAIJsonParser.h"
 
 
 //----------------------------------------------------------------//
@@ -26,11 +27,17 @@ int MOAIApp::_setOnJsMessageCallback ( lua_State* L ) {
 */
 int MOAIApp::_postMessageToJs ( lua_State* L ) {
 	MOAILuaState state ( L );
-	
-	cc8* message	= state.GetValue < cc8* >( 1, NULL );
 
-	PushMessageToJs(message);
-	
+	// position 1 is message object
+
+	int result = MOAIJsonParser::Encode(L); // pushes string onto top
+	if (result == 1) {
+		cc8* jsonString	= state.GetValue < cc8* >( -1, NULL );
+
+		PushMessageToJs(jsonString);
+	} else {
+		MOAIPrint("Error posting message to JS, json serialization failed");
+	}
 	return 0;
 }
  
@@ -60,12 +67,16 @@ void MOAIApp::HandleMessageFromJs ( const char* jsonString ) {
 	MOAILuaRef& callback = MOAIApp::Get ().onJsMessageCallback;
 
 	if ( callback ) {
-	
-		MOAIScopedLuaState L = callback.GetSelf ();
-		
-		lua_pushstring ( L, jsonString );		
-		
-		L.DebugCall ( 1, 0 );
+		MOAIScopedLuaState L = MOAILuaRuntime::Get ().State (); // empty stack
+		lua_pushstring ( L, jsonString ); // stack = S
+		int result = MOAIJsonParser::Decode(L); // will decode string from stack and push table to stack, stack = T
+		if (result == 1) {
+			callback.PushRef( L ); // stack = TF
+			lua_insert( L, -2 ); // stack = FT
+			L.DebugCall ( 1, 0 ); // call
+		} else {
+			MOAIPrint("Error parsing message from JS, json decoding failed");		
+		}
 	}
 }
 
@@ -73,8 +84,8 @@ void MOAIApp::HandleMessageFromJs ( const char* jsonString ) {
 void MOAIApp::RegisterLuaClass ( MOAILuaState& state ) {
 	
 	luaL_Reg regTable[] = {
-		{ "_setOnJsMessageCallback",			_setOnJsMessageCallback },
-		{ "_postMessageToJs",					_postMessageToJs },
+		{ "setOnJsMessageCallback",			_setOnJsMessageCallback },
+		{ "postMessageToJs",					_postMessageToJs },
 		
 		{ NULL, NULL }
 	};

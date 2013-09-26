@@ -28,6 +28,9 @@ public:
 						~MOAIJsonParser			();
 	void				RegisterLuaClass		( MOAILuaState& state );
 	void				RegisterLuaFuncs		( MOAILuaState& state );
+
+	static int			Encode 					( lua_State* L );
+	static int			Decode 					( lua_State* L );
 };
 
 #endif

@@ -285,4 +285,12 @@ void MOAIJsonParser::RegisterLuaFuncs ( MOAILuaState& state ) {
 	UNUSED ( state );
 }
 
+int MOAIJsonParser::Encode ( lua_State* L ) {
+	return _encode(L);
+}
+
+int MOAIJsonParser::Decode ( lua_State* L ) {
+	return _decode(L);
+}
+
 #endif
