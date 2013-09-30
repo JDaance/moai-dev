@@ -14,6 +14,7 @@ extern "C" {
 	void onMouseButton 			( int button, int state  );
 	void onMouseDrag 			( int x, int y );
 	void onMouseMove 			( int x, int y );
+	void onMouseWheel 			( int scroll );
 	void onPaint 				();
 	void onReshape				( int w, int h );
 	void onTimer 				();
