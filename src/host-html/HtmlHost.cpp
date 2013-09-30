@@ -63,6 +63,7 @@ namespace HtmlInputDeviceSensorID {
 	enum {
 		KEYBOARD,
 		POINTER,
+		WHEEL,
 		MOUSE_LEFT,
 		MOUSE_MIDDLE,
 		MOUSE_RIGHT,
@@ -112,7 +113,10 @@ void onMouseButton ( int button, int state  ) {
 	switch ( button ) {
 		case HtmlMouseButton::MOUSE_LEFT:
 			AKUEnqueueButtonEvent ( HtmlInputDeviceID::DEVICE, HtmlInputDeviceSensorID::MOUSE_LEFT, ( state == HtmlMouseButtonState::MOUSE_DOWN));
-		break;
+			break;
+		case HtmlMouseButton::MOUSE_RIGHT:
+			AKUEnqueueButtonEvent ( HtmlInputDeviceID::DEVICE, HtmlInputDeviceSensorID::MOUSE_RIGHT, ( state == HtmlMouseButtonState::MOUSE_DOWN));
+			break;
 	}
 }
 
@@ -124,6 +128,11 @@ void onMouseDrag ( int x, int y ) {
 //----------------------------------------------------------------//
 void onMouseMove ( int x, int y ) {
 	AKUEnqueuePointerEvent ( HtmlInputDeviceID::DEVICE, HtmlInputDeviceSensorID::POINTER, x, y );
+}
+
+//----------------------------------------------------------------//
+void onMouseWheel ( int scroll ) {
+	AKUEnqueueWheelEvent ( HtmlInputDeviceID::DEVICE, HtmlInputDeviceSensorID::WHEEL, scroll );
 }
 
 //----------------------------------------------------------------//
@@ -289,6 +298,7 @@ void RefreshContext () {
 	AKUSetInputDeviceButton			( HtmlInputDeviceID::DEVICE, HtmlInputDeviceSensorID::MOUSE_LEFT,	"mouseLeft" );
 	AKUSetInputDeviceButton			( HtmlInputDeviceID::DEVICE, HtmlInputDeviceSensorID::MOUSE_MIDDLE,	"mouseMiddle" );
 	AKUSetInputDeviceButton			( HtmlInputDeviceID::DEVICE, HtmlInputDeviceSensorID::MOUSE_RIGHT,	"mouseRight" );
+	AKUSetInputDeviceWheel			( HtmlInputDeviceID::DEVICE, HtmlInputDeviceSensorID::WHEEL,		"wheel" );
 
 	AKUSetFunc_EnterFullscreenMode ( _AKUEnterFullscreenModeFunc );
 	AKUSetFunc_ExitFullscreenMode ( _AKUExitFullscreenModeFunc );
