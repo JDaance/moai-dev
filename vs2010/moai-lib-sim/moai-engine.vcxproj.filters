@@ -464,6 +464,8 @@
     <ClCompile Include="..\..\src\moai-sim\pch.cpp" />
     <ClCompile Include="..\..\src\moai-sim\MOAITransformList.cpp">
       <Filter>transform</Filter>
+    <ClCompile Include="..\..\src\moai-sim\MOAIVecPathGraph.cpp">
+      <Filter>pathfinding</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\moai-sim\MOAISkyways.cpp" />
   </ItemGroup>
@@ -891,6 +893,8 @@
     <ClInclude Include="..\..\src\moai-sim\pch.h" />
     <ClInclude Include="..\..\src\moai-sim\MOAITransformList.h">
       <Filter>transform</Filter>
+    <ClInclude Include="..\..\src\moai-sim\MOAIVecPathGraph.h">
+      <Filter>pathfinding</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\moai-sim\MOAISkyways.h" />
   </ItemGroup>

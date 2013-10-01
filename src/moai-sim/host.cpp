@@ -197,6 +197,7 @@ void AKUInitializeSim () {
 	REGISTER_LUA_CLASS ( MOAITouchSensor )
 	REGISTER_LUA_CLASS ( MOAITransform )
 	REGISTER_LUA_CLASS ( MOAITransformList )
+	REGISTER_LUA_CLASS ( MOAIVecPathGraph )
 	REGISTER_LUA_CLASS ( MOAIVertexBuffer )
 	REGISTER_LUA_CLASS ( MOAIVertexFormat )
 	REGISTER_LUA_CLASS ( MOAIViewport )
@@ -213,10 +214,6 @@ void AKUInitializeSim () {
 	
 	#if MOAI_WITH_TINYXML
 		REGISTER_LUA_CLASS ( MOAIParticlePexPlugin )
-	#endif
-
-	#if MOAI_WITH_FREETYPE
-		REGISTER_LUA_CLASS ( MOAIFreeTypeFontReader )
 	#endif
 	
 	#if MOAI_WITH_FREETYPE

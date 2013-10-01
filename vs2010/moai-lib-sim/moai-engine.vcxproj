@@ -687,6 +687,7 @@
     <ClCompile Include="..\..\src\moai-sim\MOAIShader.cpp" />
     <ClCompile Include="..\..\src\moai-sim\MOAIShaderMgr.cpp" />
     <ClCompile Include="..\..\src\moai-sim\MOAITransformList.cpp" />
+    <ClCompile Include="..\..\src\moai-sim\MOAIVecPathGraph.cpp" />
     <ClCompile Include="..\..\src\moai-sim\MOAIVertexBuffer.cpp" />
     <ClCompile Include="..\..\src\moai-sim\MOAIVertexFormat.cpp" />
     <ClCompile Include="..\..\src\moai-sim\MOAIVertexFormatMgr.cpp" />
@@ -828,6 +829,7 @@
     <ClInclude Include="..\..\src\moai-sim\MOAIShader.h" />
     <ClInclude Include="..\..\src\moai-sim\MOAIShaderMgr.h" />
     <ClInclude Include="..\..\src\moai-sim\MOAITransformList.h" />
+    <ClInclude Include="..\..\src\moai-sim\MOAIVecPathGraph.h" />
     <ClInclude Include="..\..\src\moai-sim\MOAIVertexBuffer.h" />
     <ClInclude Include="..\..\src\moai-sim\MOAIVertexFormat.h" />
     <ClInclude Include="..\..\src\moai-sim\MOAIVertexFormatMgr.h" />

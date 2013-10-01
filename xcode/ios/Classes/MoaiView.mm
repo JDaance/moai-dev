@@ -22,12 +22,20 @@
 #import <moai-audiosampler/AKU-audiosampler.h>
 #import <lua-headers/moai_lua.h>
 
-#ifdef USE_UNTZ
-#import <moai-untz/host.h>
+#if MOAI_WITH_BOX2D
+	#include <moai-box2d/host.h>
 #endif
 
-#ifdef USE_FMOD_EX
-#include <moaiext-fmod-ex/AKU-fmod-ex.h>
+#if MOAI_WITH_CHIPMUNK
+	#include <moai-chipmunk/host.h>
+#endif
+
+#if MOAI_WITH_UNTZ
+	#import <moai-untz/host.h>
+#endif
+
+#if MOAI_WITH_FMOD_EX
+	#include <moai-fmod-ex/host.h>
 #endif
 
 #import "LocationObserver.h"
@@ -181,11 +189,19 @@ namespace MoaiInputDeviceSensorID {
 		AKUExtLoadLuacrypto ();
 		AKUExtLoadLuasocket ();
 		
-		#ifdef USE_UNTZ
+        #if MOAI_WITH_BOX2D
+		AKUInitializeBox2D ();
+        #endif
+
+        #if MOAI_WITH_CHIPMUNK
+		AKUInitializeChipmunk ();
+        #endif
+
+		#if MOAI_WITH_UNTZ
 			AKUInitializeUntz ();
 		#endif
         
-		#ifdef USE_FMOD_EX
+		#if MOAI_WITH_FMOD_EX
 			AKUFmodExInit ();
 		#endif
         
@@ -255,7 +271,7 @@ namespace MoaiInputDeviceSensorID {
 		[ self openContext ];
 		AKUSetContext ( mAku );
 		AKUUpdate ();
-		#ifdef USE_FMOD_EX
+		#if MOAI_WITH_FMOD_EX
 			AKUFmodExUpdate ();
 		#endif
 		[ self drawView ];
