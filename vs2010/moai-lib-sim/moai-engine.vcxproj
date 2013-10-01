@@ -656,8 +656,8 @@
     <ClCompile Include="..\..\src\moai-sim\MOAIAction.cpp" />
     <ClCompile Include="..\..\src\moai-sim\MOAIActionMgr.cpp" />
     <ClCompile Include="..\..\src\moai-sim\MOAIBlocker.cpp" />
-    <ClCompile Include="..\..\src\moai-sim\MOAIClipper.cpp" />
     <ClCompile Include="..\..\src\moai-sim\MOAICoroutine.cpp" />
+    <ClCompile Include="..\..\src\moai-sim\MOAISkyways.cpp" />
     <ClCompile Include="..\..\src\moai-sim\MOAITimer.cpp" />
     <ClCompile Include="..\..\src\moai-sim\MOAIAnim.cpp" />
     <ClCompile Include="..\..\src\moai-sim\MOAIAnimCurve.cpp" />
@@ -687,6 +687,7 @@
     <ClCompile Include="..\..\src\moai-sim\MOAIShader.cpp" />
     <ClCompile Include="..\..\src\moai-sim\MOAIShaderMgr.cpp" />
     <ClCompile Include="..\..\src\moai-sim\MOAITransformList.cpp" />
+    <ClCompile Include="..\..\src\moai-sim\MOAIVecPathGraph.cpp" />
     <ClCompile Include="..\..\src\moai-sim\MOAIVertexBuffer.cpp" />
     <ClCompile Include="..\..\src\moai-sim\MOAIVertexFormat.cpp" />
     <ClCompile Include="..\..\src\moai-sim\MOAIVertexFormatMgr.cpp" />
@@ -798,8 +799,8 @@
     <ClInclude Include="..\..\src\moai-sim\MOAIAction.h" />
     <ClInclude Include="..\..\src\moai-sim\MOAIActionMgr.h" />
     <ClInclude Include="..\..\src\moai-sim\MOAIBlocker.h" />
-    <ClInclude Include="..\..\src\moai-sim\MOAIClipper.h" />
     <ClInclude Include="..\..\src\moai-sim\MOAICoroutine.h" />
+    <ClInclude Include="..\..\src\moai-sim\MOAISkyways.h" />
     <ClInclude Include="..\..\src\moai-sim\MOAITimer.h" />
     <ClInclude Include="..\..\src\moai-sim\MOAIAnim.h" />
     <ClInclude Include="..\..\src\moai-sim\MOAIAnimCurve.h" />
@@ -828,6 +829,7 @@
     <ClInclude Include="..\..\src\moai-sim\MOAIShader.h" />
     <ClInclude Include="..\..\src\moai-sim\MOAIShaderMgr.h" />
     <ClInclude Include="..\..\src\moai-sim\MOAITransformList.h" />
+    <ClInclude Include="..\..\src\moai-sim\MOAIVecPathGraph.h" />
     <ClInclude Include="..\..\src\moai-sim\MOAIVertexBuffer.h" />
     <ClInclude Include="..\..\src\moai-sim\MOAIVertexFormat.h" />
     <ClInclude Include="..\..\src\moai-sim\MOAIVertexFormatMgr.h" />

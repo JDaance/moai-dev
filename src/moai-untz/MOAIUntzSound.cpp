@@ -143,6 +143,8 @@ int MOAIUntzSound::_load ( lua_State* L ) {
 		self->mSound = 0;
 	}
 
+	cc8* filename = state.GetValue < cc8* >( 2, "" );
+
 	MOAIUntzSampleBuffer* data = state.GetLuaObject < MOAIUntzSampleBuffer >( 2, false );
 	if(data)
 	{
@@ -151,7 +153,6 @@ int MOAIUntzSound::_load ( lua_State* L ) {
 	}
 	else if ( state.IsType( 2, LUA_TSTRING ) ) 
 	{
-		cc8* filename = state.GetValue < cc8* >( 2, "" );
 		bool loadIntoMemory = state.GetValue < bool >( 3, true );	
 
 		self->mFilename = filename;
@@ -162,6 +163,10 @@ int MOAIUntzSound::_load ( lua_State* L ) {
 		} else {
 			self->mSound = NULL;
 		}
+	}
+
+	if (!self->mSound) {
+		MOAIPrint("Warning: load of sound %s failed\n", filename);
 	}
 
 	return 0;
@@ -424,6 +429,7 @@ void MOAIUntzSound::RegisterLuaFuncs ( MOAILuaState& state ) {
 		{ "getLength",			_getLength },
 		{ "getPosition",		_getPosition },
 		{ "getVolume",			_getVolume },
+		{ "getFilename",		_getFilename },
 		{ "isLooping",			_isLooping },
 		{ "isPaused",			_isPaused },
 		{ "isPlaying",			_isPlaying },
