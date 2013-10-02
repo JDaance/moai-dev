@@ -29,3 +29,5 @@ tmp
 # Produced by test runner
 test/xml-results
 src/host-html/host-template/.idea
+.buildpath
+.project
