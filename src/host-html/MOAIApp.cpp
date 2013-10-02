@@ -75,7 +75,7 @@ void MOAIApp::HandleMessageFromJs ( const char* jsonString ) {
 			lua_insert( L, -2 ); // stack = FT
 			L.DebugCall ( 1, 0 ); // call
 		} else {
-			MOAIPrint("Error parsing message from JS, json decoding failed");		
+			MOAIPrint("Error parsing message from JS, json decoding failed\n");		
 		}
 	}
 }
