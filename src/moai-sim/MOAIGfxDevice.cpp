@@ -548,7 +548,7 @@ MOAIGfxDevice::MOAIGfxDevice () :
 	mCpuUVTransform ( false ),
 	mHasContext ( false ),
 	mIsFramebufferSupported ( 0 ),
-#if defined ( MOAI_OS_NACL ) || defined ( MOAI_OS_IPHONE ) || defined ( MOAI_OS_ANDROID )
+#if defined ( MOAI_OS_NACL ) || defined ( MOAI_OS_IPHONE ) || defined ( MOAI_OS_ANDROID ) || defined ( MOAI_OS_HTML )
 	mIsOpenGLES ( true ),
 #else
 	mIsOpenGLES ( false ),
