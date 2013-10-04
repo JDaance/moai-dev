@@ -414,7 +414,7 @@ void static writeVertexToVBO(MOAIVertexBuffer* vbo, const ZLVec3D &p, const ZLVe
 	writePointToStream(stream, p);
 	writePointToStream(stream, n);
 	stream->Write < u32 >( color );
-	MOAIPrint("Regular point: %.2f, %.2f, %.2f - normal: %.2f, %.2f, %.2f\n", p.mX, p.mY, p.mZ, n.mX, n.mY, n.mZ);
+	//MOAIPrint("Regular point: %.2f, %.2f, %.2f - normal: %.2f, %.2f, %.2f\n", p.mX, p.mY, p.mZ, n.mX, n.mY, n.mZ);
 }
 
 void static writeOutlineVertexToVBO(MOAIVertexBuffer* vbo, const ZLVec3D &p, const ZLVec3D &n)
@@ -422,7 +422,7 @@ void static writeOutlineVertexToVBO(MOAIVertexBuffer* vbo, const ZLVec3D &p, con
 	ZLByteStream* stream = vbo->GetStream();
 	writePointToStream(stream, p);
 	writePointToStream(stream, n);
-	MOAIPrint("Outline point: %.2f, %.2f, %.2f - normal: %.2f, %.2f, %.2f\n", p.mX, p.mY, p.mZ, n.mX, n.mY, n.mZ);
+	//MOAIPrint("Outline point: %.2f, %.2f, %.2f - normal: %.2f, %.2f, %.2f\n", p.mX, p.mY, p.mZ, n.mX, n.mY, n.mZ);
 }
 
 void static writeTrianglesToVBO(MOAIVertexBuffer* mainVbo, MOAIVertexBuffer* outlineVbo, const FPolygons &triangles, const FPolygons &polyLines, u32 hand, float missingDimValue, float normalSign, const u32 color)
@@ -443,14 +443,14 @@ void static writeTrianglesToVBO(MOAIVertexBuffer* mainVbo, MOAIVertexBuffer* out
 
 				n.mX = normalSign; n.mY = 0.0f; n.mZ = 0.0f;
 				outline_n = n + to3DWithX(v2d.mN, 0.0f);
-				outline_n.Scale(0.5f);
+				outline_n.Norm();
 			} else {
 				p3d.mX = p2d.mX;
 				p3d.mY = missingDimValue;
 
 				n.mX = 0.0f; n.mY = normalSign; n.mZ = 0.0f;
 				outline_n = n + to3DWithY(v2d.mN, 0.0f);
-				outline_n.Scale(0.5f);
+				outline_n.Norm();
 			}
 			p3d.mZ = p2d.mY;
 
