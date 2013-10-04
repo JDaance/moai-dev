@@ -263,8 +263,12 @@ void static tesselatePolygons(const FPolygons &polygons, FPolygons &triangles) {
 	{
 		const int* p = &elems[i*3];
 		FPolygon poly;
-		for (int j = 0; j < 3 && p[j] != TESS_UNDEF; ++j)
+		for (int j = 0; j < 3 && p[j] != TESS_UNDEF; ++j) {
+			int vertexNumber = p[j];
+			int originalVertexIndex = vinds[vertexNumber];
+
 			poly.push_back(USVec2D(verts[p[j]*2], verts[p[j]*2+1]));
+		}	
 		triangles.push_back(poly);
 	}
 
@@ -461,16 +465,17 @@ int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 	MOAILuaState state ( L );
 	if ( !state.CheckParams(1, "UTTNNN") ) return 0;
 	
-	MOAIVertexBuffer* vbo				= state.GetLuaObject < MOAIVertexBuffer >( 1, true );
-	int lineTableIndex					= 2;
-	int intersectionPointsTableIndex	= 3;
-	float delta							= state.GetValue<float>(4, 0.15f);
-	u32 hand							= state.GetValue < u32 >( 5, MOAISkyways::HAND_LEFT );
-	float missingDimValue				= state.GetValue < float >( 6, 0.0f );
-	float r								= state.GetValue < float >( 7, 0.0f );
-	float g								= state.GetValue < float >( 8, 0.0f );
-	float b								= state.GetValue < float >( 9, 0.0f );
-	float a								= state.GetValue < float >( 10, 0.0f );
+	MOAIVertexBuffer* mainVbo			= state.GetLuaObject < MOAIVertexBuffer >( 1, true );
+	MOAIVertexBuffer* outlineVbo		= state.GetLuaObject < MOAIVertexBuffer >( 2, true );
+	int lineTableIndex					= 3;
+	int intersectionPointsTableIndex	= 4;
+	float delta							= state.GetValue<float>(5, 0.15f);
+	u32 hand							= state.GetValue < u32 >( 6, MOAISkyways::HAND_LEFT );
+	float missingDimValue				= state.GetValue < float >( 7, 0.0f );
+	float r								= state.GetValue < float >( 8, 0.0f );
+	float g								= state.GetValue < float >( 9, 0.0f );
+	float b								= state.GetValue < float >( 10, 0.0f );
+	float a								= state.GetValue < float >( 11, 0.0f );
 
 	u32 color = ZLColor::PackRGBA(r, g, b, a);
 	
@@ -484,16 +489,18 @@ int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 	
 	int* polygonOrientations = offsetPolyLinesToPolygons(polyLines, unionIntersectionGeometries, cutIntersectionGeometries, unionPolygons, cutPolygons, delta);
 	
+	//computeOutlineNormalsForPolylines
+
 	FPolygons triangles;
 	tesselatePolygons(cutPolygons, triangles);
 	
 	//Colors triangleColors;
 	//calculateTriangleColors(triangles, triangleColors, polyLines, lineColors);
 
-	writeTrianglesToVBO(vbo, triangles, polyLines, hand, missingDimValue + delta, 1.0f, color);
-	writeTrianglesToVBO(vbo, triangles, polyLines, hand, missingDimValue - delta, -1.0f, color);
+	writeTrianglesToVBO(mainVbo, triangles, polyLines, hand, missingDimValue + delta, 1.0f, color);
+	writeTrianglesToVBO(mainVbo, triangles, polyLines, hand, missingDimValue - delta, -1.0f, color);
 
-	writeTopFacesToVBO(vbo, cutPolygons, polygonOrientations, hand, missingDimValue, delta, color);
+	writeTopFacesToVBO(mainVbo, cutPolygons, polygonOrientations, hand, missingDimValue, delta, color);
 	
 	pushPolygonsToLua(state, L, unionPolygons, polygonOrientations);
 	

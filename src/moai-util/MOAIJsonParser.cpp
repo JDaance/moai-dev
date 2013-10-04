@@ -211,7 +211,9 @@ int MOAIJsonParser::_decode ( lua_State* L ) {
 			_jsonToLua ( L, json );
 			json_decref ( json );
 			return 1;
-		}
+		} else {
+			MOAIPrint("JSON decode error at line %d column %d position %d", error.line, error.column, error.position);
+		}	
 	}
 	return 0;
 }
