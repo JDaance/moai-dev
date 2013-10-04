@@ -463,7 +463,7 @@ void static	writeTopFacesToVBO(MOAIVertexBuffer* vbo, const FPolygons &polygons,
 
 int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 	MOAILuaState state ( L );
-	if ( !state.CheckParams(1, "UTTNNN") ) return 0;
+	if ( !state.CheckParams(1, "UUTTNNN") ) return 0;
 	
 	MOAIVertexBuffer* mainVbo			= state.GetLuaObject < MOAIVertexBuffer >( 1, true );
 	MOAIVertexBuffer* outlineVbo		= state.GetLuaObject < MOAIVertexBuffer >( 2, true );
