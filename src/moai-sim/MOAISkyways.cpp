@@ -223,10 +223,10 @@ static void computeNormalsForPolygon(FPolygon &polygon) {
 	int size = polygon.size();
 	for (int i = 0; i < size; ++i) {
 		FVertex& vertex = polygon[i];
-
-		USVec2D vRight = vertex.mV;
-		USVec2D vMiddle = polygon[(i + 1)%size].mV;
-		USVec2D vLeft = polygon[(i + 2)%size].mV;
+		
+		USVec2D vRight = polygon[(i + size - 1)%size].mV;
+		USVec2D vMiddle = vertex.mV;
+		USVec2D vLeft = polygon[(i + 1)%size].mV;
 
 		USVec2D dir1 = vMiddle - vLeft; dir1.Norm();
 		USVec2D dir2 = vRight - vMiddle; dir2.Norm();
@@ -414,7 +414,7 @@ void static writeVertexToVBO(MOAIVertexBuffer* vbo, const ZLVec3D &p, const ZLVe
 	writePointToStream(stream, p);
 	writePointToStream(stream, n);
 	stream->Write < u32 >( color );
-	//MOAIPrint("Regular point: %.2f, %.2f, %.2f - normal: %.2f, %.2f, %.2f\n", p.mX, p.mY, p.mZ, n.mX, n.mY, n.mZ);
+	MOAIPrint("Regular point: %.2f, %.2f, %.2f - normal: %.2f, %.2f, %.2f\n", p.mX, p.mY, p.mZ, n.mX, n.mY, n.mZ);
 }
 
 void static writeOutlineVertexToVBO(MOAIVertexBuffer* vbo, const ZLVec3D &p, const ZLVec3D &n)
@@ -422,7 +422,7 @@ void static writeOutlineVertexToVBO(MOAIVertexBuffer* vbo, const ZLVec3D &p, con
 	ZLByteStream* stream = vbo->GetStream();
 	writePointToStream(stream, p);
 	writePointToStream(stream, n);
-	//MOAIPrint("Outline point: %.2f, %.2f, %.2f - normal: %.2f, %.2f, %.2f\n", p.mX, p.mY, p.mZ, n.mX, n.mY, n.mZ);
+	MOAIPrint("Outline point: %.2f, %.2f, %.2f - normal: %.2f, %.2f, %.2f\n", p.mX, p.mY, p.mZ, n.mX, n.mY, n.mZ);
 }
 
 void static writeTrianglesToVBO(MOAIVertexBuffer* mainVbo, MOAIVertexBuffer* outlineVbo, const FPolygons &triangles, const FPolygons &polyLines, u32 hand, float missingDimValue, float normalSign, const u32 color)
