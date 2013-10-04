@@ -238,7 +238,7 @@ static void computeNormalsForPolygon(FPolygon &polygon) {
 		dir2.Rotate90Clockwise();
 
 		vertex.mN = dir1 + dir2;
-		vertex.mN.Scale(0.5f);
+		vertex.mN.Norm();
 	}
 }
 
@@ -393,6 +393,14 @@ static void calculateTriangleColors(const FPolygons &triangles, Colors &triangle
 // 3D
 //================================================================//
 
+static ZLVec3D to3DWithX(const USVec2D &v2, float x) {
+	return ZLVec3D(x, v2.mX, v2.mY);
+}
+
+static ZLVec3D to3DWithY(const USVec2D &v2, float y) {
+	return ZLVec3D(v2.mX, y, v2.mY);
+}
+
 void static writePointToStream(ZLByteStream* stream, const ZLVec3D &p)
 {
 	stream->Write<float>(p.mX);
@@ -406,11 +414,20 @@ void static writeVertexToVBO(MOAIVertexBuffer* vbo, const ZLVec3D &p, const ZLVe
 	writePointToStream(stream, p);
 	writePointToStream(stream, n);
 	stream->Write < u32 >( color );
+	MOAIPrint("Regular point: %.2f, %.2f, %.2f - normal: %.2f, %.2f, %.2f\n", p.mX, p.mY, p.mZ, n.mX, n.mY, n.mZ);
 }
 
-void static writeTrianglesToVBO(MOAIVertexBuffer* vbo, const FPolygons &triangles, const FPolygons &polyLines, u32 hand, float missingDimValue, float normalSign, const u32 color)
+void static writeOutlineVertexToVBO(MOAIVertexBuffer* vbo, const ZLVec3D &p, const ZLVec3D &n)
 {
-	ZLVec3D p3d, n;
+	ZLByteStream* stream = vbo->GetStream();
+	writePointToStream(stream, p);
+	writePointToStream(stream, n);
+	MOAIPrint("Outline point: %.2f, %.2f, %.2f - normal: %.2f, %.2f, %.2f\n", p.mX, p.mY, p.mZ, n.mX, n.mY, n.mZ);
+}
+
+void static writeTrianglesToVBO(MOAIVertexBuffer* mainVbo, MOAIVertexBuffer* outlineVbo, const FPolygons &triangles, const FPolygons &polyLines, u32 hand, float missingDimValue, float normalSign, const u32 color)
+{
+	ZLVec3D p3d, n, outline_n;
 
 	int count = triangles.size();
 	for (int i = 0; i < triangles.size(); ++i) {
@@ -418,21 +435,27 @@ void static writeTrianglesToVBO(MOAIVertexBuffer* vbo, const FPolygons &triangle
 
 		int compCount = triangle.size();
 		for (int j = 0; j < compCount; j++) {
-			USVec2D p2d = triangle[j].mV;
+			FVertex v2d = triangle[j];
+			USVec2D p2d = v2d.mV;
 			if (hand == MOAISkyways::HAND_LEFT) {
 				p3d.mX = missingDimValue;
 				p3d.mY = p2d.mX;
 
 				n.mX = normalSign; n.mY = 0.0f; n.mZ = 0.0f;
+				outline_n = n + to3DWithX(v2d.mN, 0.0f);
+				outline_n.Scale(0.5f);
 			} else {
 				p3d.mX = p2d.mX;
 				p3d.mY = missingDimValue;
 
 				n.mX = 0.0f; n.mY = normalSign; n.mZ = 0.0f;
+				outline_n = n + to3DWithY(v2d.mN, 0.0f);
+				outline_n.Scale(0.5f);
 			}
 			p3d.mZ = p2d.mY;
 
-			writeVertexToVBO(vbo, p3d, n, color);
+			writeVertexToVBO(mainVbo, p3d, n, color);
+			writeOutlineVertexToVBO(outlineVbo, p3d, outline_n);
 		}
 	}
 }
@@ -444,18 +467,18 @@ void static writeTriToVBO(MOAIVertexBuffer* vbo, const ZLVec3D &p1, const ZLVec3
 	writeVertexToVBO(vbo, p3, n3, color);
 }
 
-ZLVec3D to3DWithX(const USVec2D &v2, float x) {
-	return ZLVec3D(x, v2.mX, v2.mY);
+void static writeTriToOutlineVBO(MOAIVertexBuffer* vbo, const ZLVec3D &p1, const ZLVec3D &n1, const ZLVec3D &p2, const ZLVec3D &n2, const ZLVec3D &p3, const ZLVec3D &n3)
+{
+	writeOutlineVertexToVBO(vbo, p1, n1);
+	writeOutlineVertexToVBO(vbo, p2, n2);
+	writeOutlineVertexToVBO(vbo, p3, n3);
 }
 
-ZLVec3D to3DWithY(const USVec2D &v2, float y) {
-	return ZLVec3D(v2.mX, y, v2.mY);
-}
-
-void static	writeTopFaceToVBO(MOAIVertexBuffer* vbo, const FVertex &v1, const FVertex &v2, int orientation, u32 hand, float missingDimValue, float delta, const u32 color)
+void static	writeTopFaceToVBO(MOAIVertexBuffer* mainVbo, MOAIVertexBuffer* outlineVbo, const FVertex &v1, const FVertex &v2, int orientation, u32 hand, float missingDimValue, float delta, const u32 color)
 {
 	ZLVec3D nl, nr, sr, sl; // north/left/south/right
 	ZLVec3D nl_n, nr_n, sr_n, sl_n; // normals
+	ZLVec3D nl_on, nr_on, sr_on, sl_on; // outline normals
 	USVec2D p1 = v1.mV, p2 = v2.mV;
 
 	if (hand == MOAISkyways::HAND_LEFT) {
@@ -463,55 +486,66 @@ void static	writeTopFaceToVBO(MOAIVertexBuffer* vbo, const FVertex &v1, const FV
 		nl.mY = p2.mX;
 		nl.mZ = p2.mY;
 		nl_n = to3DWithX(v2.mN, 0.0f);
+		nl_on = nl_n; nl_on.mX = -1.0f; nl_on.Norm();
 		
 		nr.mX = missingDimValue + delta;
 		nr.mY = p2.mX;
 		nr.mZ = p2.mY;
 		nr_n = to3DWithX(v2.mN, 0.0f);
+		nr_on = nr_n; nr_on.mX = 1.0f; nr_on.Norm();
 		
 		sr.mX = missingDimValue + delta;
 		sr.mY = p1.mX;
 		sr.mZ = p1.mY;
 		sr_n = to3DWithX(v1.mN, 0.0f);
+		sr_on = sr_n; sr_on.mX = 1.0f; sr_on.Norm();
 		
 		sl.mX = missingDimValue - delta;
 		sl.mY = p1.mX;
 		sl.mZ = p1.mY;
 		sl_n = to3DWithX(v1.mN, 0.0f);
+		sl_on = sl_n; sl_on.mX = -1.0f; sl_on.Norm();
 	} else {
 		nl.mX = p2.mX;
 		nl.mY = missingDimValue + delta;
 		nl.mZ = p2.mY;
 		nl_n = to3DWithY(v2.mN, 0.0f);
+		nl_on = nl_n; nl_on.mY = +1.0f; nl_on.Norm();
 		
 		nr.mX = p2.mX;
 		nr.mY = missingDimValue - delta;
 		nr.mZ = p2.mY;
 		nr_n = to3DWithY(v2.mN, 0.0f);
+		nr_on = nr_n; nr_on.mY = -1.0f; nr_on.Norm();
 		
 		sr.mX = p1.mX;
 		sr.mY = missingDimValue - delta;
 		sr.mZ = p1.mY;
 		sr_n = to3DWithY(v1.mN, 0.0f);
+		sr_on = sr_n; sr_on.mY = -1.0f; sr_on.Norm();
 		
 		sl.mX = p1.mX;
 		sl.mY = missingDimValue + delta;
 		sl.mZ = p1.mY;
 		sl_n = to3DWithY(v1.mN, 0.0f);
+		sl_on = sl_n; sl_on.mY = 1.0f; sl_on.Norm();
 	}
 
-	writeTriToVBO(vbo, nl, nl_n, sr, sr_n, sl, sl_n, color);
-	writeTriToVBO(vbo, nl, nl_n, nr, nr_n, sr, sr_n, color);
+	writeTriToVBO(mainVbo, nl, nl_n, sr, sr_n, sl, sl_n, color);
+	writeTriToOutlineVBO(outlineVbo, nl, nl_on, sr, sr_on, sl, sl_on);
+
+	writeTriToVBO(mainVbo, nl, nl_n, nr, nr_n, sr, sr_n, color);
+	writeTriToOutlineVBO(outlineVbo, nl, nl_on, nr, nr_on, sr, sr_on);
 }
 
-void static	writeTopFacesToVBO(MOAIVertexBuffer* vbo, const FPolygons &polygons, const int polygonOrientations[], u32 hand, float missingDimValue, float delta, const u32 color)
+void static	writeTopFacesToVBO(MOAIVertexBuffer* mainVbo, MOAIVertexBuffer* outlineVbo, const FPolygons &polygons, const int polygonOrientations[], u32 hand, float missingDimValue, float delta, const u32 color)
 {
 	for (int iP = 0; iP < polygons.size(); ++iP) {
 		FPolygon polygon = polygons[iP];
 		for (int iV = 0; iV < polygon.size(); ++iV) {
 			FVertex v1 = polygon[iV];
 			FVertex v2 = polygon[(iV + 1) % polygon.size()];
-			writeTopFaceToVBO(vbo, v1, v2, polygonOrientations[iP], hand, missingDimValue, delta, color);
+			writeTopFaceToVBO(mainVbo, outlineVbo, v1, v2, polygonOrientations[iP], hand, missingDimValue, delta, color);
 		}
 	}
 }
@@ -556,10 +590,10 @@ int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 	//Colors triangleColors;
 	//calculateTriangleColors(triangles, triangleColors, polyLines, lineColors);
 
-	writeTrianglesToVBO(mainVbo, triangles, polyLines, hand, missingDimValue + delta, 1.0f, color);
-	writeTrianglesToVBO(mainVbo, triangles, polyLines, hand, missingDimValue - delta, -1.0f, color);
+	writeTrianglesToVBO(mainVbo, outlineVbo, triangles, polyLines, hand, missingDimValue + delta, 1.0f, color);
+	writeTrianglesToVBO(mainVbo, outlineVbo, triangles, polyLines, hand, missingDimValue - delta, -1.0f, color);
 
-	writeTopFacesToVBO(mainVbo, cutPolygons, polygonOrientations, hand, missingDimValue, delta, color);
+	writeTopFacesToVBO(mainVbo, outlineVbo, cutPolygons, polygonOrientations, hand, missingDimValue, delta, color);
 	
 	pushPolygonsToLua(state, L, unionPolygons, polygonOrientations);
 	
