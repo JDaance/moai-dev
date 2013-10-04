@@ -25,7 +25,14 @@ using namespace ClipperLib;
 // STRUCT
 //================================================================//
 
-typedef std::vector< USVec2D > FPolygon;
+struct FVertex {
+public:
+	USVec2D mV;
+	USVec2D mN;
+	FVertex(USVec2D v): mV(v) {};
+};
+
+typedef std::vector< FVertex > FPolygon;
 typedef std::vector< FPolygon > FPolygons;
 typedef std::vector< u32 > Colors;
 
@@ -90,7 +97,7 @@ void static readIntersectionPointsFromLua(FPolygon &intersectionPoints, MOAILuaS
 			x = state.GetValue < float >( -1, 0.0f );
 		} else {
 			y = state.GetValue < float >( -1, 0.0f );
-			intersectionPoints.push_back(USVec2D(x, y));
+			intersectionPoints.push_back(FVertex(USVec2D(x, y)));
 		}
 		++compCount;
 		lua_pop ( L, 1 );
@@ -108,9 +115,9 @@ void static pushPolygonsToLua(MOAILuaState state, lua_State* L, const FPolygons 
 		lua_pushinteger(L, i + 1); // [bt, i]
 		lua_createtable(L, compCount * 2, 0); // [bt, i, tt]
 		for (int j = 0; j < compCount; j++) {
-			lua_pushnumber(L, polygon[j].mX); // [bt, i, tt, x]
+			lua_pushnumber(L, polygon[j].mV.mX); // [bt, i, tt, x]
 			lua_rawseti (L, -2, j * 2 + 1); // [bt, i, tt]
-			lua_pushnumber(L, polygon[j].mY); // [bt, i, tt, y]
+			lua_pushnumber(L, polygon[j].mV.mY); // [bt, i, tt, y]
 			lua_rawseti (L, -2, j * 2 + 2); // [bt, i, tt]
 		}
 		lua_settable(L, -3); // [bt[i=tt]
@@ -125,7 +132,7 @@ void static createIntersectionGeometries(const FPolygon &intersectionPoints, FPo
 {
 	unionIntersectionGeometries.clear();
 	for (int i = 0; i < intersectionPoints.size(); ++i) {
-		USVec2D p = intersectionPoints[i];
+		USVec2D p = intersectionPoints[i].mV;
 		FPolygon geom;
 		geom.push_back(USVec2D(p.mX - delta, p.mY + delta));
 		geom.push_back(USVec2D(p.mX - delta, p.mY - delta));
@@ -136,7 +143,7 @@ void static createIntersectionGeometries(const FPolygon &intersectionPoints, FPo
 	
 	cutIntersectionGeometries.clear();
 	for (int i = 0; i < intersectionPoints.size(); ++i) {
-		USVec2D p = intersectionPoints[i];
+		USVec2D p = intersectionPoints[i].mV;
 		FPolygon geom;
 		geom.push_back(USVec2D(p.mX - delta, p.mY + delta * 1.2));
 		geom.push_back(USVec2D(p.mX - delta, p.mY - delta * 1.2));
@@ -156,7 +163,7 @@ void static	floatToIntScale(const FPolygons &polys, Polygons &scaledPolys, float
 		FPolygon poly = polys[i];
 		ClipperLib::Polygon scaledPoly;
 		for (int j = 0; j < poly.size(); ++j) {
-			USVec2D p = poly[j];
+			USVec2D p = poly[j].mV;
 			scaledPoly.push_back(IntPoint(p.mX * scale, p.mY * scale));
 		}
 		scaledPolys.push_back(scaledPoly);
@@ -170,7 +177,7 @@ void static	intToFloatScale(const Polygons &scaledPolys, FPolygons &polys, float
 		FPolygon poly;
 		for (int j = 0; j < scaledPoly.size(); ++j) {
 			IntPoint p = scaledPoly[j];
-			poly.push_back(USVec2D(p.X * scale, p.Y * scale));
+			poly.push_back(FVertex(USVec2D(p.X * scale, p.Y * scale)));
 		}
 		polys.push_back(poly);
 	}
@@ -209,6 +216,40 @@ static int* offsetPolyLinesToPolygons(const FPolygons &polyLines, FPolygons &uni
 }
 
 //================================================================//
+// NORMALS
+//================================================================//
+
+static void computeNormalsForPolygon(FPolygon &polygon) {
+	int size = polygon.size();
+	for (int i = 0; i < size; ++i) {
+		FVertex& vertex = polygon[i];
+
+		USVec2D vRight = vertex.mV;
+		USVec2D vMiddle = polygon[(i + 1)%size].mV;
+		USVec2D vLeft = polygon[(i + 2)%size].mV;
+
+		USVec2D dir1 = vMiddle - vLeft; dir1.Norm();
+		USVec2D dir2 = vRight - vMiddle; dir2.Norm();
+
+		// TODO: detect intersections
+		// check if dirs are x=0 resp y=0 and point normal according to y=0 rotate90anti ?
+
+		dir1.Rotate90Clockwise();
+		dir2.Rotate90Clockwise();
+
+		vertex.mN = dir1 + dir2;
+		vertex.mN.Scale(0.5f);
+	}
+}
+
+static void computeNormalsForPolygons(FPolygons &polygons) {
+	for (int i = 0; i < polygons.size(); ++i) {
+		FPolygon& poly = polygons[i];
+		computeNormalsForPolygon(poly);
+	}
+}
+
+//================================================================//
 // TESSELATION
 //================================================================//
 
@@ -234,14 +275,18 @@ void static tesselatePolygons(const FPolygons &polygons, FPolygons &triangles) {
 	ma.extraVertices = 256; // realloc not provided, allow 256 extra vertices.
 
 	TESStesselator* tess = tessNewTess(&ma);
+
+	FPolygon vertexIndex;
 	
 	for (int i = 0; i < polygons.size(); ++i) {
 		FPolygon polygon = polygons[i];
 		int count = polygon.size();
 		float *comps = new float[count * 2];
 		for (int j = 0; j < count; ++j) {
-			comps[j * 2] = polygon[j].mX;
-			comps[j * 2 + 1] = polygon[j].mY;
+			FVertex vertex = polygon[j];
+			comps[j * 2] = vertex.mV.mX;
+			comps[j * 2 + 1] = vertex.mV.mY;
+			vertexIndex.push_back(vertex);
 		}
 		tessAddContour(tess, 2, comps, sizeof(float)*2, count);
 	}
@@ -266,8 +311,8 @@ void static tesselatePolygons(const FPolygons &polygons, FPolygons &triangles) {
 		for (int j = 0; j < 3 && p[j] != TESS_UNDEF; ++j) {
 			int vertexNumber = p[j];
 			int originalVertexIndex = vinds[vertexNumber];
-
-			poly.push_back(USVec2D(verts[p[j]*2], verts[p[j]*2+1]));
+			FVertex vertex = vertexIndex[originalVertexIndex];
+			poly.push_back(vertex);
 		}	
 		triangles.push_back(poly);
 	}
@@ -373,7 +418,7 @@ void static writeTrianglesToVBO(MOAIVertexBuffer* vbo, const FPolygons &triangle
 
 		int compCount = triangle.size();
 		for (int j = 0; j < compCount; j++) {
-			USVec2D p2d = triangle[j];
+			USVec2D p2d = triangle[j].mV;
 			if (hand == MOAISkyways::HAND_LEFT) {
 				p3d.mX = missingDimValue;
 				p3d.mY = p2d.mX;
@@ -392,57 +437,71 @@ void static writeTrianglesToVBO(MOAIVertexBuffer* vbo, const FPolygons &triangle
 	}
 }
 
-void static writeTriToVBO(MOAIVertexBuffer* vbo, const ZLVec3D &p1, const ZLVec3D &p2, const ZLVec3D &p3, const u32 color)
+void static writeTriToVBO(MOAIVertexBuffer* vbo, const ZLVec3D &p1, const ZLVec3D &n1, const ZLVec3D &p2, const ZLVec3D &n2, const ZLVec3D &p3, const ZLVec3D &n3, const u32 color)
 {
-	ZLVec3D n;
-	n.Cross(p2 - p1, p3 - p1);
-	n.Norm();
-	
-	writeVertexToVBO(vbo, p1, n, color);
-	writeVertexToVBO(vbo, p2, n, color);
-	writeVertexToVBO(vbo, p3, n, color);
+	writeVertexToVBO(vbo, p1, n1, color);
+	writeVertexToVBO(vbo, p2, n2, color);
+	writeVertexToVBO(vbo, p3, n3, color);
 }
 
-void static	writeTopFaceToVBO(MOAIVertexBuffer* vbo, const USVec2D &p1, const USVec2D &p2, int orientation, u32 hand, float missingDimValue, float delta, const u32 color)
+ZLVec3D to3DWithX(const USVec2D &v2, float x) {
+	return ZLVec3D(x, v2.mX, v2.mY);
+}
+
+ZLVec3D to3DWithY(const USVec2D &v2, float y) {
+	return ZLVec3D(v2.mX, y, v2.mY);
+}
+
+void static	writeTopFaceToVBO(MOAIVertexBuffer* vbo, const FVertex &v1, const FVertex &v2, int orientation, u32 hand, float missingDimValue, float delta, const u32 color)
 {
 	ZLVec3D nl, nr, sr, sl; // north/left/south/right
+	ZLVec3D nl_n, nr_n, sr_n, sl_n; // normals
+	USVec2D p1 = v1.mV, p2 = v2.mV;
 
 	if (hand == MOAISkyways::HAND_LEFT) {
 		nl.mX = missingDimValue - delta;
 		nl.mY = p2.mX;
 		nl.mZ = p2.mY;
+		nl_n = to3DWithX(v2.mN, 0.0f);
 		
 		nr.mX = missingDimValue + delta;
 		nr.mY = p2.mX;
 		nr.mZ = p2.mY;
+		nr_n = to3DWithX(v2.mN, 0.0f);
 		
 		sr.mX = missingDimValue + delta;
 		sr.mY = p1.mX;
 		sr.mZ = p1.mY;
+		sr_n = to3DWithX(v1.mN, 0.0f);
 		
 		sl.mX = missingDimValue - delta;
 		sl.mY = p1.mX;
 		sl.mZ = p1.mY;
+		sl_n = to3DWithX(v1.mN, 0.0f);
 	} else {
 		nl.mX = p2.mX;
 		nl.mY = missingDimValue + delta;
 		nl.mZ = p2.mY;
+		nl_n = to3DWithY(v2.mN, 0.0f);
 		
 		nr.mX = p2.mX;
 		nr.mY = missingDimValue - delta;
 		nr.mZ = p2.mY;
+		nr_n = to3DWithY(v2.mN, 0.0f);
 		
 		sr.mX = p1.mX;
 		sr.mY = missingDimValue - delta;
 		sr.mZ = p1.mY;
+		sr_n = to3DWithY(v1.mN, 0.0f);
 		
 		sl.mX = p1.mX;
 		sl.mY = missingDimValue + delta;
 		sl.mZ = p1.mY;
+		sl_n = to3DWithY(v1.mN, 0.0f);
 	}
 
-	writeTriToVBO(vbo, nl, sr, sl, color);
-	writeTriToVBO(vbo, nl, nr, sr, color);
+	writeTriToVBO(vbo, nl, nl_n, sr, sr_n, sl, sl_n, color);
+	writeTriToVBO(vbo, nl, nl_n, nr, nr_n, sr, sr_n, color);
 }
 
 void static	writeTopFacesToVBO(MOAIVertexBuffer* vbo, const FPolygons &polygons, const int polygonOrientations[], u32 hand, float missingDimValue, float delta, const u32 color)
@@ -450,9 +509,9 @@ void static	writeTopFacesToVBO(MOAIVertexBuffer* vbo, const FPolygons &polygons,
 	for (int iP = 0; iP < polygons.size(); ++iP) {
 		FPolygon polygon = polygons[iP];
 		for (int iV = 0; iV < polygon.size(); ++iV) {
-			USVec2D p1 = polygon[iV];
-			USVec2D p2 = polygon[(iV + 1) % polygon.size()];
-			writeTopFaceToVBO(vbo, p1, p2, polygonOrientations[iP], hand, missingDimValue, delta, color);
+			FVertex v1 = polygon[iV];
+			FVertex v2 = polygon[(iV + 1) % polygon.size()];
+			writeTopFaceToVBO(vbo, v1, v2, polygonOrientations[iP], hand, missingDimValue, delta, color);
 		}
 	}
 }
@@ -489,7 +548,7 @@ int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 	
 	int* polygonOrientations = offsetPolyLinesToPolygons(polyLines, unionIntersectionGeometries, cutIntersectionGeometries, unionPolygons, cutPolygons, delta);
 	
-	//computeOutlineNormalsForPolylines
+	computeNormalsForPolygons(cutPolygons);
 
 	FPolygons triangles;
 	tesselatePolygons(cutPolygons, triangles);
