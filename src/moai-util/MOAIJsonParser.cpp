@@ -292,7 +292,9 @@ int MOAIJsonParser::Encode ( lua_State* L ) {
 }
 
 int MOAIJsonParser::Decode ( lua_State* L ) {
-	return _decode(L);
+	int result = _decode(L);
+	lua_remove(L, -2);
+	return result;
 }
 
 #endif
