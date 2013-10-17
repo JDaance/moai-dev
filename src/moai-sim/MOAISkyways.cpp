@@ -191,7 +191,7 @@ static int* offsetPolyLinesToPolygons(const FPolygons &polyLines, FPolygons &uni
 	floatToIntScale(unionIntersectionGeometries, scaledUnionIntersectionGeometries, scale);
 	floatToIntScale(cutIntersectionGeometries, scaledCutIntersectionGeometries, scale);
 	
- 	OffsetPolyLines(scaledPolyLines, scaledPolygons, delta * scale, jtRound, etRound, 3.0);
+ 	OffsetPolyLines(scaledPolyLines, scaledPolygons, delta * scale, jtRound, etRound, 0.25);
 	
 	//MOAIPrint("Orientation scaledIntersectionGeometries[0]: %d\n", Orientation(scaledCutIntersectionGeometries[0]));
 
