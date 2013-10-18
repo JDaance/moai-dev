@@ -143,7 +143,16 @@ void MOAIMesh::DrawIndex ( u32 idx, float xOff, float yOff, float zOff, float xS
 			}
 		}
 		else {
-			zglDrawArrays ( this->mPrimType, 0, this->mVertexBuffer->GetVertexCount ());
+			int verticesToDrawCount = this->mVertexBuffer->GetVertexCount ();
+			MOAIPrint("Vertex count: %d", verticesToDrawCount);
+			int batchAmount = 10000;
+			int verticesDrawnCount = 0;
+			while (verticesToDrawCount > 0) {
+				int drawCount = min(batchAmount, verticesToDrawCount);
+				zglDrawArrays ( this->mPrimType, verticesDrawnCount, drawCount);
+				verticesDrawnCount += drawCount;
+				verticesToDrawCount -= drawCount;
+			}
 		}
 	}
 }
