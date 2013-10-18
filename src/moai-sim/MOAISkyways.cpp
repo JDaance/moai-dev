@@ -4,6 +4,7 @@
 #include "pch.h"
 #include <moai-sim/MOAISkyways.h>
 #include <moai-sim/MOAIVertexBuffer.h>
+#include <moai-sim/MOAIVertexFormat.h>
 
 #include <clipper/clipper.hpp>
 
@@ -586,14 +587,14 @@ int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 
 	FPolygons triangles;
 	tesselatePolygons(cutPolygons, triangles);
-	
-	//Colors triangleColors;
-	//calculateTriangleColors(triangles, triangleColors, polyLines, lineColors);
 
+	mainVbo->Reserve(triangles.size() * 3 * 5 * mainVbo->GetFormat()->GetVertexSize ()); // 5 arbitrary (2 for 2 sides + ? for top)- TODO count polylines in cut for top face vertex count
 	writeTrianglesToVBO(mainVbo, outlineVbo, triangles, polyLines, hand, missingDimValue + delta, 1.0f, color);
 	writeTrianglesToVBO(mainVbo, outlineVbo, triangles, polyLines, hand, missingDimValue - delta, -1.0f, color);
 
 	writeTopFacesToVBO(mainVbo, outlineVbo, cutPolygons, polygonOrientations, hand, missingDimValue, delta, color);
+	
+	// TODO implement bless here instead of in LUA
 	
 	pushPolygonsToLua(state, L, unionPolygons, polygonOrientations);
 	
