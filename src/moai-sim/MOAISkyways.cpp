@@ -588,8 +588,11 @@ int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 	FPolygons triangles;
 	tesselatePolygons(cutPolygons, triangles);
 
-	mainVbo->Reserve(triangles.size() * 3 * 5 * mainVbo->GetFormat()->GetVertexSize ()); // 5 arbitrary (2 for 2 sides + ? for top)- TODO count polylines in cut for top face vertex count
-	outlineVbo->Reserve(triangles.size() * 3 * 5 * mainVbo->GetFormat()->GetVertexSize ()); // 5 arbitrary (2 for 2 sides + ? for top)- TODO count polylines in cut for top face vertex count
+	// 5 arbitrary (2 for 2 sides + ? for top)- TODO count polylines in cut for top face vertex count
+	int approximateVertexCount = triangles.size() * 3 * 5 * mainVbo->GetFormat()->GetVertexSize ();
+	mainVbo->Reserve(approximateVertexCount); 
+	outlineVbo->Reserve(approximateVertexCount);
+
 	writeTrianglesToVBO(mainVbo, outlineVbo, triangles, polyLines, hand, missingDimValue + delta, 1.0f, color);
 	writeTrianglesToVBO(mainVbo, outlineVbo, triangles, polyLines, hand, missingDimValue - delta, -1.0f, color);
 
