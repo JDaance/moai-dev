@@ -435,8 +435,9 @@ void static writeTrianglesToVBO(MOAIVertexBuffer* mainVbo, MOAIVertexBuffer* out
 		FPolygon triangle = triangles[i];
 
 		int compCount = triangle.size();
-		for (int j = 0; j < compCount; j++) {
-			FVertex v2d = triangle[j];
+		for (int j = 0; j < compCount; ++j) {
+			// go backwards for hand left for correct culling
+			FVertex v2d = hand == MOAISkyways::HAND_LEFT ? triangle[compCount - j - 1] : triangle[j];
 			USVec2D p2d = v2d.mV;
 			if (hand == MOAISkyways::HAND_LEFT) {
 				p3d.mX = missingDimValue;
@@ -481,6 +482,17 @@ void static	writeTopFaceToVBO(MOAIVertexBuffer* mainVbo, MOAIVertexBuffer* outli
 	ZLVec3D nl_n, nr_n, sr_n, sl_n; // normals
 	ZLVec3D nl_on, nr_on, sr_on, sl_on; // outline normals
 	USVec2D p1 = v1.mV, p2 = v2.mV;
+
+	{
+		// this tests skips faces that would face away from camera at all times
+		USVec2D realLineNormal = p2 - p1;
+		realLineNormal.Rotate90Anticlockwise();
+		realLineNormal.Norm();
+
+		static USVec2D backfacing(0.7, -0.7);
+		if (realLineNormal.Dot(backfacing) >= 0.2)
+			return;
+	}
 
 	if (hand == MOAISkyways::HAND_LEFT) {
 		nl.mX = missingDimValue - delta;
@@ -588,15 +600,18 @@ int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 	FPolygons triangles;
 	tesselatePolygons(cutPolygons, triangles);
 
-	// 5 arbitrary (2 for 2 sides + ? for top)- TODO count polylines in cut for top face vertex count
-	int approximateVertexCount = triangles.size() * 3 * 5 * mainVbo->GetFormat()->GetVertexSize ();
+	// 3 = tri, 3 = arbitrary - TODO count polylines in cut for top face vertex count
+	int approximateVertexCount = triangles.size() * 3 * 3 * mainVbo->GetFormat()->GetVertexSize ();
 	mainVbo->Reserve(approximateVertexCount); 
 	outlineVbo->Reserve(approximateVertexCount);
 
-	writeTrianglesToVBO(mainVbo, outlineVbo, triangles, polyLines, hand, missingDimValue + delta, 1.0f, color);
+	// skip far side
+	// writeTrianglesToVBO(mainVbo, outlineVbo, triangles, polyLines, hand, missingDimValue + delta, 1.0f, color);
 	writeTrianglesToVBO(mainVbo, outlineVbo, triangles, polyLines, hand, missingDimValue - delta, -1.0f, color);
 
 	writeTopFacesToVBO(mainVbo, outlineVbo, cutPolygons, polygonOrientations, hand, missingDimValue, delta, color);
+
+	MOAIPrint("Approximated %d vertices but wrote %d\n", approximateVertexCount / mainVbo->GetFormat()->GetVertexSize (), mainVbo->GetVertexCount());
 	
 	// TODO implement bless here instead of in LUA
 	
