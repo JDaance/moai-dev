@@ -76,6 +76,7 @@
 	MY_HEADER_SEARCH_PATHS += $(MY_MOAI_ROOT)/3rdparty/chipmunk-5.3.4/include
 	MY_HEADER_SEARCH_PATHS += $(MY_MOAI_ROOT)/3rdparty/chipmunk-5.3.4/include/chipmunk
 	MY_HEADER_SEARCH_PATHS += $(MY_MOAI_ROOT)/3rdparty/chipmunk-5.3.4/include/chipmunk/constraints
+	MY_HEADER_SEARCH_PATHS += $(MY_MOAI_ROOT)/3rdparty/clipper
 	MY_HEADER_SEARCH_PATHS += $(MY_MOAI_ROOT)/3rdparty/contrib
 	MY_HEADER_SEARCH_PATHS += $(MY_MOAI_ROOT)/3rdparty/curl-7.19.7/include-android
 	MY_HEADER_SEARCH_PATHS += $(MY_MOAI_ROOT)/3rdparty/expat-2.0.1/amiga
@@ -89,6 +90,8 @@
 	MY_HEADER_SEARCH_PATHS += $(MY_MOAI_ROOT)/3rdparty/freetype-2.4.4/config
 	MY_HEADER_SEARCH_PATHS += $(MY_MOAI_ROOT)/3rdparty/jansson-2.1/src
 	MY_HEADER_SEARCH_PATHS += $(MY_MOAI_ROOT)/3rdparty/jpeg-8c
+	MY_HEADER_SEARCH_PATHS += $(MY_MOAI_ROOT)/3rdparty/libtess2/Include
+	MY_HEADER_SEARCH_PATHS += $(MY_MOAI_ROOT)/3rdparty/libtess2/Source
 	MY_HEADER_SEARCH_PATHS += $(MY_MOAI_ROOT)/3rdparty/lpng140
 	MY_HEADER_SEARCH_PATHS += $(MY_MOAI_ROOT)/3rdparty/lua-5.1.3/src
 	MY_HEADER_SEARCH_PATHS += $(MY_MOAI_ROOT)/3rdparty/luacrypto-0.2.0/src
@@ -150,6 +153,7 @@
 	LOCAL_STATIC_LIBRARIES += libbox2D
 	LOCAL_STATIC_LIBRARIES += libcares
 	LOCAL_STATIC_LIBRARIES += libchipmunk
+	LOCAL_STATIC_LIBRARIES += libclipper
 	LOCAL_STATIC_LIBRARIES += libcontrib
 	LOCAL_STATIC_LIBRARIES += libcurl
 	LOCAL_STATIC_LIBRARIES += libexpat
@@ -161,6 +165,7 @@
 	LOCAL_STATIC_LIBRARIES += libsfmt
 	LOCAL_STATIC_LIBRARIES += libsqlite
 	LOCAL_STATIC_LIBRARIES += libssl
+	LOCAL_STATIC_LIBRARIES += libtess2
 	LOCAL_STATIC_LIBRARIES += libtinyxml
 	
 	include $(BUILD_SHARED_LIBRARY)
@@ -172,12 +177,14 @@
 	include box2d/Android.mk
 	include c-ares/Android.mk
 	include chipmunk/Android.mk
+	include clipper/Android.mk
 	include contrib/Android.mk
 	include curl/Android.mk
 	include expat/Android.mk
 	include freetype/Android.mk
 	include jpg/Android.mk
 	include json/Android.mk
+	include libtess2/Android.mk
 	include lua/Android.mk
 	include moaiext-android/Android.mk
 	include moaiext-luaext/Android.mk
