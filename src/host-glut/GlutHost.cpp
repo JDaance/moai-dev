@@ -512,6 +512,7 @@ void GlutRefreshContext () {
 		AKUExtLoadLuafilesystem ();
 		AKUExtLoadLuasocket ();
 		AKUExtLoadLuasql ();
+		AKUExtLoadShinylua ();
 	#endif
 	
 	#if MOAI_WITH_HARNESS

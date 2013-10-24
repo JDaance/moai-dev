@@ -10,6 +10,9 @@ private:
 
 	//----------------------------------------------------------------//
 	static int		_createLegGeometry			( lua_State* L );
+	
+	static int		_startProfile				( lua_State* L );
+	static int		_stopAndDumpProfile			( lua_State* L );
 
 public:
 	

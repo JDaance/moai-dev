@@ -718,6 +718,9 @@
       <Project>{51007be8-c720-4a9f-a1bf-c2aa31179e02}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="..\shinylua\shinylua.vcxproj">
+      <Project>{da73706a-ee6e-4f3d-a96e-3aa51cd52447}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\zl-lib-util\zl-lib-util.vcxproj">
       <Project>{e97a3e3d-01d5-4210-bca0-a6d816624f1a}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

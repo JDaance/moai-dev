@@ -10,6 +10,8 @@
 
 #include <libtess2/Include/tesselator.h>
 
+#include "ShinyLua.h"
+
 // TODO: these are getting reintroduced somewhere; find them and kill them
 
 #ifdef DeleteFile
@@ -620,15 +622,25 @@ int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 	return 1;
 }
 
-//================================================================//
-// MOAIClipper
-//================================================================//
+int MOAISkyways::_startProfile ( lua_State* L ) {
+	ShinyLua_start(L);
+	return 0;
+}
+
+int MOAISkyways::_stopAndDumpProfile ( lua_State* L ) {
+	ShinyLua_update(L);
+	ShinyLua_stop(L);
+	ShinyLua_output(L);
+	return 0;
+}
 
 //----------------------------------------------------------------//
 void MOAISkyways::RegisterLuaClass ( MOAILuaState& state ) {
 
 	luaL_Reg regTable [] = {
 		{ "createLegGeometry",					_createLegGeometry },
+		{ "startProfile",						_startProfile },
+		{ "stopAndDumpProfile",					_stopAndDumpProfile },
 		{ NULL, NULL }
 	};
 
