@@ -10,7 +10,9 @@
 
 #include <libtess2/Include/tesselator.h>
 
-#include "ShinyLua.h"
+#ifdef USE_SHINY
+	#include "ShinyLua.h"
+#endif
 
 // TODO: these are getting reintroduced somewhere; find them and kill them
 
@@ -623,15 +625,20 @@ int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 }
 
 int MOAISkyways::_startProfile ( lua_State* L ) {
-	ShinyLua_start(L);
+#ifdef USE_SHINY
+		ShinyLua_start(L);
+#endif
 	return 0;
 }
 
 int MOAISkyways::_stopAndGetProfileFlat ( lua_State* L ) {
+#ifdef USE_SHINY
 	ShinyLua_update(L);
 	ShinyLua_stop(L);
 	ShinyLua_flat_string(L);
+#else
 	return 1;
+#endif
 }
 
 //----------------------------------------------------------------//
