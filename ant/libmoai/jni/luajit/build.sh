@@ -7,7 +7,7 @@
 
 MOAI_ROOT="$( cd ../../../../ && pwd )"
 host_os=`uname -s | tr "[:upper:]" "[:lower:]"`
-host_arch=`uname -m`
+host_arch="x86"
 
 SRCDIR=$MOAI_ROOT/3rdparty/LuaJIT-2.0.1
 
@@ -20,13 +20,14 @@ fi
 
 cd "$SRCDIR"
 
-NDK_BUILD_LOCATION="$(which ndk-build)"
+NDK_BUILD_LOCATION="/home/tall/dev/android-ndk-r9"
 if [[ x$NDK_BUILD_LOCATION = "x" ]]; then
     echo "The Android NDK must be on your path."
     exit 1
 fi
 
 NDK="${NDK_BUILD_LOCATION%/ndk-build}"
+echo $NDK
 
 if [[ x$NDK = "x" ]]; then
     echo "The Android NDK must be on your path."

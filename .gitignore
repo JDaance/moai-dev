@@ -21,7 +21,6 @@ CMakeFiles
 CMakeCache.txt
 cmake_install.cmake
 *.o
-*.a
 src/moai/moai
 release
 tmp
