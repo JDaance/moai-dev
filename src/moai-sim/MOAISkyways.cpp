@@ -627,11 +627,11 @@ int MOAISkyways::_startProfile ( lua_State* L ) {
 	return 0;
 }
 
-int MOAISkyways::_stopAndDumpProfile ( lua_State* L ) {
+int MOAISkyways::_stopAndGetProfileFlat ( lua_State* L ) {
 	ShinyLua_update(L);
 	ShinyLua_stop(L);
-	ShinyLua_output(L);
-	return 0;
+	ShinyLua_flat_string(L);
+	return 1;
 }
 
 //----------------------------------------------------------------//
@@ -640,7 +640,7 @@ void MOAISkyways::RegisterLuaClass ( MOAILuaState& state ) {
 	luaL_Reg regTable [] = {
 		{ "createLegGeometry",					_createLegGeometry },
 		{ "startProfile",						_startProfile },
-		{ "stopAndDumpProfile",					_stopAndDumpProfile },
+		{ "stopAndGetProfileFlat",				_stopAndGetProfileFlat },
 		{ NULL, NULL }
 	};
 
