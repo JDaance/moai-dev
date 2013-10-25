@@ -49,6 +49,11 @@
 	ifeq ($(USE_UNTZ),true)
 		LOCAL_CFLAGS	+= -DMOAI_WITH_UNTZ=1
 	endif
+
+	ifeq ($(USE_LUAJIT),true)
+		LOCAL_CFLAGS	+= -DMOAI_WITH_LUAJIT
+	endif
+
 	
 #----------------------------------------------------------------#
 # header search paths
@@ -160,7 +165,13 @@
 	LOCAL_STATIC_LIBRARIES += libfreetype
 	LOCAL_STATIC_LIBRARIES += libjpg
 	LOCAL_STATIC_LIBRARIES += libjson
-	LOCAL_STATIC_LIBRARIES += liblua
+
+	ifeq ($(USE_LUAJIT),false)
+		LOCAL_STATIC_LIBRARIES += liblua
+	else
+		LOCAL_STATIC_LIBRARIES += libluajit
+	endif
+
 	LOCAL_STATIC_LIBRARIES += libpng
 	LOCAL_STATIC_LIBRARIES += libsfmt
 	LOCAL_STATIC_LIBRARIES += libsqlite
@@ -185,7 +196,13 @@
 	include jpg/Android.mk
 	include json/Android.mk
 	include libtess2/Android.mk
-	include lua/Android.mk
+	
+	ifeq ($(USE_LUAJIT),false)
+		include lua/Android.mk
+	else
+		include luajit/Android.mk
+	endif
+
 	include moaiext-android/Android.mk
 	include moaiext-luaext/Android.mk
 	
