@@ -189,25 +189,19 @@ static int* offsetPolyLinesToPolygons(const FPolygons &polyLines, FPolygons &uni
 	floatToIntScale(unionIntersectionGeometries, scaledUnionIntersectionGeometries, scale);
 	floatToIntScale(cutIntersectionGeometries, scaledCutIntersectionGeometries, scale);
 	
-	PROFILE_BEGIN(OffsetPolyLines);
  	OffsetPolyLines(scaledPolyLines, scaledPolygons, delta * scale, jtRound, etRound, 0.25);
-	PROFILE_END();
 	
 	//MOAIPrint("Orientation scaledIntersectionGeometries[0]: %d\n", Orientation(scaledCutIntersectionGeometries[0]));
 	
-	PROFILE_BEGIN(ctUnion);
     Clipper clpr;
     clpr.AddPolygons(scaledPolygons, ptSubject);
 	clpr.AddPolygons(scaledUnionIntersectionGeometries, ptClip);
     clpr.Execute(ctUnion, scaledUnionPolygons, pftPositive, pftPositive);
-	PROFILE_END();
 	
-	PROFILE_BEGIN(ctDifference);
 	clpr.Clear();
     clpr.AddPolygons(scaledPolygons, ptSubject);
 	clpr.AddPolygons(scaledCutIntersectionGeometries, ptClip);
     clpr.Execute(ctDifference, scaledCutPolygons, pftPositive, pftPositive);
-	PROFILE_END();
 
 	int* polygonOrientations = new int[scaledUnionPolygons.size()];
 	for (int i = 0; i < scaledUnionPolygons.size(); ++i)
@@ -633,7 +627,6 @@ int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 
 int MOAISkyways::_startProfile ( lua_State* L ) {
 #ifdef MOAI_USE_SHINY
-	PROFILE_BEGIN(Skyways_profile);
 	ShinyLua_clear(L);
 	ShinyLua_start(L);
 #endif
