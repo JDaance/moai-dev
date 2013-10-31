@@ -2,6 +2,7 @@
 // http://getmoai.com
 
 #include "pch.h"
+
 #include <moai-sim/MOAISkyways.h>
 #include <moai-sim/MOAIVertexBuffer.h>
 #include <moai-sim/MOAIVertexFormat.h>
@@ -80,7 +81,6 @@ void static readPolyLinesFromLua(FPolygons &polyLines, /*Colors &colors, */MOAIL
 
 void static readIntersectionPointsFromLua(FPolygon &intersectionPoints, MOAILuaState state, lua_State* L, int tableIndex)
 {
-	
 	int length = luaL_getn(L, tableIndex);
 	
 	float x, y;
@@ -100,9 +100,8 @@ void static readIntersectionPointsFromLua(FPolygon &intersectionPoints, MOAILuaS
 	}
 }
 
-void static pushPolygonsToLua(MOAILuaState state, lua_State* L, const FPolygons &polygons, const int polygonOrientations[])
+void static pushPolygonsToLua(MOAILuaState state, lua_State* L, const FPolygons &polygons)
 {
-	
 	int count = polygons.size();
 	lua_createtable(L, count, 0); // [bt]
 	int i = 0;
@@ -126,7 +125,6 @@ void static pushPolygonsToLua(MOAILuaState state, lua_State* L, const FPolygons 
 
 void static createIntersectionGeometries(const FPolygon &intersectionPoints, FPolygons &unionIntersectionGeometries, FPolygons &cutIntersectionGeometries, float delta)
 {
-	
 	unionIntersectionGeometries.clear();
 	for(FPolygon::const_iterator itVertex = intersectionPoints.begin(); itVertex != intersectionPoints.end(); ++itVertex) {
 		USVec2D p = itVertex->mV;
@@ -180,7 +178,7 @@ void static	intToFloatScale(const Polygons &scaledPolys, FPolygons &polys, float
 	}
 }
 
-static int* offsetPolyLinesToPolygons(const FPolygons &polyLines, FPolygons &unionIntersectionGeometries, FPolygons &cutIntersectionGeometries, FPolygons &unionPolygons, FPolygons &cutPolygons, float delta) {
+static void offsetPolyLinesToPolygons(const FPolygons &polyLines, FPolygons &unionIntersectionGeometries, FPolygons &cutIntersectionGeometries, FPolygons &unionPolygons, FPolygons &cutPolygons, vector<bool> &cutPolygonOrientations, float delta) {
 	
 	const float scale = 1000.0f; // scale for integers used by clipper
 
@@ -190,8 +188,6 @@ static int* offsetPolyLinesToPolygons(const FPolygons &polyLines, FPolygons &uni
 	floatToIntScale(cutIntersectionGeometries, scaledCutIntersectionGeometries, scale);
 	
  	OffsetPolyLines(scaledPolyLines, scaledPolygons, delta * scale, jtRound, etRound, 0.25);
-	
-	//MOAIPrint("Orientation scaledIntersectionGeometries[0]: %d\n", Orientation(scaledCutIntersectionGeometries[0]));
 	
     Clipper clpr;
     clpr.AddPolygons(scaledPolygons, ptSubject);
@@ -203,21 +199,20 @@ static int* offsetPolyLinesToPolygons(const FPolygons &polyLines, FPolygons &uni
 	clpr.AddPolygons(scaledCutIntersectionGeometries, ptClip);
     clpr.Execute(ctDifference, scaledCutPolygons, pftPositive, pftPositive);
 
-	int* polygonOrientations = new int[scaledUnionPolygons.size()];
-	for (int i = 0; i < scaledUnionPolygons.size(); ++i)
-		polygonOrientations[i] = Orientation(scaledUnionPolygons[i]);
+	cutPolygonOrientations.clear();
+	for(Polygons::const_iterator itScaledCutPoly = scaledCutPolygons.begin(); itScaledCutPoly != scaledCutPolygons.end(); ++itScaledCutPoly) {
+		cutPolygonOrientations.push_back(Orientation(*itScaledCutPoly));
+	}
 
 	intToFloatScale(scaledUnionPolygons, unionPolygons, 1.0f/scale);
 	intToFloatScale(scaledCutPolygons, cutPolygons, 1.0f/scale);
-
-	return polygonOrientations;
 }
 
 //================================================================//
 // NORMALS
 //================================================================//
 
-static void computeNormalsForPolygon(FPolygon &polygon) {
+static void computeNormalsForPolygon(FPolygon &polygon, bool orientation) {
 	
 	int size = polygon.size();
 	for (int i = 0; i < size; ++i) {
@@ -230,22 +225,40 @@ static void computeNormalsForPolygon(FPolygon &polygon) {
 		USVec2D dir1 = vMiddle - vLeft; dir1.Norm();
 		USVec2D dir2 = vRight - vMiddle; dir2.Norm();
 
-		// TODO: detect intersections
-		// check if dirs are x=0 resp y=0 and point normal according to y=0 rotate90anti ?
+		bool isIntersectionCorner = false;
+		if (orientation == true) {
+			USVec2D dir1rotated = dir1;
+			dir1rotated.Rotate90Anticlockwise(); // really clockwise ;)
+			
+			if (ZLFloat::IsClose(dir1rotated.mX, dir2.mX, EPSILON) && ZLFloat::IsClose(dir1rotated.mY, dir2.mY, EPSILON)) {
+				// vertex must be a cut intersection corner
+				if (dir2.mX > 0 || dir1.mX > 0) {
+					// up
+					vertex.mN = USVec2D(0.0f, 1.0f);
+					isIntersectionCorner = true;
+				} else if (dir2.mX < 0 || dir1.mX < 0) {
+					// down
+					vertex.mN = USVec2D(0.0f, -1.0f);
+					isIntersectionCorner = true;
+				}
+			}
+		}
 
-		dir1.Rotate90Clockwise();
-		dir2.Rotate90Clockwise();
+		if (!isIntersectionCorner) {
+			dir1.Rotate90Clockwise(); // really anticlockwise ;)
+			dir2.Rotate90Clockwise(); // really anticlockwise ;)
 
-		vertex.mN = dir1 + dir2;
-		vertex.mN.Norm();
+			vertex.mN = dir1 + dir2;
+			vertex.mN.Norm();
+		}
 	}
 }
 
-static void computeNormalsForPolygons(FPolygons &polygons) {
+static void computeNormalsForPolygons(FPolygons &polygons, const vector<bool> &polygonOrientations) {
 	
-	for (int i = 0; i < polygons.size(); ++i) {
-		FPolygon& poly = polygons[i];
-		computeNormalsForPolygon(poly);
+	int i = 0;
+	for(FPolygons::iterator itPolygon = polygons.begin(); itPolygon != polygons.end(); ++itPolygon, ++i) {
+		computeNormalsForPolygon(*itPolygon, polygonOrientations[i]);
 	}
 }
 
@@ -292,17 +305,12 @@ void static tesselatePolygons(const FPolygons &polygons, FPolygons &triangles) {
 	}
 
 	tessTesselate(tess, TESS_WINDING_POSITIVE, TESS_POLYGONS, 3, 2, 0);
-
-	//MOAIPrint("Memory used: %.1f kB\n", allocated/1024.0f);
 	
 	const float* verts = tessGetVertices(tess);
 	const int* vinds = tessGetVertexIndices(tess);
 	const int* elems = tessGetElements(tess);
 	const int nverts = tessGetVertexCount(tess);
 	const int nelems = tessGetElementCount(tess);
-
-	//MOAIPrint("tessGetElementCount %d\n", nverts);
-	//MOAIPrint("tessGetVertexCount %d\n", nelems);
 
 	for (int i = 0; i < nelems; ++i)
 	{
@@ -495,7 +503,7 @@ void static	writeTopFaceToVBO(MOAIVertexBuffer* mainVbo, MOAIVertexBuffer* outli
 		realLineNormal.Norm();
 
 		static USVec2D backfacing(0.8, -0.6);
-		if (realLineNormal.Dot(backfacing) >= 0.2)
+		if (realLineNormal.Dot(backfacing) >= 0.3)
 			return;
 	}
 
@@ -556,7 +564,7 @@ void static	writeTopFaceToVBO(MOAIVertexBuffer* mainVbo, MOAIVertexBuffer* outli
 	writeTriToOutlineVBO(outlineVbo, nl, nl_on, nr, nr_on, sr, sr_on);
 }
 
-void static	writeTopFacesToVBO(MOAIVertexBuffer* mainVbo, MOAIVertexBuffer* outlineVbo, const FPolygons &polygons, const int polygonOrientations[], u32 hand, float missingDimValue, float delta, const u32 color)
+void static	writeTopFacesToVBO(MOAIVertexBuffer* mainVbo, MOAIVertexBuffer* outlineVbo, const FPolygons &polygons, const vector<bool> &polygonOrientations, u32 hand, float missingDimValue, float delta, const u32 color)
 {
 	int iP = 0;
 	for(FPolygons::const_iterator itPolygon = polygons.begin(); itPolygon != polygons.end(); ++itPolygon, ++iP) {
@@ -598,9 +606,10 @@ int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 
 	createIntersectionGeometries(intersectionPoints, unionIntersectionGeometries, cutIntersectionGeometries, delta);
 	
-	int* polygonOrientations = offsetPolyLinesToPolygons(polyLines, unionIntersectionGeometries, cutIntersectionGeometries, unionPolygons, cutPolygons, delta);
+	vector<bool> cutPolygonOrientations;
+	offsetPolyLinesToPolygons(polyLines, unionIntersectionGeometries, cutIntersectionGeometries, unionPolygons, cutPolygons, cutPolygonOrientations, delta);
 	
-	computeNormalsForPolygons(cutPolygons);
+	computeNormalsForPolygons(cutPolygons, cutPolygonOrientations);
 
 	FPolygons triangles;
 	tesselatePolygons(cutPolygons, triangles);
@@ -614,13 +623,13 @@ int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 	// writeTrianglesToVBO(mainVbo, outlineVbo, triangles, polyLines, hand, missingDimValue + delta, 1.0f, color);
 	writeTrianglesToVBO(mainVbo, outlineVbo, triangles, polyLines, hand, missingDimValue - delta, -1.0f, color);
 
-	writeTopFacesToVBO(mainVbo, outlineVbo, cutPolygons, polygonOrientations, hand, missingDimValue, delta, color);
+	writeTopFacesToVBO(mainVbo, outlineVbo, cutPolygons, cutPolygonOrientations, hand, missingDimValue, delta, color);
 
 	MOAIPrint("Approximated %d vertices but wrote %d\n", approximateVertexCount / mainVbo->GetFormat()->GetVertexSize (), mainVbo->GetVertexCount());
 	
 	// TODO implement bless here instead of in LUA
 	
-	pushPolygonsToLua(state, L, unionPolygons, polygonOrientations);
+	pushPolygonsToLua(state, L, unionPolygons);
 	
 	return 1;
 }
