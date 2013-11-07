@@ -499,7 +499,7 @@ void static	writeTopFaceToVBO(MOAIVertexBuffer* mainVbo, MOAIVertexBuffer* outli
 	{
 		// this tests skips faces that would face away from camera at all times
 		USVec2D realLineNormal = p2 - p1;
-		realLineNormal.Rotate90Anticlockwise();
+		realLineNormal.Rotate90Anticlockwise(); // really clockwise..
 		realLineNormal.Norm();
 
 		static USVec2D backfacing(0.8, -0.6);
