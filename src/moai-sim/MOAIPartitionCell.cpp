@@ -45,7 +45,7 @@ void MOAIPartitionCell::GatherProps ( MOAIPartitionResultBuffer& results, const 
 	for ( ; propIt; propIt = propIt->Next ()) {
 		MOAIProp* prop = propIt->Data ();
 		
-		if ( prop == ignore ) continue;
+		if ( prop == ignore || !prop->IsVisible()) continue;
 		
 		float t;
 		if (( mask == 0 ) || ( prop->mMask & mask )) {
@@ -63,7 +63,7 @@ void MOAIPartitionCell::GatherProps ( MOAIPartitionResultBuffer& results, const 
 	for ( ; propIt; propIt = propIt->Next ()) {
 		MOAIProp* prop = propIt->Data ();
 		
-		if ( prop == ignore ) continue;
+		if ( prop == ignore || !prop->IsVisible()) continue;
 		
 		if (( mask == 0 ) || ( prop->mMask & mask )) {
 			prop->AddToSortBuffer ( results );
@@ -78,7 +78,7 @@ void MOAIPartitionCell::GatherProps ( MOAIPartitionResultBuffer& results, const 
 	for ( ; propIt; propIt = propIt->Next ()) {
 		MOAIProp* prop = propIt->Data ();
 		
-		if ( prop == ignore ) continue;
+		if ( prop == ignore || !prop->IsVisible()) continue;
 		
 		if (( mask == 0 ) || ( prop->mMask & mask )) {
 			if ( prop->mBounds.Contains ( point )) {
@@ -97,7 +97,7 @@ void MOAIPartitionCell::GatherProps ( MOAIPartitionResultBuffer& results, const 
 	for ( ; propIt; propIt = propIt->Next ()) {
 		MOAIProp* prop = propIt->Data ();
 		
-		if ( prop == ignore ) continue;
+		if ( prop == ignore || !prop->IsVisible()) continue;
 		
 		if (( mask == 0 ) || ( prop->mMask & mask )) {	
 			if ( prop->mBounds.Overlap ( box )) {
@@ -114,7 +114,7 @@ void MOAIPartitionCell::GatherProps ( MOAIPartitionResultBuffer& results, const 
 	for ( ; propIt; propIt = propIt->Next ()) {
 		MOAIProp* prop = propIt->Data ();
 		
-		if ( prop == ignore ) continue;
+		if ( prop == ignore || !prop->IsVisible()) continue;
 		
 		if (( mask == 0 ) || ( prop->mMask & mask )) {	
 			//if ( !frustum.Cull ( prop->mBounds )) {
