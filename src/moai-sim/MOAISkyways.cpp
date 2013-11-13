@@ -503,7 +503,7 @@ void static	writeTopFaceToVBO(MOAIVertexBuffer* mainVbo, MOAIVertexBuffer* outli
 		realLineNormal.Norm();
 
 		static USVec2D backfacing(0.8, -0.6);
-		if (realLineNormal.Dot(backfacing) >= 0.3)
+		if (realLineNormal.Dot(backfacing) >= 0.5)
 			return;
 	}
 
