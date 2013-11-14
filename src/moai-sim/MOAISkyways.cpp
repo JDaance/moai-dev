@@ -162,11 +162,11 @@ void static pushPerpCollisionPositionsToLua(MOAILuaState state, lua_State* L, co
 		sprintf(stringGridIndex, "%d", gridIndex);
 
 		lua_pushstring(L, stringGridIndex); // [t, s]
-		lua_rawseti (L, -2, i * 3); // [t]
-		lua_pushnumber(L, bottom); // [t, n]
 		lua_rawseti (L, -2, i * 3 + 1); // [t]
+		lua_pushnumber(L, bottom); // [t, n]
+		lua_rawseti (L, -2, i * 3 + 1 + 1); // [t]
 		lua_pushnumber(L, top); // [t, n]
-		lua_rawseti (L, -2, i * 3 + 2); // [t]
+		lua_rawseti (L, -2, i * 3 + 2 + 1); // [t]
 	}
 }
 
