@@ -100,6 +100,19 @@ void static readIntersectionPointsFromLua(FPolygon &intersectionPoints, MOAILuaS
 	}
 }
 
+void static readPerpLegIndexesFromLua(vector<int> &physics_perpLegIndexes, MOAILuaState state, lua_State* L, int tableIndex)
+{
+	physics_perpLegIndexes.clear();
+	
+	lua_pushnil ( L );
+	while ( lua_next ( L, tableIndex ) != 0 ) {
+		cc8* stringIndex = state.GetValue < cc8* >( -1, "" );
+		int index = atoi(stringIndex);
+		physics_perpLegIndexes.push_back(index);
+		lua_pop ( L, 1 );
+	}
+}
+
 void static pushPolygonsToLua(MOAILuaState state, lua_State* L, const FPolygons &polygons)
 {
 	int count = polygons.size();
@@ -119,23 +132,51 @@ void static pushPolygonsToLua(MOAILuaState state, lua_State* L, const FPolygons 
 	}
 }
 
+int static roundToInt(float d)
+{
+  return floor(d + 0.5);
+}
+
+void static pushPerpCollisionPositionsToLua(MOAILuaState state, lua_State* L, const FPolygons &physics_perpIntersectionPolygons, const float gridSize)
+{
+	// horrible data format (efficient)
+	// legindex, bottomy, topy, legindex, bottomy, topy, ...
+	// "5", 4, 4.3, "11", 5.6, 5.75, ...
+	// use strings for lua proper precision
+
+	float top, bottom, left, right;
+	char stringGridIndex[15];
+
+	lua_createtable(L, physics_perpIntersectionPolygons.size() * 3, 0); // [t]
+	int i = 0;
+	for(FPolygons::const_iterator itPolygon = physics_perpIntersectionPolygons.begin(); itPolygon != physics_perpIntersectionPolygons.end(); ++itPolygon, ++i) {
+		top = -1000; bottom = 1000; left = 1000; right = -1000;
+		for(FPolygon::const_iterator itVertex = itPolygon->begin(); itVertex != itPolygon->end(); ++itVertex) {
+			top		= max(top, itVertex->mV.mY);
+			bottom	= min(bottom, itVertex->mV.mY);
+			left	= min(left, itVertex->mV.mX);
+			right	= max(right, itVertex->mV.mX);
+		}
+		float indexWorldLoc = (left + right)/2;
+		int gridIndex = roundToInt(indexWorldLoc/gridSize);		
+		sprintf(stringGridIndex, "%d", gridIndex);
+
+		lua_pushstring(L, stringGridIndex); // [t, s]
+		lua_rawseti (L, -2, i * 3); // [t]
+		lua_pushnumber(L, bottom); // [t, n]
+		lua_rawseti (L, -2, i * 3 + 1); // [t]
+		lua_pushnumber(L, top); // [t, n]
+		lua_rawseti (L, -2, i * 3 + 2); // [t]
+	}
+}
+
 //================================================================//
 // INTERSECTION GEOMS
 //================================================================//
 
-void static createIntersectionGeometries(const FPolygon &intersectionPoints, FPolygons &unionIntersectionGeometries, FPolygons &cutIntersectionGeometries, float delta)
-{
-	unionIntersectionGeometries.clear();
-	for(FPolygon::const_iterator itVertex = intersectionPoints.begin(); itVertex != intersectionPoints.end(); ++itVertex) {
-		USVec2D p = itVertex->mV;
-		FPolygon geom;
-		geom.push_back(USVec2D(p.mX - delta, p.mY + delta));
-		geom.push_back(USVec2D(p.mX - delta, p.mY - delta));
-		geom.push_back(USVec2D(p.mX + delta, p.mY - delta));
-		geom.push_back(USVec2D(p.mX + delta, p.mY + delta));
-		unionIntersectionGeometries.push_back(geom);
-	}
-	
+void static createIntersectionGeometries(const FPolygon &intersectionPoints, FPolygons &cutIntersectionGeometries, float delta,
+	bool physics_generateSegments, FPolygons &physics_unionIntersectionGeometries)
+{	
 	cutIntersectionGeometries.clear();
 	for(FPolygon::const_iterator itVertex = intersectionPoints.begin(); itVertex != intersectionPoints.end(); ++itVertex) {
 		USVec2D p = itVertex->mV;
@@ -145,6 +186,19 @@ void static createIntersectionGeometries(const FPolygon &intersectionPoints, FPo
 		geom.push_back(USVec2D(p.mX + delta, p.mY - delta * 1.2));
 		geom.push_back(USVec2D(p.mX + delta, p.mY + delta * 1.2));
 		cutIntersectionGeometries.push_back(geom);
+	}
+	
+	if (physics_generateSegments) {
+		physics_unionIntersectionGeometries.clear();
+		for(FPolygon::const_iterator itVertex = intersectionPoints.begin(); itVertex != intersectionPoints.end(); ++itVertex) {
+			USVec2D p = itVertex->mV;
+			FPolygon geom;
+			geom.push_back(USVec2D(p.mX - delta, p.mY + delta));
+			geom.push_back(USVec2D(p.mX - delta, p.mY - delta));
+			geom.push_back(USVec2D(p.mX + delta, p.mY - delta));
+			geom.push_back(USVec2D(p.mX + delta, p.mY + delta));
+			physics_unionIntersectionGeometries.push_back(geom);
+		}
 	}
 }
 
@@ -178,34 +232,72 @@ void static	intToFloatScale(const Polygons &scaledPolys, FPolygons &polys, float
 	}
 }
 
-static void offsetPolyLinesToPolygons(const FPolygons &polyLines, FPolygons &unionIntersectionGeometries, FPolygons &cutIntersectionGeometries, FPolygons &unionPolygons, FPolygons &cutPolygons, vector<bool> &cutPolygonOrientations, float delta) {
+static Polygons createPerpendicularIntersectionTestPolygons(const vector<int> &physics_perpLegIndexes, const float delta, const float scale, const float gridSize)
+{
+	const float scaledGridSize = gridSize * scale;
+	const float scaledDelta = delta * scale;
+
+	// try to be higher/lower then a level would ever be
+	const int top = 1000 * scale;
+	const int bottom = -1000 * scale;
+
+	Polygons scaledPolygons;
+	for(vector<int>::const_iterator itIndex = physics_perpLegIndexes.begin(); itIndex != physics_perpLegIndexes.end(); ++itIndex) {
+		int index = *itIndex;
+		float worldLocForIndex = scaledGridSize * index;
+
+		int left	= worldLocForIndex - scaledDelta;
+		int right	= worldLocForIndex + scaledDelta;
+
+		ClipperLib::Polygon polygon;
+		polygon.push_back(IntPoint( right, bottom ));
+		polygon.push_back(IntPoint( right, top	  ));
+		polygon.push_back(IntPoint( left,  top	  ));
+		polygon.push_back(IntPoint( left,  bottom ));
+		scaledPolygons.push_back(polygon);
+	}
+	return scaledPolygons;
+}
+
+static void offsetPolyLinesToPolygons(const FPolygons &polyLines, FPolygons &cutIntersectionGeometries, FPolygons &cutPolygons, vector<bool> &cutPolygonOrientations, const float delta, 
+	bool physics_generateSegments, const float gridSize, const vector<int> &physics_perpLegIndexes, FPolygons &physics_unionIntersectionGeometries, FPolygons &physics_unionPolygons, FPolygons &physics_perpIntersectionPolygons) {
 	
 	const float scale = 1000.0f; // scale for integers used by clipper
 
-	Polygons scaledPolyLines, scaledUnionIntersectionGeometries, scaledCutIntersectionGeometries, scaledPolygons, scaledUnionPolygons, scaledCutPolygons;
+	Polygons scaledPolyLines, scaledCutIntersectionGeometries, scaledPolygons, scaledCutPolygons, physics_scaledUnionIntersectionGeometries, physics_scaledUnionPolygons, physics_scaledPerpIntersectionPolygons;
 	floatToIntScale(polyLines, scaledPolyLines, scale);
-	floatToIntScale(unionIntersectionGeometries, scaledUnionIntersectionGeometries, scale);
+	floatToIntScale(physics_unionIntersectionGeometries, physics_scaledUnionIntersectionGeometries, scale);
 	floatToIntScale(cutIntersectionGeometries, scaledCutIntersectionGeometries, scale);
 	
  	OffsetPolyLines(scaledPolyLines, scaledPolygons, delta * scale, jtRound, etRound, 0.25);
 	
     Clipper clpr;
     clpr.AddPolygons(scaledPolygons, ptSubject);
-	clpr.AddPolygons(scaledUnionIntersectionGeometries, ptClip);
-    clpr.Execute(ctUnion, scaledUnionPolygons, pftPositive, pftPositive);
-	
-	clpr.Clear();
-    clpr.AddPolygons(scaledPolygons, ptSubject);
 	clpr.AddPolygons(scaledCutIntersectionGeometries, ptClip);
     clpr.Execute(ctDifference, scaledCutPolygons, pftPositive, pftPositive);
+	
+	if (physics_generateSegments) {
+		clpr.Clear();
+		clpr.AddPolygons(scaledPolygons, ptSubject);
+		clpr.AddPolygons(physics_scaledUnionIntersectionGeometries, ptClip);
+		clpr.Execute(ctUnion, physics_scaledUnionPolygons, pftPositive, pftPositive);
+
+		clpr.Clear();
+		clpr.AddPolygons(createPerpendicularIntersectionTestPolygons(physics_perpLegIndexes, delta, scale, gridSize), ptSubject);
+		clpr.AddPolygons(physics_scaledUnionPolygons, ptClip);
+		clpr.Execute(ctIntersection, physics_scaledPerpIntersectionPolygons, pftPositive, pftPositive);
+	}
 
 	cutPolygonOrientations.clear();
 	for(Polygons::const_iterator itScaledCutPoly = scaledCutPolygons.begin(); itScaledCutPoly != scaledCutPolygons.end(); ++itScaledCutPoly) {
 		cutPolygonOrientations.push_back(Orientation(*itScaledCutPoly));
 	}
 
-	intToFloatScale(scaledUnionPolygons, unionPolygons, 1.0f/scale);
 	intToFloatScale(scaledCutPolygons, cutPolygons, 1.0f/scale);
+	if (physics_generateSegments) {
+		intToFloatScale(physics_scaledUnionPolygons, physics_unionPolygons, 1.0f/scale);
+		intToFloatScale(physics_scaledPerpIntersectionPolygons, physics_perpIntersectionPolygons, 1.0f/scale);
+	}
 }
 
 //================================================================//
@@ -582,32 +674,43 @@ void static	writeTopFacesToVBO(MOAIVertexBuffer* mainVbo, MOAIVertexBuffer* outl
 
 int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 	MOAILuaState state ( L );
-	if ( !state.CheckParams(1, "UUTTNNN") ) return 0;
+	if ( !state.CheckParams(1, "UUTTNNNB") ) return 0;
 	
-	MOAIVertexBuffer* mainVbo			= state.GetLuaObject < MOAIVertexBuffer >( 1, true );
-	MOAIVertexBuffer* outlineVbo		= state.GetLuaObject < MOAIVertexBuffer >( 2, true );
-	int lineTableIndex					= 3;
-	int intersectionPointsTableIndex	= 4;
-	float delta							= state.GetValue<float>(5, 0.15f);
-	u32 hand							= state.GetValue < u32 >( 6, MOAISkyways::HAND_LEFT );
-	float missingDimValue				= state.GetValue < float >( 7, 0.0f );
-	float r								= state.GetValue < float >( 8, 0.0f );
-	float g								= state.GetValue < float >( 9, 0.0f );
-	float b								= state.GetValue < float >( 10, 0.0f );
-	float a								= state.GetValue < float >( 11, 0.0f );
+	MOAIVertexBuffer* mainVbo					= state.GetLuaObject < MOAIVertexBuffer >( 1, true );
+	MOAIVertexBuffer* outlineVbo				= state.GetLuaObject < MOAIVertexBuffer >( 2, true );
+	const int lineTableIndex					= 3;
+	const int intersectionPointsTableIndex		= 4;
+	const float delta							= state.GetValue<float>(5, 0.15f);
+	const u32 hand								= state.GetValue < u32 >( 6, MOAISkyways::HAND_LEFT );
+	const float missingDimValue					= state.GetValue < float >( 7, 0.0f );
+	const bool physics_generateSegments			= state.GetValue < bool >( 8, false );
+	const float gridSize						= state.GetValue<float>(9, -1);
+	const int physicsPerpLegIndexesTableIndex	= 10;
+	const float r								= state.GetValue < float >( 11, 0.0f );
+    const float g								= state.GetValue < float >( 12, 0.0f );
+    const float b								= state.GetValue < float >( 13, 0.0f );
+    const float a								= state.GetValue < float >( 14, 0.0f );
 
-	u32 color = ZLColor::PackRGBA(r, g, b, a);
+    const u32 color = ZLColor::PackRGBA(r, g, b, a);
 	
-	FPolygons polyLines, unionIntersectionGeometries, cutIntersectionGeometries, unionPolygons, cutPolygons;
+	FPolygons polyLines, cutIntersectionGeometries, cutPolygons;
 	FPolygon intersectionPoints;
+	
+	vector<int> physics_perpLegIndexes;
+	FPolygons physics_unionIntersectionGeometries, physics_unionPolygons, physics_perpIntersectionPolygons;
 
 	readPolyLinesFromLua(polyLines, state, L, lineTableIndex);
 	readIntersectionPointsFromLua(intersectionPoints, state, L, intersectionPointsTableIndex);
+	if (physics_generateSegments) {
+		readPerpLegIndexesFromLua(physics_perpLegIndexes, state, L, physicsPerpLegIndexesTableIndex);
+	}
 
-	createIntersectionGeometries(intersectionPoints, unionIntersectionGeometries, cutIntersectionGeometries, delta);
+	createIntersectionGeometries(intersectionPoints, cutIntersectionGeometries, delta, 
+		physics_generateSegments, physics_unionIntersectionGeometries);
 	
 	vector<bool> cutPolygonOrientations;
-	offsetPolyLinesToPolygons(polyLines, unionIntersectionGeometries, cutIntersectionGeometries, unionPolygons, cutPolygons, cutPolygonOrientations, delta);
+	offsetPolyLinesToPolygons(polyLines, cutIntersectionGeometries, cutPolygons, cutPolygonOrientations, delta,
+		physics_generateSegments, gridSize, physics_perpLegIndexes, physics_unionIntersectionGeometries, physics_unionPolygons, physics_perpIntersectionPolygons);
 	
 	computeNormalsForPolygons(cutPolygons, cutPolygonOrientations);
 
@@ -620,7 +723,6 @@ int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 	outlineVbo->Reserve(approximateVertexCount);
 
 	// skip far side
-	// writeTrianglesToVBO(mainVbo, outlineVbo, triangles, polyLines, hand, missingDimValue + delta, 1.0f, color);
 	writeTrianglesToVBO(mainVbo, outlineVbo, triangles, polyLines, hand, missingDimValue - delta, -1.0f, color);
 
 	writeTopFacesToVBO(mainVbo, outlineVbo, cutPolygons, cutPolygonOrientations, hand, missingDimValue, delta, color);
@@ -629,9 +731,14 @@ int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 	
 	// TODO implement bless here instead of in LUA
 	
-	pushPolygonsToLua(state, L, unionPolygons);
-	
-	return 1;
+	if (physics_generateSegments) {
+		pushPolygonsToLua(state, L, physics_unionPolygons);
+		pushPerpCollisionPositionsToLua(state, L, physics_perpIntersectionPolygons, gridSize);
+
+		return 2;
+	} else {
+		return 0;
+	}
 }
 
 int MOAISkyways::_startProfile ( lua_State* L ) {
