@@ -284,7 +284,7 @@ static void offsetPolyLinesToPolygons(const FPolygons &polyLines, FPolygons &cut
 
 		clpr.Clear();
 		clpr.AddPolygons(createPerpendicularIntersectionTestPolygons(physics_perpLegIndexes, delta, scale, gridSize), ptSubject);
-		clpr.AddPolygons(physics_scaledUnionPolygons, ptClip);
+		clpr.AddPolygons(scaledCutPolygons, ptClip);
 		clpr.Execute(ctIntersection, physics_scaledPerpIntersectionPolygons, pftPositive, pftPositive);
 	}
 
