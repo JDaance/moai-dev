@@ -275,7 +275,7 @@ static void offsetPolyLinesToPolygons(const FPolygons &polyLines, FPolygons &cut
 	Polygons scaledPolyLines, scaledCutIntersectionGeometries, scaledPolygons, scaledCutPolygons;
 	floatToIntScale(polyLines, scaledPolyLines, scale);
 	
- 	OffsetPolyLines(scaledPolyLines, scaledPolygons, delta * scale, jtRound, etRound, 0.25);
+ 	OffsetPolyLines(scaledPolyLines, scaledPolygons, delta * scale, jtRound, etRound, 100.0);
 	
 	floatToIntScale(cutIntersectionGeometries, scaledCutIntersectionGeometries, scale);
 
