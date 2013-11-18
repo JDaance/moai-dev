@@ -270,7 +270,7 @@ static Polygons createPerpendicularIntersectionTestPolygons(const vector<int> &p
 static void offsetPolyLinesToPolygons(const FPolygons &polyLines, FPolygons &cutIntersectionGeometries, FPolygons &cutPolygons, vector<bool> &cutPolygonOrientations, const float delta, 
 	bool physics_generateSegments, const float gridSize, const vector<int> &physics_perpLegIndexes, const FPolygons &physics_unionIntersectionGeometries, const FPolygons &physics_cutIntersectionGeometries, FPolygons &physics_unionPolygons, FPolygons &physics_perpIntersectionPolygons) {
 	
-	const float scale = 1000.0f; // scale for integers used by clipper
+	const float scale = 100000.0f; // scale for integers used by clipper
 
 	Polygons scaledPolyLines, scaledCutIntersectionGeometries, scaledPolygons, scaledCutPolygons;
 	floatToIntScale(polyLines, scaledPolyLines, scale);
