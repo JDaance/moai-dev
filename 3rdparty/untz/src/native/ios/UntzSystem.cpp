@@ -247,7 +247,8 @@ System::System(UInt32 sampleRate, UInt32 numFrames, UInt32 options)
 #endif
 
     // Set frames per buffer;
-    float aBufferLength = (numFrames+1)/(float)sampleRate; // In seconds
+    float aBufferLength = 0.02; // In seconds
+    ///float aBufferLength = (numFrames+1)/(float)sampleRate; // In seconds
     AudioSessionSetProperty(kAudioSessionProperty_PreferredHardwareIOBufferDuration, 
                             sizeof(aBufferLength), &aBufferLength);
 #endif
