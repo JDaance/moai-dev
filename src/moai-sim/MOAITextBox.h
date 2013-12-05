@@ -234,6 +234,7 @@ private:
 	
 	bool				mYFlip;
 	float				mGlyphScale;
+	bool				mSnapToViewportScale;
 	
 	int					mCurrentPageIdx;
 	int					mNextPageIdx;
@@ -286,6 +287,7 @@ private:
 	static int			_setLetterSpacing		( lua_State* L );
 	static int			_setRect				( lua_State* L );
 	static int			_setReveal				( lua_State* L );
+	static int			_setSnapToViewportScale	( lua_State* L );
 	static int			_setSpeed				( lua_State* L );
 	static int			_setString				( lua_State* L );
 	static int			_setStyle				( lua_State* L );
