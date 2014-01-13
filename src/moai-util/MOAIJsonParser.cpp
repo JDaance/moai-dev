@@ -190,10 +190,10 @@ json_t* _luaToJSONObject ( lua_State* L, int idx ) {
 
 //----------------------------------------------------------------//
 /**	@name	decode
-	@text	Decode a JSON string into a hierarchy of Lua tables.
+	@text	Decode a JSON string into a hierarchy of Lua tables. If decode fails it will return nil and a table representing the error position
 	
 	@in		string input
-	@out	table result
+	@out	table result, or if decode fails: nil and table error
 */
 int MOAIJsonParser::_decode ( lua_State* L ) {
 	UNUSED ( L );
@@ -212,7 +212,15 @@ int MOAIJsonParser::_decode ( lua_State* L ) {
 			json_decref ( json );
 			return 1;
 		} else {
-			MOAIPrint("JSON decode error at line %d column %d position %d", error.line, error.column, error.position);
+			lua_pushnil( L );
+			lua_newtable(L);
+			int top = lua_gettop(L);
+			lua_pushstring( L, "line" ); lua_pushinteger( L, error.line ); lua_settable(L, top);
+			lua_pushstring( L, "column" ); lua_pushinteger( L, error.column ); lua_settable(L, top);
+			lua_pushstring( L, "position" ); lua_pushinteger( L, error.position ); lua_settable(L, top);
+			lua_pushstring( L, "source" ); lua_pushstring( L, error.source ); lua_settable(L, top);
+			lua_pushstring( L, "text" ); lua_pushstring( L, error.text ); lua_settable(L, top);
+			return 2;
 		}	
 	}
 	return 0;
