@@ -182,7 +182,7 @@ static void _onSpecialFunc ( int key, int x, int y ) {
 
         else {
 
-                AKUEnqueueKeyboardEvent ( GlutInputDeviceID::DEVICE, GlutInputDeviceSensorID::KEYBOARD, key, true );
+                AKUEnqueueKeyboardEvent ( GlutInputDeviceID::DEVICE, GlutInputDeviceSensorID::KEYBOARD, key + 1000, true );
 
         }
 }
@@ -194,7 +194,7 @@ static void _onSpecialUpFunc ( int key, int x, int y ) {
 
         _updateModifiers ();
 
-        AKUEnqueueKeyboardEvent ( GlutInputDeviceID::DEVICE, GlutInputDeviceSensorID::KEYBOARD, key, false );
+        AKUEnqueueKeyboardEvent ( GlutInputDeviceID::DEVICE, GlutInputDeviceSensorID::KEYBOARD, key + 1000, false );
 }
 
 //----------------------------------------------------------------//
