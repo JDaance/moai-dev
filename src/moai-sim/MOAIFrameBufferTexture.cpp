@@ -158,6 +158,7 @@ void MOAIFrameBufferTexture::OnCreate () {
 		this->mIsDirty = true;
 	}
 	else {
+		MOAIPrint("Failed to create frame buffer texture");
 		this->Clear ();
 	}
 }
