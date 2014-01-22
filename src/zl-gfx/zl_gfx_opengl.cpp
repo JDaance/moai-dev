@@ -397,6 +397,8 @@ GLenum _remapEnum ( u32 zglEnum ) {
 
 		case ZGL_WRAP_MODE_CLAMP:						return GL_CLAMP_TO_EDGE;
 		case ZGL_WRAP_MODE_REPEAT:						return GL_REPEAT;
+
+		case 33189:										return 33189; // depth buffer format
 	}
   	
 	assert ( false );
