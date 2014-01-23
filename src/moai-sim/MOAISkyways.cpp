@@ -132,6 +132,14 @@ void static pushPolygonsToLua(MOAILuaState state, lua_State* L, const FPolygons 
 	}
 }
 
+int static countLinesInPolygons(FPolygons polygons) {
+	int count = 0;
+	for(FPolygons::const_iterator itPolygon = polygons.begin(); itPolygon != polygons.end(); ++itPolygon) {
+		count += itPolygon->size();
+	}
+	return count;
+}
+
 int static roundToInt(float d)
 {
   return floor(d + 0.5);
@@ -439,6 +447,8 @@ void static tesselatePolygons(const FPolygons &polygons, FPolygons &triangles) {
 	if (tess) tessDeleteTess(tess);
 }
 
+
+
 //================================================================//
 // COLORIZE
 //================================================================//
@@ -549,16 +559,16 @@ void static inline writeOutlineVertexToVBO(MOAIVertexBuffer* vbo, const ZLVec3D 
 	//MOAIPrint("Outline point: %.2f, %.2f, %.2f - normal: %.2f, %.2f, %.2f\n", p.mX, p.mY, p.mZ, n.mX, n.mY, n.mZ);
 }
 
-void static writeTrianglesToVBO(MOAIVertexBuffer* mainVbo, MOAIVertexBuffer* outlineVbo, const FPolygons &triangles, const FPolygons &polyLines, u32 hand, float missingDimValue, float normalSign, const u32 color)
+void static writeTrianglesToVBO(MOAIVertexBuffer* mainVbo, MOAIVertexBuffer* outlineVbo, const FPolygons &triangles, const FPolygons &polyLines, u32 hand, float missingDimValue, float normalSign, const u32 color, const bool frontFacing)
 {
+	// for some reason right hand frontfacing is a special case :)
+	bool ascending = hand == MOAISkyways::HAND_RIGHT && frontFacing;
 	
 	ZLVec3D p3d, n, outline_n;
-
 	for(FPolygons::const_iterator itTriangle = triangles.begin(); itTriangle != triangles.end(); ++itTriangle) {
 		int compCount = itTriangle->size();
 		for (int j = 0; j < compCount; ++j) {
-			// go backwards for hand left for correct culling
-			FVertex v2d = hand == MOAISkyways::HAND_LEFT ? (*itTriangle)[compCount - j - 1] : (*itTriangle)[j];
+			FVertex v2d = !ascending ? (*itTriangle)[compCount - j - 1] : (*itTriangle)[j];
 			USVec2D p2d = v2d.mV;
 			if (hand == MOAISkyways::HAND_LEFT) {
 				p3d.mX = missingDimValue;
@@ -738,17 +748,16 @@ int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 	FPolygons triangles;
 	tesselatePolygons(geom_cutPolygons, triangles);
 
-	// 3 = tri, 3 = arbitrary - TODO count polylines in cut for top face vertex count
-	int approximateVertexCount = triangles.size() * 3 * 3 * mainVbo->GetFormat()->GetVertexSize ();
-	mainVbo->Reserve(approximateVertexCount); 
-	outlineVbo->Reserve(approximateVertexCount);
+	int lineCount = countLinesInPolygons(geom_cutPolygons);
+	// 2 sides, 3 vertices per triangle, 2 triangles per line, 3 vertices per triangle
+	int vertexCount = (triangles.size() * 2 * 3 + lineCount * 2 * 3) * mainVbo->GetFormat()->GetVertexSize ();
+	mainVbo->Reserve(vertexCount); 
+	outlineVbo->Reserve(vertexCount);
 
-	// skip far side
-	writeTrianglesToVBO(mainVbo, outlineVbo, triangles, polyLines, hand, missingDimValue - delta, -1.0f, color);
+	writeTrianglesToVBO(mainVbo, outlineVbo, triangles, polyLines, hand, missingDimValue - delta, -1.0f, color, true);
+	writeTrianglesToVBO(mainVbo, outlineVbo, triangles, polyLines, hand, missingDimValue + delta, -1.0f, color, false);
 
 	writeTopFacesToVBO(mainVbo, outlineVbo, geom_cutPolygons, geom_cutPolygonOrientations, hand, missingDimValue, delta, color);
-
-	MOAIPrint("Approximated %d vertices but wrote %d\n", approximateVertexCount / mainVbo->GetFormat()->GetVertexSize (), mainVbo->GetVertexCount());
 	
 	// TODO implement bless here instead of in LUA
 	

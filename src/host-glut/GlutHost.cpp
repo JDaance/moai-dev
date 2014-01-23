@@ -438,6 +438,8 @@ int GlutHost ( int argc, char** argv ) {
 
 	char* lastScript = NULL;
 
+	AKURunString("MOAIEnvironment.isWindows = true");
+
 	if ( argc < 2 ) {
 		AKURunScript ( "main.lua" );
 	}
