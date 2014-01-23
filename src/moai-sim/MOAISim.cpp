@@ -966,7 +966,8 @@ void MOAISim::Update () {
 		// in other words, at least one interval of step time has elapsed in real time
 		// so we need to catch up
 		if (( this->mLoopFlags & SIM_LOOP_FORCE_STEP ) || (( this->mStep <= gap ) && ( budget > 0.0 ))) {
-			budget -= this->StepSim ( this->mStep, this->mStepMultiplier );
+			//budget -= this->StepSim ( this->mStep, this->mStepMultiplier );
+			budget -= this->StepSim ( gap, this->mStepMultiplier );
 			gap -= this->mStep * ( double )this->mStepMultiplier;
 		}
 		
