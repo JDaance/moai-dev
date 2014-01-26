@@ -4,6 +4,7 @@
 #include "pch.h"
 #include <moai-sim/MOAIActionMgr.h>
 #include <moai-sim/MOAICoroutine.h>
+#include <moai-sim/MOAISim.h>
 
 //----------------------------------------------------------------//
 /**	@name	blockOnAction
@@ -98,6 +99,9 @@ int MOAICoroutine::_run ( lua_State* L ) {
 	
 	lua_xmove ( state, self->mState, self->mNarg + 1 );
 	
+	if (MOAILuaRuntime::IsValid())
+		MOAILuaRuntime::Get().AddThreadState(self->mState);
+	
 	self->Start ();
 
 	return 0;
@@ -151,10 +155,11 @@ void MOAICoroutine::OnUpdate ( float step ) {
 		else {	
 			// Pass the step value as the return result from coroutine.yield ()
 			lua_pushnumber ( this->mState, step );
+			lua_pushnumber ( this->mState, MOAISim::Get().GetSimDuration() );
 			#if LUA_VERSION_NUM < 502
-				result = lua_resume ( this->mState, 1 );	
+				result = lua_resume ( this->mState, 2 );	
 			#else
-				result = lua_resume ( this->mState, NULL, 1 );	
+				result = lua_resume ( this->mState, NULL, 2 );	
 			#endif	
 		}
 		
@@ -179,6 +184,8 @@ void MOAICoroutine::OnUpdate ( float step ) {
 		}
 		else {
 			this->ClearLocal ( this->mRef );
+			if (MOAILuaRuntime::IsValid())
+				MOAILuaRuntime::Get().RemoveThreadState(this->mState);
 			this->mState = 0;
 		}
 	}
@@ -191,6 +198,8 @@ void MOAICoroutine::OnStop () {
 	// if we're stopping the thread from outside of its coroutine, clear out the ref
 	if ( !this->IsCurrent ()) {
 		this->ClearLocal ( this->mRef );
+		if (MOAILuaRuntime::IsValid())
+			MOAILuaRuntime::Get().RemoveThreadState(this->mState);
 		this->mState = 0;
 	}
 }

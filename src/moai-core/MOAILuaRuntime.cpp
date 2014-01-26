@@ -10,6 +10,8 @@
 #include <moai-core/MOAILuaRef.h>
 #include <moai-core/MOAILuaState-impl.h>
 
+#include <algorithm>
+
 #define MOAI_WITH_LUAJIT 1
 
 #if !MOAI_WITH_LUAJIT
@@ -309,7 +311,31 @@ void* MOAILuaRuntime::_trackingAlloc ( void *ud, void *ptr, size_t osize, size_t
 		}
 
 		if ( self.mAllocLogEnabled ) {
-			printf ( "Lua alloc: %d\n", ( int )nsize );
+			//printf ( "Lua alloc: %d\n", ( int )nsize );
+			lua_Debug ar;
+			STLString stackTrace = NULL;
+			if (lua_getstack ( self.mMainState, 0, &ar )) {
+				stackTrace = self.mMainState.GetStackTrace ( 0 );
+			} else {
+				FOREACH(ThreadStateSet::const_iterator, threadState, self.mThreadStateSet) {
+					if (lua_getstack ( *threadState, 0, &ar )) {
+						stackTrace = MOAIScopedLuaState(*threadState).GetStackTrace ( 0 );
+						break;
+					}
+				}
+			}
+			if (!stackTrace) {
+				stackTrace = "Unknown";
+			}
+			if (!self.mAllocationMap.contains(stackTrace)) {
+				AllocationTrace allocation;
+				allocation.stackTrace = stackTrace;
+				self.mAllocationMap [ stackTrace ] = allocation;
+			}
+			AllocationTrace allocation = self.mAllocationMap [ stackTrace ];
+			allocation.allocationCount += 1;
+			allocation.allocationSize += nsize;
+			self.mAllocationMap [ stackTrace ] = allocation;
 		}
 
 		self.mTotalBytes -= osize;
@@ -328,6 +354,16 @@ void* MOAILuaRuntime::_trackingAlloc ( void *ud, void *ptr, size_t osize, size_t
 //================================================================//
 // MOAILuaRuntime
 //================================================================//
+
+//----------------------------------------------------------------//
+void MOAILuaRuntime::AddThreadState ( lua_State* L ) {
+	this->mThreadStateSet.insert(L);
+}
+
+//----------------------------------------------------------------//
+void MOAILuaRuntime::RemoveThreadState ( lua_State* L ) {
+	this->mThreadStateSet.erase(L);
+}
 
 //----------------------------------------------------------------//
 void MOAILuaRuntime::BuildHistogram ( HistMap& histogram ) {
@@ -633,6 +669,22 @@ void MOAILuaRuntime::RegisterObject ( MOAILuaObject& object ) {
 }
 
 //----------------------------------------------------------------//
+void MOAILuaRuntime::ReportAllocations ( FILE *f ) {
+	fprintf ( f, "found %d traces\n", ( int )this->mAllocationMap.size () );
+	
+	STLArray<AllocationTrace> traceList;
+
+	for ( AllocationMap::const_iterator i = this->mAllocationMap.begin (); i != this->mAllocationMap.end (); ++i ) {
+		traceList.push_back(i->second);		
+	}
+	std::sort(traceList.begin(), traceList.end()); // ascending
+	
+	FOREACH(STLArray<AllocationTrace>::const_iterator, trace, traceList) {
+		fprintf ( f, "%s\t\t%d\t%d\n", trace->stackTrace.c_str(), trace->allocationCount, trace->allocationSize );
+	}
+}
+
+//----------------------------------------------------------------//
 void MOAILuaRuntime::ReportHistogram ( FILE *f ) {
 
 	if ( !this->mHistogramEnabled ) return;
@@ -764,6 +816,7 @@ MOAILuaRuntime::MOAILuaRuntime () :
 
 //----------------------------------------------------------------//
 MOAILuaRuntime::~MOAILuaRuntime () {
+	this->mThreadStateSet.clear();
 
 	if ( this->mMainState ) {
 		// run a full cycle of the garbage collector here in case any Lua bound objects
