@@ -109,7 +109,6 @@ private:
 	static int		_getStep					( lua_State* L );
 	static int		_openWindow					( lua_State* L );
 	static int		_pauseTimer					( lua_State* L );
-	static int		_reportAllocations			( lua_State* L );
 	static int		_reportHistogram			( lua_State* L );
 	static int		_reportLeaks				( lua_State* L );
 	static int		_setBoostThreshold			( lua_State* L );

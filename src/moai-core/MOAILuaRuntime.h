@@ -22,20 +22,6 @@ public:
 
 private:
 
-	struct AllocationTrace {
-		STLString stackTrace;
-		int allocationCount;
-		int allocationSize;
-		AllocationTrace(): allocationCount(0), allocationSize(0) {}
-		bool operator<(const AllocationTrace &rhs) {
-			return allocationSize < rhs.allocationSize;
-		}
-	};
-
-	typedef STLSet < lua_State* >		ThreadStateSet;
-
-	typedef	STLMap < STLString, AllocationTrace >	AllocationMap;
-
 	typedef STLMap < MOAILuaObject*, STLString >	LeakMap;
 	typedef STLArray < MOAILuaObject* >				LeakPtrList;
 	typedef STLMap < STLString, LeakPtrList >		LeakStackMap;
@@ -60,8 +46,6 @@ private:
 	size_t				mObjectCount;			// All MOAIObjects, whether or not bound to Lua
 
 	bool				mAllocLogEnabled;
-	AllocationMap		mAllocationMap;
-	ThreadStateSet		mThreadStateSet;
 
 	//----------------------------------------------------------------//
 	static int				_debugCall				( lua_State* L );
@@ -92,7 +76,6 @@ public:
 	GET_SET ( TracebackFunc, TracebackFunc, mTracebackFunc )
 
 	//----------------------------------------------------------------//
-	void					AddThreadState				(lua_State* L);
 	void					ClearObjectStackTrace		( MOAILuaObject* object );
 	void					Close						();
 	void					EnableHistogram				( bool enable );
@@ -107,8 +90,6 @@ public:
 	MOAIScopedLuaState		Open						();
 	void					PushHistogram				( MOAILuaState& state );
 	void					RegisterModule				( cc8* name, lua_CFunction loader, bool autoLoad );
-	void					RemoveThreadState			(lua_State* L);
-	void					ReportAllocations			( FILE *f );
 	void					ReportHistogram				( FILE *f );
 	void					ReportLeaksFormatted		( FILE *f );
 	void					ReportLeaksRaw				( FILE *f );

@@ -368,12 +368,6 @@ int MOAISim::_pauseTimer ( lua_State* L ) {
 	return 0;
 }
 
-int MOAISim::_reportAllocations ( lua_State* L ) {
-	MOAILuaState state ( L );
-	MOAILuaRuntime::Get ().ReportAllocations ( MOAILogMgr::Get ().GetFile ());
-	return 0;
-}
-
 //----------------------------------------------------------------//
 /**	@name	reportHistogram
 	@text	Generates a histogram of active MOAIObjects.
@@ -788,7 +782,6 @@ void MOAISim::RegisterLuaClass ( MOAILuaState& state ) {
 		{ "getStep",					_getStep },
 		{ "openWindow",					_openWindow },
 		{ "pauseTimer",					_pauseTimer },
-		{ "reportAllocations",			_reportAllocations },
 		{ "reportHistogram",			_reportHistogram },
 		{ "reportLeaks",				_reportLeaks },
 		{ "setBoostThreshold",			_setBoostThreshold },
