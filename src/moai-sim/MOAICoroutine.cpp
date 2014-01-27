@@ -4,6 +4,7 @@
 #include "pch.h"
 #include <moai-sim/MOAIActionMgr.h>
 #include <moai-sim/MOAICoroutine.h>
+#include <moai-sim/MOAISim.h>
 
 //----------------------------------------------------------------//
 /**	@name	blockOnAction
@@ -151,10 +152,11 @@ void MOAICoroutine::OnUpdate ( float step ) {
 		else {	
 			// Pass the step value as the return result from coroutine.yield ()
 			lua_pushnumber ( this->mState, step );
+			lua_pushnumber ( this->mState, MOAISim::Get().GetSimDuration() );
 			#if LUA_VERSION_NUM < 502
-				result = lua_resume ( this->mState, 1 );	
+				result = lua_resume ( this->mState, 2 );	
 			#else
-				result = lua_resume ( this->mState, NULL, 1 );	
+				result = lua_resume ( this->mState, NULL, 2 );	
 			#endif	
 		}
 		
