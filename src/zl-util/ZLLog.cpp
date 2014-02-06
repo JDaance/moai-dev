@@ -24,7 +24,7 @@ void ZLLog::Print ( cc8* format, ... ) {
 	va_list args;
 	va_start ( args, format );	
 	
-#ifdef ANDROID
+	#ifdef ANDROID
 		__android_log_vprint(ANDROID_LOG_INFO,"MoaiLog", format, args);
 	#else
 		vprintf ( format, args );
@@ -32,16 +32,23 @@ void ZLLog::Print ( cc8* format, ... ) {
 	
 	va_end ( args );
 }
-#ifdef ANDROID
 
 //----------------------------------------------------------------//
-void ZLLog::PrintFile ( ZLFILE* file, cc8* format, ... ) {
+#ifdef ANDROID
+	void ZLLog::PrintFile ( ZLFILE* file, cc8* format, ... ) {
+#else
+	void ZLLog::PrintFile ( FILE* file, cc8* format, ... ) {
+#endif
 
 	va_list args;
 	va_start ( args, format );	
 	
 	if ( file ) {
-		zl_vfprintf ( file, format, args );
+		#ifdef ANDROID
+			zl_vfprintf ( file, format, args );
+		#else
+			vfprintf ( file, format, args );
+		#endif
 	}
 	else {
 		#ifdef ANDROID
@@ -54,15 +61,19 @@ void ZLLog::PrintFile ( ZLFILE* file, cc8* format, ... ) {
 	va_end ( args );
 }
 
-#else
 //----------------------------------------------------------------//
-void ZLLog::PrintFile ( FILE* file, cc8* format, ... ) {
-
-	va_list args;
-	va_start ( args, format );	
+#ifdef ANDROID
+	void ZLLog::PrintFileV ( ZLFILE* file, cc8* format, va_list args ) {
+#else
+	void ZLLog::PrintFileV ( FILE* file, cc8* format, va_list args ) {
+#endif
 	
 	if ( file ) {
-		vfprintf ( file, format, args );
+		#ifdef ANDROID
+			zl_vfprintf ( file, format, args );
+		#else
+			vfprintf ( file, format, args );
+		#endif
 	}
 	else {
 		#ifdef ANDROID
@@ -70,24 +81,5 @@ void ZLLog::PrintFile ( FILE* file, cc8* format, ... ) {
 		#else
 			vprintf ( format, args );
 		#endif
-	}
-	
-	va_end ( args );
-}
-
-#endif
-
-//----------------------------------------------------------------//
-void ZLLog::PrintFileV ( FILE* file, cc8* format, va_list args ) {
-	
-	if ( file ) {
-		vfprintf ( file, format, args );
-	}
-	else {
-#ifdef ANDROID
-		__android_log_vprint(ANDROID_LOG_INFO,"MoaiLog", format, args);
-#else
-		vprintf ( format, args );
-#endif
 	}
 }

@@ -269,8 +269,8 @@ void MOAILogMgr::Print ( cc8* message, ... ) {
 
 //----------------------------------------------------------------//
 void MOAILogMgr::PrintVar ( cc8* message, va_list args ) {
-
-	vfprintf ( this->mFile, message, args );
+	
+	ZLLog::PrintFileV ( NULL, message, args );
 }
 
 //----------------------------------------------------------------//
