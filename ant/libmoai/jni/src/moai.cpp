@@ -314,6 +314,9 @@
 		MOAIKeyboardAndroid::Affirm ();
 		REGISTER_LUA_CLASS ( MOAIKeyboardAndroid );
 
+		REGISTER_LUA_CLASS ( MOAISimpleSoundAndroid );
+		REGISTER_LUA_CLASS ( MOAISimpleSoundSystemAndroid );
+
 #if MOAI_WITH_BOX2D
 		AKUInitializeBox2D ();
 #endif

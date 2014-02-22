@@ -21,7 +21,7 @@ gfxQuad:setRect ( -64, -64, 64, 64 )
 prop = MOAIProp2D.new ()
 prop:setDeck ( gfxQuad )
 prop:setColor ( 0, 0, 0, 0 )
-prop:seekColor ( 1, 0, 0, 1, 1.5 )
+prop:seekColor ( 1, 1, 1, 0.1, 1.5 )
 layer:insertProp ( prop )
 
 prop:moveRot ( 360, 1.5 )

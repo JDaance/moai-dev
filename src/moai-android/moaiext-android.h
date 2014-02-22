@@ -12,6 +12,8 @@
 #include <moai-android/MOAIKeyboardAndroid.h>
 #include <moai-android/MOAIMoviePlayerAndroid.h>
 #include <moai-android/MOAINotificationsAndroid.h>
+#include <moai-android/MOAISimpleSoundAndroid.h>
+#include <moai-android/MOAISimpleSoundSystemAndroid.h>
 #include <moai-android/MOAITapjoyAndroid.h>
 #include <moai-android/MOAITwitterAndroid.h>
 #include <moai-android/MOAITstoreWallAndroid.h>

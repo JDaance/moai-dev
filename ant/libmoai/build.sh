@@ -112,64 +112,78 @@
 
 		if [ x"$existing_arm_mode" != x"$arm_mode" ]; then
 			should_clean=true
+			echo "Cleaning because of arm_mode"
 		fi
 
 		if [ x"$existing_arm_arch" != x"$arm_arch" ]; then
 			should_clean=true
+			echo "Cleaning because of arm_arch"
 		fi
 
 		if [ x"$existing_app_platform" != x"$app_platform" ]; then
 			should_clean=true
+			echo "Cleaning because of app_platform"
 		fi
 
 		if [ x"$existing_use_fmod" != x"$use_fmod" ]; then
 			should_clean=true
+			echo "Cleaning because of use_fmod"
 		fi
 
 		if [ x"$existing_use_untz" != x"$use_untz" ]; then
 			should_clean=true
+			echo "Cleaning because of use_untz"
 		fi
 
         if [ x"$existing_use_luajit" != x"$use_luajit" ]; then
 			should_clean=true
+			echo "Cleaning because of use_luajit"
 		fi
 
 		if [ x"$existing_adcolony_flags" != x"$adcolony_flags" ]; then
 			should_clean=true
+			echo "Cleaning because of adcolony_flags"
 		fi
 
 		if [ x"$existing_billing_flags" != x"$billing_flags" ]; then
 			should_clean=true
+			echo "Cleaning because of billing_flags"
 		fi
 
 		if [ x"$existing_chartboost_flags" != x"$chartboost_flags" ]; then
 			should_clean=true
+			echo "Cleaning because of chartboost_flags"
 		fi
 
 		if [ x"$existing_crittercism_flags" != x"$crittercism_flags" ]; then
 			should_clean=true
+			echo "Cleaning because of crittercism_flags"
 		fi
 
 		if [ x"$existing_facebook_flags" != x"$facebook_flags" ]; then
 			should_clean=true
+			echo "Cleaning because of facebook_flags"
 		fi
 
 		if [ x"$existing_push_flags" != x"$push_flags" ]; then
 			should_clean=true
+			echo "Cleaning because of push_flags"
 		fi
 
 		if [ x"$existing_tapjoy_flags" != x"$tapjoy_flags" ]; then
 			should_clean=true
+			echo "Cleaning because of tapjoy_flags"
 		fi
         if [ x"$existing_twitter_flags" != x"$twitter_flags" ]; then
 			should_clean=true
+			echo "Cleaning because of twitter_flags"
 		fi
 
 	fi
 	
-	if [ x"$should_clean" = xtrue ]; then
-		./clean.sh
-	fi
+#	if [ x"$should_clean" = xtrue ]; then
+#		./clean.sh
+#	fi
 
 	# echo message about what we are doing
 	echo "Building libmoai.so for $arm_mode, $arm_arch, $app_platform"

@@ -26,6 +26,8 @@
 	LOCAL_SRC_FILES 	+= $(MY_MOAI_ROOT)/src/moai-android/MOAIKeyboardAndroid.cpp
 	LOCAL_SRC_FILES 	+= $(MY_MOAI_ROOT)/src/moai-android/MOAIMoviePlayerAndroid.cpp
 	LOCAL_SRC_FILES 	+= $(MY_MOAI_ROOT)/src/moai-android/MOAINotificationsAndroid.cpp
+	LOCAL_SRC_FILES 	+= $(MY_MOAI_ROOT)/src/moai-android/MOAISimpleSoundAndroid.cpp
+	LOCAL_SRC_FILES 	+= $(MY_MOAI_ROOT)/src/moai-android/MOAISimpleSoundSystemAndroid.cpp
 	LOCAL_SRC_FILES 	+= $(MY_MOAI_ROOT)/src/moai-android/MOAITapjoyAndroid.cpp
 	LOCAL_SRC_FILES 	+= $(MY_MOAI_ROOT)/src/moai-android/MOAITwitterAndroid.cpp
 	LOCAL_SRC_FILES 	+= $(MY_MOAI_ROOT)/src/moai-android/MOAITstoreWallAndroid.cpp

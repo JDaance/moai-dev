@@ -6,17 +6,23 @@
 
 MOAISim.openWindow ( "test", 320, 480 )
 
+MOAIGfxDevice.getFrameBuffer():setClearColor (0.5, 0.5, 0.5, 1.0)
+MOAIGfxDevice.getFrameBuffer():setClearDepth(true)
+		
 viewport = MOAIViewport.new ()
 viewport:setSize ( 320, 480 )
 viewport:setScale ( 320, 480 )
 
-layer = MOAILayer.new ()
-layer:setViewport ( viewport )
-MOAISim.pushRenderPass ( layer )
+layer2 = MOAILayer.new ()
+layer2:setViewport ( viewport )
+MOAISim.pushRenderPass ( layer2 )
+layer3 = MOAILayer2D.new ()
+layer3:setViewport ( viewport )
+MOAISim.pushRenderPass ( layer3 )
 
 camera = MOAICamera.new ()
 camera:setLoc ( 0, 0, camera:getFocalLength ( 320 ))
-layer:setCamera ( camera )
+layer2:setCamera ( camera )
 
 function makeBoxMesh ( xMin, yMin, zMin, xMax, yMax, zMax, texture )
 	
@@ -109,4 +115,19 @@ prop:setDeck ( mesh )
 prop:moveRot ( 360, 360, 0, 3 )
 prop:setShader ( MOAIShaderMgr.getShader ( MOAIShaderMgr.MESH_SHADER ))
 prop:setCullMode ( MOAIProp.CULL_BACK )
-layer:insertProp ( prop )
+prop:setDepthMask ( true )
+
+local quadsmall = MOAIGfxQuad2D.new()
+quadsmall:setRect(-160, -240, -50, -100)
+quadsmall:setUVRect( 0, 1, 1, 0 )
+
+fgprop = MOAIProp.new()
+fgprop:setDeck(quadsmall)
+fgprop:setDepthTest(MOAIProp.DEPTH_TEST_LESS_EQUAL)
+fgprop:setDepthMask(false)
+fgprop:setLoc(0, 0, -1)
+fgprop:setCullMode(MOAIProp.CULL_BACK)
+fgprop:setBlendMode(MOAIProp.GL_ONE, MOAIProp.GL_ZERO)
+
+layer2:insertProp ( prop )
+layer3:insertProp ( fgprop )
