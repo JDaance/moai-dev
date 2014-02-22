@@ -86,8 +86,7 @@ System::System(UInt32 sampleRate, UInt32 numFrames, UInt32 options)
 	streamOptions.flags = 0 | RTAUDIO_MINIMIZE_LATENCY | RTAUDIO_NONINTERLEAVED;
 	try 
 	{
-		UInt32 hackedNumFrames = 1000;
-		wsd->audioIO.openStream( &outParams, NULL, RTAUDIO_FLOAT32, sampleRate, &hackedNumFrames, &RtInOut, (void *)&mpData->mMixer, &streamOptions );
+		wsd->audioIO.openStream( &outParams, NULL, RTAUDIO_FLOAT32, sampleRate, &numFrames, &RtInOut, (void *)&mpData->mMixer, &streamOptions );
 		wsd->audioIO.startStream();
 	}
 	catch(RtError& error)
