@@ -1149,7 +1149,7 @@ MOAITextBox::MOAITextBox () :
 	
 	this->mFrame.Init ( 0.0f, 0.0f, 0.0f, 0.0f ); 
 	this->SetMask ( MOAIProp::CAN_DRAW | MOAIProp::CAN_DRAW_DEBUG );
-	//this->mBlendMode.SetBlend ( ZGL_BLEND_FACTOR_SRC_ALPHA, ZGL_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA );
+	this->mBlendMode.SetBlend ( ZGL_BLEND_FACTOR_SRC_ALPHA, ZGL_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA );
 }
 
 //----------------------------------------------------------------//
