@@ -31,6 +31,9 @@
   #include <unistd.h>
 #elif defined (ANDROID)
   #include <unistd.h>
+  #include <jni.h>
+  #include <moai-android/moaiext-jni.h>
+  extern JavaVM* jvm;
 #endif
 
 
@@ -285,6 +288,22 @@ int MOAISim::_getMemoryUsage ( lua_State* L ) {
 		lua_pushnumber(L, t_info.resident_size / divisor);
 		lua_setfield(L, -2, "_sys_rss");
 	}
+#elif defined(ANDROID)
+	JNI_GET_ENV ( jvm, env );
+	jclass debug = env->FindClass("android/os/Debug");
+    jmethodID getNativeHeapAllocatedSize = env->GetStaticMethodID(debug, "getNativeHeapAllocatedSize", "()J");
+    long nativeHeapAllocatedSize = env->CallStaticLongMethod(debug, getNativeHeapAllocatedSize);
+    jmethodID getNativeHeapFreeSize = env->GetStaticMethodID(debug, "getNativeHeapFreeSize", "()J");
+    long nativeHeapFreeSize = env->CallStaticLongMethod(debug, getNativeHeapFreeSize);	 
+    jmethodID getNativeHeapSize = env->GetStaticMethodID(debug, "getNativeHeapSize", "()J");
+    long nativeHeapSize = env->CallStaticLongMethod(debug, getNativeHeapSize);
+	
+	lua_pushnumber(L, nativeHeapAllocatedSize / divisor);
+	lua_setfield(L, -2, "_nativeHeapAllocatedSize");
+	lua_pushnumber(L, nativeHeapFreeSize / divisor);
+	lua_setfield(L, -2, "_nativeHeapFreeSize");
+	lua_pushnumber(L, nativeHeapSize / divisor);
+	lua_setfield(L, -2, "_nativeHeapSize");
 #endif
 	
 	lua_pushnumber(L, total / divisor);
