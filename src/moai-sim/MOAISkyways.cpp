@@ -35,7 +35,9 @@ struct FVertex {
 public:
 	USVec2D mV;
 	USVec2D mN;
+	u32 color;
 	FVertex(USVec2D v): mV(v) {};
+	FVertex(USVec2D v, u32 c): mV(v), color(c) {};
 };
 
 typedef std::vector< FVertex > FPolygon;
@@ -55,24 +57,30 @@ float static popTableFloat(MOAILuaState state, lua_State* L, int tableIndex)
 	return val;
 }
 
-void static readPolyLinesFromLua(FPolygons &polyLines, /*Colors &colors, */MOAILuaState state, lua_State* L, int tableIndex)
+void static readPolyLinesFromLua(FPolygons &polyLines, MOAILuaState state, lua_State* L, int tableIndex)
 {
 	
 	int length = luaL_getn(L, tableIndex);
 	
-	float x1, y1, x2, y2;//, r, g, b, a;
+	float x1, y1, x2, y2, r, g, b, a;
 
 	u32 lineCount = 0;
 	lua_pushnil ( L );
-	while (lineCount < length / 4) {
+	while (lineCount < length / 8) {
 		x1	= popTableFloat(state, L, tableIndex);
 		y1	= popTableFloat(state, L, tableIndex);
 		x2	= popTableFloat(state, L, tableIndex);
 		y2	= popTableFloat(state, L, tableIndex);
+		r	= popTableFloat(state, L, tableIndex);
+		g	= popTableFloat(state, L, tableIndex);
+		b	= popTableFloat(state, L, tableIndex);
+		a	= popTableFloat(state, L, tableIndex);
 		
+		u32 color = ZLColor::PackRGBA(r, g, b, a);
+
 		FPolygon polyLine;
-		polyLine.push_back(USVec2D(x1, y1));
-		polyLine.push_back(USVec2D(x2, y2));
+		polyLine.push_back(FVertex(USVec2D(x1, y1), color));
+		polyLine.push_back(FVertex(USVec2D(x2, y2), color));
 		polyLines.push_back(polyLine);
 
 		++lineCount;
@@ -113,7 +121,13 @@ void static readPerpLegIndexesFromLua(vector<int> &physics_perpLegIndexes, MOAIL
 	}
 }
 
-void static pushPolygonsToLua(MOAILuaState state, lua_State* L, const FPolygons &polygons)
+void static setTableFloat(lua_State* L, int tableIndex, int index, float value)
+{
+	lua_pushnumber(L, value); // [bt, i, tt, x]
+	lua_rawseti (L, tableIndex, index); // [bt, i, tt]
+}
+
+void static pushPhysicsSegmentsToLua(MOAILuaState state, lua_State* L, const FPolygons &polygons)
 {
 	int count = polygons.size();
 	lua_createtable(L, count, 0); // [bt]
@@ -121,12 +135,19 @@ void static pushPolygonsToLua(MOAILuaState state, lua_State* L, const FPolygons 
 	for(FPolygons::const_iterator itPolygon = polygons.begin(); itPolygon != polygons.end(); ++itPolygon, ++i) {
 		int compCount = itPolygon->size();
 		lua_pushinteger(L, i + 1); // [bt, i]
-		lua_createtable(L, compCount * 2, 0); // [bt, i, tt]
+		int colorOffset = 4;
+		lua_createtable(L, compCount * 2 + colorOffset, 0); // [bt, i, tt]
+		{
+			FVertex vertex = itPolygon->at(0);
+			ZLColorVec color = ZLColor::Set(vertex.color);
+			setTableFloat(L, -2, 1, color.mR);
+			setTableFloat(L, -2, 2, color.mG);
+			setTableFloat(L, -2, 3, color.mB);
+			setTableFloat(L, -2, 4, color.mA);
+		}
 		for (int j = 0; j < compCount; j++) {
-			lua_pushnumber(L, (*itPolygon)[j].mV.mX); // [bt, i, tt, x]
-			lua_rawseti (L, -2, j * 2 + 1); // [bt, i, tt]
-			lua_pushnumber(L, (*itPolygon)[j].mV.mY); // [bt, i, tt, y]
-			lua_rawseti (L, -2, j * 2 + 2); // [bt, i, tt]
+			setTableFloat(L, -2, j * 2 + 1 + colorOffset, itPolygon->at(j).mV.mX);
+			setTableFloat(L, -2, j * 2 + 2 + colorOffset, itPolygon->at(j).mV.mY);
 		}
 		lua_settable(L, -3); // [bt[i=tt]
 	}
@@ -310,7 +331,7 @@ static void offsetPolyLinesToPolygons(const FPolygons &polyLines, const float of
 		clpr.Clear();
 		clpr.AddPolygons(physics_scaledPolygons, ptSubject);
 		clpr.AddPolygons(physics_scaledUnionIntersectionGeometries, ptClip);
-		clpr.Execute(ctUnion, physics_scaledUnionPolygons, pftPositive, pftPositive);
+		clpr.Execute(ctDifference, physics_scaledUnionPolygons, pftPositive, pftPositive);
 	
 		clpr.Clear();
 		clpr.AddPolygons(physics_scaledPolygons, ptSubject);
@@ -382,6 +403,65 @@ static void computeNormalsForPolygons(FPolygons &polygons, const vector<bool> &p
 }
 
 //================================================================//
+// COLORIZE
+//================================================================//
+
+// http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+/*
+int pnpoly(int nvert, float *vertx, float *verty, float testx, float testy)
+{
+	int i, j, c = 0;
+	for (i = 0, j = nvert-1; i < nvert; j = i++) {
+		if ( ((verty[i]>testy) != (verty[j]>testy)) &&
+				(testx < (vertx[j]-vertx[i]) * (testy-verty[i]) / (verty[j]-verty[i]) + vertx[i]) )
+			c = !c;
+	}
+	return c;
+}
+*/
+
+// Translated from above
+static bool pointInPolygon(const FPolygon &polygon, const USVec2D &point) {
+	int nvert = polygon.size();
+	int i, j, c = 0;
+	for (i = 0, j = nvert-1; i < nvert; j = i++) {
+		if ( ((polygon[i].mV.mY>point.mY) != (polygon[j].mV.mY>point.mY)) &&
+				(point.mX < (polygon[j].mV.mX-polygon[i].mV.mX) * (point.mY-polygon[i].mV.mY) / (polygon[j].mV.mY-polygon[i].mV.mY) + polygon[i].mV.mX) )
+			c = !c;
+	}
+	return c;
+}
+
+static void setPolygonColors(FPolygon &polygon, const u32 color) {
+	for(FPolygon::iterator itVertex = polygon.begin(); itVertex != polygon.end(); ++itVertex) {
+		itVertex->color = color;
+	}
+}
+
+static void computeColorForPolygon(FPolygon &polygon, const std::vector< FVertex > &pointsWithColors) {
+	for(std::vector< FVertex >::const_iterator itPoint = pointsWithColors.begin(); itPoint != pointsWithColors.end(); ++itPoint) {
+		if (pointInPolygon(polygon, itPoint->mV)) {
+			setPolygonColors(polygon, itPoint->color);
+		}
+	}
+}
+
+static void flattenPolyLinesToPoints(const FPolygons &polyLines, std::vector< FVertex > &points) {
+	for(FPolygons::const_iterator itLine = polyLines.begin(); itLine != polyLines.end(); ++itLine) {
+		points.push_back(itLine->at(0));
+		points.push_back(itLine->at(1));
+	}
+}
+
+static void computeColorsForPolygons(FPolygons &polygons, const FPolygons &polyLines) {
+	std::vector< FVertex > pointsWithColors;
+	flattenPolyLinesToPoints(polyLines, pointsWithColors);
+	for(FPolygons::iterator itPolygon = polygons.begin(); itPolygon != polygons.end(); ++itPolygon) {
+		computeColorForPolygon(*itPolygon, pointsWithColors);
+	}
+}
+
+//================================================================//
 // TESSELATION
 //================================================================//
 
@@ -447,77 +527,6 @@ void static tesselatePolygons(const FPolygons &polygons, FPolygons &triangles) {
 	if (tess) tessDeleteTess(tess);
 }
 
-
-
-//================================================================//
-// COLORIZE
-//================================================================//
-
-/*
-static float pointToLineDistanceSq(const USVec2D &center, const FPolygon &line)
-{
-	USVec2D dir = line[1] - line[0];
-	USVec2D diff = center - line[0];
-	float t = diff.Dot(dir) / dir.Dot(dir);
-	t = min(t, 1.0f); t = max(t, 0.0f);
-
-	// trying to write: closest = line[0] + dir * t
-	USVec2D closest = dir;
-	closest.Scale(t); closest.Add(line[0]);
-
-	float distanceSq = ZLDist::PointToPointSqrd(center, closest);
-	return distanceSq;*/
-
-	/*
-	LUA:
-	local dir = self.v2 - self.v1
-	local diff = v - self.v1
-	
-	 -- t is a scalar around 0-1 indicating where on the line is closest to the sphere
-	local t = V3.dot(diff, dir) / V3.dot(dir, dir)
-	
-	-- clamp t within [0, 1] otherwise it is outside of the line
-	t = math.min(t, 1)
-	t = math.max(t, 0)
-	
-	local closest = self.v1 + dir * t
-	local distance = (closest - v):len()
-	return closest, distance
-	*//*
-}
-
-static u32 findClosestPolyLineColor(const USVec2D &center, const FPolygons &polyLines, const Colors &lineColors)
-{
-	float shortestDistanceSq = 1000000.0f; // omg, infinity almost
-	u32 closestColor;
-	bool first = true;
-	
-	int count = polyLines.size();
-	for (int i = 0; i < count; ++i) {
-		FPolygon line = polyLines[i];
-		float distanceSq = pointToLineDistanceSq(center, line);
-		if (distanceSq < shortestDistanceSq) {
-			shortestDistanceSq = distanceSq;
-			closestColor = lineColors[i];
-		}
-	}
-	return closestColor;
-}
-
-static void calculateTriangleColors(const FPolygons &triangles, Colors &triangleColors, const FPolygons &polyLines, const Colors &lineColors)
-{
-	triangleColors.clear();
-
-	int count = triangles.size();
-	for (int i = 0; i < count; ++i) {
-		FPolygon triangle = triangles[i];
-		USVec2D center = triangle[0] + triangle[1] + triangle[2];
-		center.Scale(1.0f/3.0f);
-		u32 color = findClosestPolyLineColor(center, polyLines, lineColors);
-		triangleColors.push_back(color);
-	}
-}*/
-
 //================================================================//
 // 3D
 //================================================================//
@@ -559,7 +568,7 @@ void static inline writeOutlineVertexToVBO(MOAIVertexBuffer* vbo, const ZLVec3D 
 	//MOAIPrint("Outline point: %.2f, %.2f, %.2f - normal: %.2f, %.2f, %.2f\n", p.mX, p.mY, p.mZ, n.mX, n.mY, n.mZ);
 }
 
-void static writeTrianglesToVBO(MOAIVertexBuffer* mainVbo, MOAIVertexBuffer* outlineVbo, const FPolygons &triangles, const FPolygons &polyLines, u32 hand, float missingDimValue, float normalSign, const u32 color, const bool frontFacing)
+void static writeTrianglesToVBO(MOAIVertexBuffer* mainVbo, MOAIVertexBuffer* outlineVbo, const FPolygons &triangles, const FPolygons &polyLines, u32 hand, float missingDimValue, float normalSign, const bool frontFacing)
 {
 	// for some reason right hand frontfacing is a special case :)
 	bool ascending = hand == MOAISkyways::HAND_RIGHT && frontFacing;
@@ -587,7 +596,7 @@ void static writeTrianglesToVBO(MOAIVertexBuffer* mainVbo, MOAIVertexBuffer* out
 			}
 			p3d.mZ = p2d.mY;
 
-			writeVertexToVBO(mainVbo, p3d, n, color);
+			writeVertexToVBO(mainVbo, p3d, n, v2d.color);
 			writeOutlineVertexToVBO(outlineVbo, p3d, outline_n);
 		}
 	}
@@ -685,14 +694,14 @@ void static	writeTopFaceToVBO(MOAIVertexBuffer* mainVbo, MOAIVertexBuffer* outli
 	writeTriToOutlineVBO(outlineVbo, nl, nl_on, nr, nr_on, sr, sr_on);
 }
 
-void static	writeTopFacesToVBO(MOAIVertexBuffer* mainVbo, MOAIVertexBuffer* outlineVbo, const FPolygons &polygons, const vector<bool> &polygonOrientations, u32 hand, float missingDimValue, float delta, const u32 color)
+void static	writeTopFacesToVBO(MOAIVertexBuffer* mainVbo, MOAIVertexBuffer* outlineVbo, const FPolygons &polygons, const vector<bool> &polygonOrientations, u32 hand, float missingDimValue, float delta)
 {
 	int iP = 0;
 	for(FPolygons::const_iterator itPolygon = polygons.begin(); itPolygon != polygons.end(); ++itPolygon, ++iP) {
 		for (int iV = 0; iV < itPolygon->size(); ++iV) {
 			FVertex v1 = (*itPolygon)[iV];
 			FVertex v2 = (*itPolygon)[(iV + 1) % itPolygon->size()];
-			writeTopFaceToVBO(mainVbo, outlineVbo, v1, v2, polygonOrientations[iP], hand, missingDimValue, delta, color);
+			writeTopFaceToVBO(mainVbo, outlineVbo, v1, v2, polygonOrientations[iP], hand, missingDimValue, delta, v1.color);
 		}
 	}
 }
@@ -703,7 +712,7 @@ void static	writeTopFacesToVBO(MOAIVertexBuffer* mainVbo, MOAIVertexBuffer* outl
 
 int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 	MOAILuaState state ( L );
-	if ( !state.CheckParams(1, "UUTTNNNNBNNTNNNN") ) return 0;
+	if ( !state.CheckParams(1, "UUTTNNNNBNNT") ) return 0;
 	
 	MOAIVertexBuffer* mainVbo					= state.GetLuaObject < MOAIVertexBuffer >( 1, true );
 	MOAIVertexBuffer* outlineVbo				= state.GetLuaObject < MOAIVertexBuffer >( 2, true );
@@ -717,12 +726,6 @@ int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 	const float physics_roundLimit				= state.GetValue<float>(10, 0);
 	const float gridSize						= state.GetValue<float>(11, -1);
 	const int physicsPerpLegIndexesTableIndex	= 12;
-	const float r								= state.GetValue < float >( 13, 0.0f );
-    const float g								= state.GetValue < float >( 14, 0.0f );
-    const float b								= state.GetValue < float >( 15, 0.0f );
-    const float a								= state.GetValue < float >( 16, 0.0f );
-
-    const u32 color = ZLColor::PackRGBA(r, g, b, a);
 	
 	FPolygons polyLines, geom_cutIntersectionGeometries, geom_cutPolygons;
 	FPolygon intersectionPoints;
@@ -745,6 +748,9 @@ int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 	
 	computeNormalsForPolygons(geom_cutPolygons, geom_cutPolygonOrientations);
 
+	computeColorsForPolygons(geom_cutPolygons, polyLines);
+	computeColorsForPolygons(physics_unionPolygons, polyLines);
+
 	FPolygons triangles;
 	tesselatePolygons(geom_cutPolygons, triangles);
 
@@ -754,15 +760,15 @@ int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 	mainVbo->Reserve(vertexCount); 
 	outlineVbo->Reserve(vertexCount);
 
-	writeTrianglesToVBO(mainVbo, outlineVbo, triangles, polyLines, hand, missingDimValue - delta, -1.0f, color, true);
-	writeTrianglesToVBO(mainVbo, outlineVbo, triangles, polyLines, hand, missingDimValue + delta, -1.0f, color, false);
+	writeTrianglesToVBO(mainVbo, outlineVbo, triangles, polyLines, hand, missingDimValue - delta, -1.0f, true);
+	writeTrianglesToVBO(mainVbo, outlineVbo, triangles, polyLines, hand, missingDimValue + delta, -1.0f, false);
 
-	writeTopFacesToVBO(mainVbo, outlineVbo, geom_cutPolygons, geom_cutPolygonOrientations, hand, missingDimValue, delta, color);
+	writeTopFacesToVBO(mainVbo, outlineVbo, geom_cutPolygons, geom_cutPolygonOrientations, hand, missingDimValue, delta);
 	
 	// TODO implement bless here instead of in LUA
 	
 	if (physics_generateSegments) {
-		pushPolygonsToLua(state, L, physics_unionPolygons);
+		pushPhysicsSegmentsToLua(state, L, physics_unionPolygons);
 		pushPerpCollisionPositionsToLua(state, L, physics_perpIntersectionPolygons, gridSize);
 
 		return 2;
