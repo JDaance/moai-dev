@@ -59,7 +59,6 @@ float static popTableFloat(MOAILuaState state, lua_State* L, int tableIndex)
 
 void static readPolyLinesFromLua(FPolygons &polyLines, MOAILuaState state, lua_State* L, int tableIndex)
 {
-	
 	int length = luaL_getn(L, tableIndex);
 	
 	float x1, y1, x2, y2, r, g, b, a;
@@ -86,6 +85,7 @@ void static readPolyLinesFromLua(FPolygons &polyLines, MOAILuaState state, lua_S
 
 		++lineCount;
 	}
+	lua_pop ( L, 1 ); // loop stopped without lua_next consuming key
 }
 
 void static readIntersectionPointsFromLua(FPolygon &intersectionPoints, MOAILuaState state, lua_State* L, int tableIndex)
@@ -759,7 +759,7 @@ int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 	readIntersectionPointsFromLua(intersectionPoints, state, L, intersectionPointsTableIndex);
 	if (physics_generateSegments) {
 		readPerpLegIndexesFromLua(physics_perpLegIndexes, state, L, physicsPerpLegIndexesTableIndex);
-	}
+	};
 
 	createIntersectionGeometries(intersectionPoints, geom_cutIntersectionGeometries, delta, 
 		physics_generateSegments, physics_unionIntersectionGeometries, physics_cutIntersectionGeometries);
