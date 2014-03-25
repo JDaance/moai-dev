@@ -77,6 +77,7 @@ void static readPolyLinesFromLua(FPolygons &polyLines, MOAILuaState state, lua_S
 		a	= popTableFloat(state, L, tableIndex);
 		
 		u32 color = ZLColor::PackRGBA(r, g, b, a);
+		ZLColorVec cv = ZLColor::Set(color);
 
 		FPolygon polyLine;
 		polyLine.push_back(FVertex(USVec2D(x1, y1), color));
@@ -210,10 +211,11 @@ void static createIntersectionGeometries(const FPolygon &intersectionPoints, FPo
 	for(FPolygon::const_iterator itVertex = intersectionPoints.begin(); itVertex != intersectionPoints.end(); ++itVertex) {
 		USVec2D p = itVertex->mV;
 		FPolygon geom;
-		geom.push_back(USVec2D(p.mX - delta, p.mY + delta * 1.2));
-		geom.push_back(USVec2D(p.mX - delta, p.mY - delta * 1.2));
-		geom.push_back(USVec2D(p.mX + delta, p.mY - delta * 1.2));
-		geom.push_back(USVec2D(p.mX + delta, p.mY + delta * 1.2));
+		float expandX = 1.001, expandY = 1.2;
+		geom.push_back(USVec2D(p.mX - delta * expandX, p.mY + delta * expandY));
+		geom.push_back(USVec2D(p.mX - delta * expandX, p.mY - delta * expandY));
+		geom.push_back(USVec2D(p.mX + delta * expandX, p.mY - delta * expandY));
+		geom.push_back(USVec2D(p.mX + delta * expandX, p.mY + delta * expandY));
 		cutIntersectionGeometries.push_back(geom);
 	}
 	
@@ -230,10 +232,11 @@ void static createIntersectionGeometries(const FPolygon &intersectionPoints, FPo
 			physics_unionIntersectionGeometries.push_back(unionGeom);
 
 			FPolygon cutGeom;
-			cutGeom.push_back(USVec2D(p.mX - delta * 1.2, p.mY + delta * 1.2));
-			cutGeom.push_back(USVec2D(p.mX - delta * 1.2, p.mY - delta * 1.2));
-			cutGeom.push_back(USVec2D(p.mX + delta * 1.2, p.mY - delta * 1.2));
-			cutGeom.push_back(USVec2D(p.mX + delta * 1.2, p.mY + delta * 1.2));
+			float expandX = 1.2, expandY = 1.2;
+			cutGeom.push_back(USVec2D(p.mX - delta * expandX, p.mY + delta * expandY));
+			cutGeom.push_back(USVec2D(p.mX - delta * expandX, p.mY - delta * expandY));
+			cutGeom.push_back(USVec2D(p.mX + delta * expandX, p.mY - delta * expandY));
+			cutGeom.push_back(USVec2D(p.mX + delta * expandX, p.mY + delta * expandY));
 			physics_cutIntersectionGeometries.push_back(cutGeom);
 		}
 	}
@@ -297,7 +300,7 @@ static Polygons createPerpendicularIntersectionTestPolygons(const vector<int> &p
 }
 
 static void offsetPolyLinesToPolygons(const FPolygons &polyLines, const float offsetAmount, const float geom_roundLimit, FPolygons &geom_cutIntersectionGeometries, FPolygons &geom_cutPolygons, vector<bool> &geom_cutPolygonOrientations, 
-	bool physics_generateSegments, const float physics_roundLimit, const float gridSize, const vector<int> &physics_perpLegIndexes, const FPolygons &physics_unionIntersectionGeometries, const FPolygons &physics_cutIntersectionGeometries, FPolygons &physics_unionPolygons, FPolygons &physics_perpIntersectionPolygons) {
+	bool physics_generateSegments, const float physics_roundLimit, const float gridSize, const vector<int> &physics_perpLegIndexes, const FPolygons &physics_unionIntersectionGeometries, const FPolygons &physics_cutIntersectionGeometries, FPolygons &physics_unionPolygons, vector<bool> &physics_unionPolygonOrientations, FPolygons &physics_perpIntersectionPolygons) {
 	
 	const float scale = 100000.0f; // scale for integers used by clipper
 
@@ -331,7 +334,7 @@ static void offsetPolyLinesToPolygons(const FPolygons &polyLines, const float of
 		clpr.Clear();
 		clpr.AddPolygons(physics_scaledPolygons, ptSubject);
 		clpr.AddPolygons(physics_scaledUnionIntersectionGeometries, ptClip);
-		clpr.Execute(ctDifference, physics_scaledUnionPolygons, pftPositive, pftPositive);
+		clpr.Execute(ctUnion, physics_scaledUnionPolygons, pftPositive, pftPositive);
 	
 		clpr.Clear();
 		clpr.AddPolygons(physics_scaledPolygons, ptSubject);
@@ -345,6 +348,11 @@ static void offsetPolyLinesToPolygons(const FPolygons &polyLines, const float of
 		
 		intToFloatScale(physics_scaledUnionPolygons, physics_unionPolygons, 1.0f/scale);
 		intToFloatScale(physics_scaledPerpIntersectionPolygons, physics_perpIntersectionPolygons, 1.0f/scale);
+
+		physics_unionPolygonOrientations.clear();
+		for(Polygons::const_iterator itPoly = physics_scaledUnionPolygons.begin(); itPoly != physics_scaledUnionPolygons.end(); ++itPoly) {
+			physics_unionPolygonOrientations.push_back(Orientation(*itPoly));
+		}
 	}
 }
 
@@ -372,14 +380,13 @@ static void computeNormalsForPolygon(FPolygon &polygon, bool orientation) {
 			
 			if (ZLFloat::IsClose(dir1rotated.mX, dir2.mX, EPSILON) && ZLFloat::IsClose(dir1rotated.mY, dir2.mY, EPSILON)) {
 				// vertex must be a cut intersection corner
+				isIntersectionCorner = true;
 				if (dir2.mX > 0 || dir1.mX > 0) {
 					// up
 					vertex.mN = USVec2D(0.0f, 1.0f);
-					isIntersectionCorner = true;
 				} else if (dir2.mX < 0 || dir1.mX < 0) {
 					// down
 					vertex.mN = USVec2D(0.0f, -1.0f);
-					isIntersectionCorner = true;
 				}
 			}
 		}
@@ -395,7 +402,6 @@ static void computeNormalsForPolygon(FPolygon &polygon, bool orientation) {
 }
 
 static void computeNormalsForPolygons(FPolygons &polygons, const vector<bool> &polygonOrientations) {
-	
 	int i = 0;
 	for(FPolygons::iterator itPolygon = polygons.begin(); itPolygon != polygons.end(); ++itPolygon, ++i) {
 		computeNormalsForPolygon(*itPolygon, polygonOrientations[i]);
@@ -438,12 +444,13 @@ static void setPolygonColors(FPolygon &polygon, const u32 color) {
 	}
 }
 
-static void computeColorForPolygon(FPolygon &polygon, const std::vector< FVertex > &pointsWithColors) {
+static u32 computeColorForPolygon(FPolygon &polygon, const std::vector< FVertex > &pointsWithColors) {
 	for(std::vector< FVertex >::const_iterator itPoint = pointsWithColors.begin(); itPoint != pointsWithColors.end(); ++itPoint) {
 		if (pointInPolygon(polygon, itPoint->mV)) {
-			setPolygonColors(polygon, itPoint->color);
+			return itPoint->color;
 		}
 	}
+	return NULL;
 }
 
 static void flattenPolyLinesToPoints(const FPolygons &polyLines, std::vector< FVertex > &points) {
@@ -453,11 +460,26 @@ static void flattenPolyLinesToPoints(const FPolygons &polyLines, std::vector< FV
 	}
 }
 
-static void computeColorsForPolygons(FPolygons &polygons, const FPolygons &polyLines) {
+const u32 black = ZLColor::PackRGBA(0.0f, 0.0f, 0.0f, 1.0f);
+static void computeColorsForPolygons(FPolygons &polygons, const FPolygons &polyLines, const vector<bool> &polygonOrientations) {
 	std::vector< FVertex > pointsWithColors;
 	flattenPolyLinesToPoints(polyLines, pointsWithColors);
-	for(FPolygons::iterator itPolygon = polygons.begin(); itPolygon != polygons.end(); ++itPolygon) {
-		computeColorForPolygon(*itPolygon, pointsWithColors);
+	u32 lastColor = NULL;
+	int i = 0;
+	for(FPolygons::iterator itPolygon = polygons.begin(); itPolygon != polygons.end(); ++itPolygon, ++i) {
+		bool orientation = polygonOrientations[i];
+		MOAIPrint(orientation ? ">" : "<");
+		u32 color;
+		if (orientation)
+			color = computeColorForPolygon(*itPolygon, pointsWithColors);
+		else
+			color = lastColor;
+		if (!color) {
+			MOAIPrint("Warning, found no color for polygon, defaulting to black\n");
+			color = black;
+		}
+		setPolygonColors(*itPolygon, color);
+		lastColor = color;
 	}
 }
 
@@ -742,14 +764,16 @@ int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 	createIntersectionGeometries(intersectionPoints, geom_cutIntersectionGeometries, delta, 
 		physics_generateSegments, physics_unionIntersectionGeometries, physics_cutIntersectionGeometries);
 	
-	vector<bool> geom_cutPolygonOrientations;
+	vector<bool> geom_cutPolygonOrientations, physics_unionPolygonOrientations;
 	offsetPolyLinesToPolygons(polyLines, delta, geom_roundLimit, geom_cutIntersectionGeometries, geom_cutPolygons, geom_cutPolygonOrientations, 
-		physics_generateSegments, physics_roundLimit, gridSize, physics_perpLegIndexes, physics_unionIntersectionGeometries, physics_cutIntersectionGeometries, physics_unionPolygons, physics_perpIntersectionPolygons);
+		physics_generateSegments, physics_roundLimit, gridSize, physics_perpLegIndexes, physics_unionIntersectionGeometries, physics_cutIntersectionGeometries, physics_unionPolygons, physics_unionPolygonOrientations, physics_perpIntersectionPolygons);
 	
 	computeNormalsForPolygons(geom_cutPolygons, geom_cutPolygonOrientations);
 
-	computeColorsForPolygons(geom_cutPolygons, polyLines);
-	computeColorsForPolygons(physics_unionPolygons, polyLines);
+	MOAIPrint("\n\nColors for geom\n");
+	computeColorsForPolygons(geom_cutPolygons, polyLines, geom_cutPolygonOrientations);
+	MOAIPrint("\n\nColors for physics\n");
+	computeColorsForPolygons(physics_unionPolygons, polyLines, physics_unionPolygonOrientations);
 
 	FPolygons triangles;
 	tesselatePolygons(geom_cutPolygons, triangles);
