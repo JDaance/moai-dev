@@ -468,7 +468,7 @@ static void computeColorsForPolygons(FPolygons &polygons, const FPolygons &polyL
 	int i = 0;
 	for(FPolygons::iterator itPolygon = polygons.begin(); itPolygon != polygons.end(); ++itPolygon, ++i) {
 		bool orientation = polygonOrientations[i];
-		MOAIPrint(orientation ? ">" : "<");
+		//MOAIPrint(orientation ? ">" : "<");
 		u32 color;
 		if (orientation)
 			color = computeColorForPolygon(*itPolygon, pointsWithColors);
@@ -770,9 +770,7 @@ int MOAISkyways::_createLegGeometry ( lua_State* L ) {
 	
 	computeNormalsForPolygons(geom_cutPolygons, geom_cutPolygonOrientations);
 
-	MOAIPrint("\n\nColors for geom\n");
 	computeColorsForPolygons(geom_cutPolygons, polyLines, geom_cutPolygonOrientations);
-	MOAIPrint("\n\nColors for physics\n");
 	computeColorsForPolygons(physics_unionPolygons, polyLines, physics_unionPolygonOrientations);
 
 	FPolygons triangles;
