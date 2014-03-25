@@ -482,9 +482,9 @@ static void computeColorsForPolygons(FPolygons &polygons, const FPolygons &polyL
 				color = black;
 			}
 			setPolygonColors(*itPolygon, color);
-			coloredPolygons.push_back(itPolygon._Ptr);
+			coloredPolygons.push_back(&(*itPolygon));
 		} else {
-			holePolygons.push_back(itPolygon._Ptr);
+			holePolygons.push_back(&(*itPolygon));
 		}
 	}
 	i = 0;
