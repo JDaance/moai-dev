@@ -438,6 +438,13 @@ static bool pointInPolygon(const FPolygon &polygon, const USVec2D &point) {
 	return c;
 }
 
+static FPolygon* findPolygonIncludingPoint(const vector<FPolygon*> polygons, const USVec2D &point) {
+	for(vector<FPolygon*>::const_iterator itPolygon = polygons.begin(); itPolygon != polygons.end(); ++itPolygon) {
+		if (pointInPolygon(**itPolygon, point)) return *itPolygon;
+	}
+	return NULL;
+}
+
 static void setPolygonColors(FPolygon &polygon, const u32 color) {
 	for(FPolygon::iterator itVertex = polygon.begin(); itVertex != polygon.end(); ++itVertex) {
 		itVertex->color = color;
@@ -464,22 +471,34 @@ const u32 black = ZLColor::PackRGBA(0.0f, 0.0f, 0.0f, 1.0f);
 static void computeColorsForPolygons(FPolygons &polygons, const FPolygons &polyLines, const vector<bool> &polygonOrientations) {
 	std::vector< FVertex > pointsWithColors;
 	flattenPolyLinesToPoints(polyLines, pointsWithColors);
-	u32 lastColor = NULL;
 	int i = 0;
+	vector<FPolygon*> coloredPolygons, holePolygons;
 	for(FPolygons::iterator itPolygon = polygons.begin(); itPolygon != polygons.end(); ++itPolygon, ++i) {
 		bool orientation = polygonOrientations[i];
-		//MOAIPrint(orientation ? ">" : "<");
-		u32 color;
-		if (orientation)
-			color = computeColorForPolygon(*itPolygon, pointsWithColors);
-		else
-			color = lastColor;
-		if (!color) {
-			MOAIPrint("Warning, found no color for polygon, defaulting to black\n");
-			color = black;
+		if (orientation) {
+			u32 color = computeColorForPolygon(*itPolygon, pointsWithColors);
+			if (!color) {
+				MOAIPrint("Warning, found no color for polygon, defaulting to black\n");
+				color = black;
+			}
+			setPolygonColors(*itPolygon, color);
+			coloredPolygons.push_back(itPolygon._Ptr);
+		} else {
+			holePolygons.push_back(itPolygon._Ptr);
 		}
-		setPolygonColors(*itPolygon, color);
-		lastColor = color;
+	}
+	i = 0;
+	for(vector<FPolygon*>::iterator itPolygon = holePolygons.begin(); itPolygon != holePolygons.end(); ++itPolygon, ++i) {
+		FVertex randomVertex = (*itPolygon)->at(0);
+		FPolygon* polygonIncludingVertex = findPolygonIncludingPoint(coloredPolygons, randomVertex.mV);
+		u32 color;
+		if (!polygonIncludingVertex) {
+			MOAIPrint("Warning, found no polygon including hole, defaulting to black\n");
+			color = black;
+		} else {
+			color = polygonIncludingVertex->at(0).color;
+		}
+		setPolygonColors(**itPolygon, color);
 	}
 }
 
