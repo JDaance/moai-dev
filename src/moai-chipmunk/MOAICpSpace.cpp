@@ -19,7 +19,7 @@ public:
 
 	cpCollisionType		mTypeA;
 	cpCollisionType		mTypeB;
-	MOAILuaRef			mHandler;
+	MOAILuaStrongRef	mHandler;
 	u32					mMask;
 	
 	MOAICpSpace* mSpace;
@@ -299,6 +299,7 @@ int MOAICpSpace::_insertProp ( lua_State* L ) {
 	@text	Updates the shape in the spatial hash.
 
 	@in		MOAICpSpace self
+	@in		MOAICpShape shape
 	@out	nil
 */
 int MOAICpSpace::_rehashShape ( lua_State* L ) {
@@ -345,7 +346,7 @@ int MOAICpSpace::_removeProp ( lua_State* L ) {
 
 //----------------------------------------------------------------//
 /**	@name	resizeActiveHash
-	@text	Sets the dimenstions of the active object hash.
+	@text	Sets the dimensions of the active object hash.
 
 	@in		MOAICpSpace self
 	@in		number dim
@@ -364,7 +365,7 @@ int MOAICpSpace::_resizeActiveHash ( lua_State* L ) {
 
 //----------------------------------------------------------------//
 /**	@name	resizeStaticHash
-	@text	Sets the dimenstions of the static object hash.
+	@text	Sets the dimensions of the static object hash.
 
 	@in		MOAICpSpace self
 	@in		number dim
@@ -436,7 +437,7 @@ int MOAICpSpace::_setCollisionHandler ( lua_State* L ) {
 		}
 		
 		handler->mMask = state.GetValue < u32 >( 4, ALL );
-		handler->mHandler.SetStrongRef ( state, 5 );
+		handler->mHandler.SetRef ( state, 5 );
 	}
 	else {
 	
@@ -623,7 +624,7 @@ int MOAICpSpace::_shapeForSegment ( lua_State* L ) {
 
 //----------------------------------------------------------------//
 /**	@name	shapeListForPoint
-	@text	Retrieves a list of shaps that overlap the point specified, that exists
+	@text	Retrieves a list of shapes that overlap the point specified, that exists
 			on the specified layer (or any layer if nil) and is part of the
 			specified group (or any group if nil).
 			
@@ -632,7 +633,7 @@ int MOAICpSpace::_shapeForSegment ( lua_State* L ) {
 	@in		number y
 	@opt	number layers
 	@opt	number group
-	@out	MOAICpShape shapes The shapes that were matched as multiple return values.
+	@out	MOAICpShape shapes		The shapes that were matched as multiple return values.
 */
 int MOAICpSpace::_shapeListForPoint ( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAICpSpace, "UNN" )
@@ -661,7 +662,7 @@ int MOAICpSpace::_shapeListForPoint ( lua_State* L ) {
 
 //----------------------------------------------------------------//
 /**	@name	shapeListForRect
-	@text	Retrieves a list of shaps that overlap the rect specified, that exists
+	@text	Retrieves a list of shapes that overlap the rect specified, that exists
 			on the specified layer (or any layer if nil) and is part of the
 			specified group (or any group if nil).
 			
@@ -672,7 +673,7 @@ int MOAICpSpace::_shapeListForPoint ( lua_State* L ) {
 	@in		number yMax
 	@opt	number layers
 	@opt	number group
-	@out	MOAICpShape shapes The shapes that were matched as multiple return values.
+	@out	MOAICpShape shapes		The shapes that were matched as multiple return values.
 */
 int MOAICpSpace::_shapeListForRect ( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAICpSpace, "UNNNN" )
@@ -706,7 +707,7 @@ int MOAICpSpace::_shapeListForRect ( lua_State* L ) {
 
 //----------------------------------------------------------------//
 /**	@name	shapeListForSegment
-	@text	Retrieves a list of shaps that overlap the segment specified, that exists
+	@text	Retrieves a list of shapes that overlap the segment specified, that exists
 			on the specified layer (or any layer if nil) and is part of the
 			specified group (or any group if nil).
 			
@@ -717,7 +718,7 @@ int MOAICpSpace::_shapeListForRect ( lua_State* L ) {
 	@in		number y2
 	@opt	number layers
 	@opt	number group
-	@out	MOAICpShape shapes The shapes that were matched as multiple return values.
+	@out	MOAICpShape shapes		The shapes that were matched as multiple return values.
 */
 int MOAICpSpace::_shapeListForSegment ( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAICpSpace, "UNNNN" )
@@ -788,7 +789,7 @@ void MOAICpSpace::InsertPrim ( MOAICpPrim& prim ) {
 
 	if ( prim.mSpace == this ) return;
 	
-	prim.Retain ();
+	this->LuaRetain ( &prim );
 
 	if ( prim.mSpace ) {
 		prim.mSpace->RemovePrim ( prim );
@@ -832,7 +833,7 @@ MOAICpSpace::~MOAICpSpace () {
 	while ( primIt ) {
 		MOAICpPrim* prim = primIt->Data ();
 		primIt = primIt->Next ();
-		prim->Release ();
+		this->LuaRelease ( prim );
 	}
 
 	this->mPrims.Clear ();
@@ -947,5 +948,5 @@ void MOAICpSpace::RemovePrim ( MOAICpPrim& prim ) {
 	this->mPrims.Remove ( prim.mLinkInSpace );
 	
 	prim.mSpace = 0;
-	prim.Release ();
+	this->LuaRelease ( &prim );
 }

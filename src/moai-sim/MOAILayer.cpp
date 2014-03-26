@@ -122,7 +122,7 @@ int MOAILayer::_getSortMode ( lua_State* L ) {
 /**	@name	getSortScale
 	@text	Return the scalar applied to axis sorts.
 	
-	@in		MOAILayer2D self
+	@in		MOAILayer self
 	@out	number x
 	@out	number y
 	@out	number priority
@@ -360,7 +360,7 @@ int MOAILayer::_setViewport ( lua_State* L ) {
 	@text	Display debug lines for props in this layer.
 	
 	@in		MOAILayer self
-	@opt	bool showDebugLines		Default value is 'true'.
+	@opt	boolean showDebugLines		Default value is 'true'.
 	@out	nil
 */
 int	MOAILayer::_showDebugLines ( lua_State* L ) {

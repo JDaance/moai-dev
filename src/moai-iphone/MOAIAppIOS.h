@@ -19,7 +19,7 @@
 //================================================================//
 /**	@name	MOAIAppIOS
 	@text	Wrapper for base application class on iOS devices.
-			Exposed to lua via MOAIApp on all mobile platforms.
+			Exposed to Lua via MOAIApp on all mobile platforms.
 
 	@const	APP_OPENED_FROM_URL		Event code indicating that the app was stared via a URL click.
 	@const	SESSION_START			Event code indicating the beginning of an app session.
@@ -75,12 +75,12 @@ public:
 		INTERFACE_ORIENTATION_LANDSCAPE_RIGHT      = UIInterfaceOrientationLandscapeRight,
 	};
 
-	UIApplication*			mApplication;
-	MOAILuaRef				mListeners [ TOTAL ];
-	ReachabilityListener*	mReachabilityListener;
-	MOAILuaRef				mOnTakeCameraCallback;
-	MOAITakeCameraListener* mTakeCameraListener;
-	UIPopoverController*	mImagePickerPopover;
+	UIApplication*				mApplication;
+	MOAILuaStrongRef			mListeners [ TOTAL ];
+	ReachabilityListener*		mReachabilityListener;
+	MOAILuaStrongRef			mOnTakeCameraCallback;
+	MOAITakeCameraListener*		mTakeCameraListener;
+	UIPopoverController*		mImagePickerPopover;
 
 			MOAIAppIOS			();
 			~MOAIAppIOS			();

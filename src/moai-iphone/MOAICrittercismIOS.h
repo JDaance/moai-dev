@@ -15,7 +15,7 @@
 /**	@name	MOAICrittercismIOS
 	@text	Wrapper for Crittercism integration on iOS devices.
 			Crittercism provides real-time, actionable crash reports 
-			for mobile apps. Exposed to lua via MOAICrittercism on
+			for mobile apps. Exposed to Lua via MOAICrittercism on
 			all mobile platforms.
 */
 class MOAICrittercismIOS :
@@ -32,6 +32,7 @@ public:
 
 	DECL_LUA_SINGLETON ( MOAICrittercismIOS );
 	
+	//----------------------------------------------------------------//
 			MOAICrittercismIOS		();
 			~MOAICrittercismIOS		();
 	void	RegisterLuaClass		( MOAILuaState& state );

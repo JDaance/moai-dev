@@ -11,6 +11,7 @@
 
 #import <moai-sim/headers.h>
 
+
 //-----------------------------------------------------------------//
 void AKUAppDidStartSession ( bool resumed ) {
 
@@ -84,13 +85,13 @@ void AKUIphoneInit ( UIApplication* application ) {
 	REGISTER_LUA_CLASS ( MOAIDialogIOS )
 	REGISTER_LUA_CLASS ( MOAIGameCenterIOS )
 	REGISTER_LUA_CLASS ( MOAIKeyboardIOS )
-	//REGISTER_LUA_CLASS ( MOAIMobileAppTrackerIOS )
+	REGISTER_LUA_CLASS ( MOAIMobileAppTrackerIOS )
 	REGISTER_LUA_CLASS ( MOAIMoviePlayerIOS )
 	REGISTER_LUA_CLASS ( MOAIBrowserIOS )
 	REGISTER_LUA_CLASS ( MOAIWebViewIOS )
 
 	#ifndef DISABLE_TWITTER
-		REGISTER_LUA_CLASS ( MOAITwitterIOS )
+		//REGISTER_LUA_CLASS ( MOAITwitterIOS )
 	#endif
 	
 	#ifndef DISABLE_TAPJOY
@@ -112,9 +113,17 @@ void AKUIphoneInit ( UIApplication* application ) {
 	#ifndef DISABLE_PLAYHAVEN
 		//REGISTER_LUA_CLASS ( MOAIPlayhavenIOS )
 	#endif
-		
+	
+	#ifndef DISABLE_CHARTBOOST
+	   MOAIChartBoostIOS::Affirm();
+	   REGISTER_LUA_CLASS ( MOAIChartBoostIOS );
+	
+	#endif
+	
+	#if MOAI_WITH_HTTP_CLIENT	
 	REGISTER_LUA_CLASS ( MOAIHttpTaskNSURL )
 	MOAIUrlMgrNSURL::Affirm ();
+	#endif
 		
 	// Device properties
 	MOAIEnvironment& environment = MOAIEnvironment::Get ();

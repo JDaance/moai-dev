@@ -42,9 +42,9 @@ MOAICellCoord::~MOAICellCoord () {
 	@text	Returns the coordinate of a cell given an address.
 
 	@in		MOAIGridSpace self
-	@in		number xTile
-	@in		number yTile
-	@out	number cellAddr
+	@in		number cellAddr
+	@out	number xTile
+	@out	number yTile
 */
 int MOAIGridSpace::_cellAddrToCoord	( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIGridSpace, "UN" )
@@ -179,9 +179,9 @@ int MOAIGridSpace::_getTileSize ( lua_State* L ) {
 	@in		MOAIGridSpace self
 	@in		number width
 	@in		number height
-	@opt	number tileWidth		Default valus is 1.
-	@opt	number tileHeight		Default valus is 1.
-	@opt	number xGutter			Default valus is 0.
+	@opt	number tileWidth		Default value is 1.
+	@opt	number tileHeight		Default value is 1.
+	@opt	number xGutter			Default value is 0.
 	@opt	number yGutter			Default value is 0.
 	@out	nil
 */
@@ -223,8 +223,8 @@ int MOAIGridSpace::_initDiamondGrid ( lua_State* L ) {
 	@in		MOAIGridSpace self
 	@in		number width
 	@in		number height
-	@opt	number radius			Default valus is 1.
-	@opt	number xGutter			Default valus is 0.
+	@opt	number radius			Default value is 1.
+	@opt	number xGutter			Default value is 0.
 	@opt	number yGutter			Default value is 0.
 	@out	nil
 */
@@ -268,9 +268,9 @@ int MOAIGridSpace::_initHexGrid ( lua_State* L ) {
 	@in		MOAIGridSpace self
 	@in		number width
 	@in		number height
-	@opt	number tileWidth		Default valus is 1.
-	@opt	number tileHeight		Default valus is 1.
-	@opt	number xGutter			Default valus is 0.
+	@opt	number tileWidth		Default value is 1.
+	@opt	number tileHeight		Default value is 1.
+	@opt	number xGutter			Default value is 0.
 	@opt	number yGutter			Default value is 0.
 	@out	nil
 */
@@ -312,9 +312,9 @@ int MOAIGridSpace::_initObliqueGrid ( lua_State* L ) {
 	@in		MOAIGridSpace self
 	@in		number width
 	@in		number height
-	@opt	number tileWidth		Default valus is 1.
-	@opt	number tileHeight		Default valus is 1.
-	@opt	number xGutter			Default valus is 0.
+	@opt	number tileWidth		Default value is 1.
+	@opt	number tileHeight		Default value is 1.
+	@opt	number xGutter			Default value is 0.
 	@opt	number yGutter			Default value is 0.
 	@out	nil
 */

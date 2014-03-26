@@ -7,6 +7,7 @@
 #define SHADER(str) #str
 
 static cc8* _lineShaderFSH = SHADER (
+
 	varying LOWP vec4 colorVarying;
 
 	void main () {

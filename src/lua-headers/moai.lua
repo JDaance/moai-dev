@@ -324,9 +324,9 @@ MOAIRenderMgr.extend (
 		end
 		
 		-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
-		function class.grabNextFrame ()
+		function class.grabNextFrame (image, callback)
 			local frameBuffer = MOAIGfxDevice.getFrameBuffer ()
-			frameBuffer:grabNextFrame ()
+			frameBuffer:grabNextFrame (image, callback)
 		end
 		
 		-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -
@@ -470,6 +470,14 @@ MOAIGfxDevice.extend (
 	end
 )
 
+--============================================================--
+-- Cross Platform
+--============================================================--
+
+if MOAISim.forceGC then
+    MOAISim.forceGarbageCollection = MOAISim.forceGC
+end
+
 MOAIApp = MOAIAppAndroid or MOAIAppIOS or MOAIApp
 MOAIBrowser = MOAIBrowserAndroid or MOAIBrowserIOS
 MOAISafariIOS = MOAIBrowserIOS
@@ -520,3 +528,4 @@ if MOAITwitterIOS then
         end
     end
 end
+

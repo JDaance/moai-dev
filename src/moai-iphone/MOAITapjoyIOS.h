@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h> 
 #import <moai-core/headers.h>
 
-#import <Components/TJCVideoAds/TJCVideoAdProtocol.h>
+#import <Tapjoy/Tapjoy.h>
 
 @class MOAITapjoyIOSVideoAdDelegate;
 
@@ -20,7 +20,7 @@
 	@text	Wrapper for Tapjoy integration on iOS devices.
 			Tapjoy provides a turnkey advertising platform that 
 			delivers cost-effective, high-value new users and helps 
-			apps make money. Exposed to lua via MOAITapjoy on 
+			apps make money. Exposed to Lua via MOAITapjoy on 
 			all mobile platforms.
 
 	@const	TAPJOY_VIDEO_AD_BEGIN								Event code for Tapjoy video ad playback begin.

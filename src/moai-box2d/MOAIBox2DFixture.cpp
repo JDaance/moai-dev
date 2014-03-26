@@ -57,9 +57,9 @@ int MOAIBox2DFixture::_getBody ( lua_State* L ) {
 	@text	See Box2D documentation.
 	
 	@in		MOAIBox2DFixture self
-	@out	(number) categoryBits
-	@out	(number) maskBits
-	@out	(number) groupIndex
+	@out	number categoryBits
+	@out	number maskBits
+	@out	number groupIndex
 */
 int MOAIBox2DFixture::_getFilter ( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIBox2DFixture, "U" )
@@ -94,7 +94,7 @@ int MOAIBox2DFixture::_getFilter ( lua_State* L ) {
 int MOAIBox2DFixture::_setCollisionHandler ( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAIBox2DFixture, "UF" )
 	
-	self->SetLocal ( state, 2, self->mCollisionHandler );
+	self->mCollisionHandler.SetRef ( *self, state, 2 );
 	self->mCollisionPhaseMask = state.GetValue < u32 >( 3, MOAIBox2DArbiter::ALL );
 	self->mCollisionCategoryMask = state.GetValue < u32 >( 4, 0xffffffff );
 	
@@ -106,7 +106,7 @@ int MOAIBox2DFixture::_setCollisionHandler ( lua_State* L ) {
 	@text	See Box2D documentation.
 	
 	@in		MOAIBox2DFixture self
-	@in		number density in kg/units^2, converted to kg/m^2
+	@in		number density			In kg/units^2, converted to kg/m^2
 	@out	nil
 */
 int MOAIBox2DFixture::_setDensity ( lua_State* L ) {
@@ -244,7 +244,7 @@ void MOAIBox2DFixture::HandleCollision ( u32 eventType, MOAIBox2DFixture* other,
 			if ( this->mCollisionHandler ) {
 			
 				MOAIScopedLuaState state = MOAILuaRuntime::Get ().State ();
-				if ( this->PushLocal ( state, this->mCollisionHandler )) {
+				if ( this->mCollisionHandler.PushRef ( state )) {
 					
 					state.Push ( eventType );
 					this->PushLuaUserdata ( state );

@@ -129,10 +129,17 @@ int MOAIUntzSound::_isPlaying ( lua_State* L ) {
 
 //----------------------------------------------------------------//
 /**	@name	load
-	@text	Loads a sound from disk.
+	@text	Loads a sound from disk or from a buffer.
 	
+	@overload
 	@in		MOAIUntzSound self
 	@in		string filename
+	@opt	boolean loadIntoMemory			Default value is true
+	@out	nil
+	
+	@overload
+	@in		MOAIUntzSound self
+	@in		MOAIUntzSampleBuffer data
 	@out	nil
 */
 int MOAIUntzSound::_load ( lua_State* L ) {
@@ -176,7 +183,7 @@ int MOAIUntzSound::_load ( lua_State* L ) {
 /**	@name	moveVolume
 	@text	Animation helper for volume attribute,
 	
-	@in		MOAITransform self
+	@in		MOAIUntzSound self
 	@in		number vDelta		Delta to be added to v.
 	@in		number length		Length of animation in seconds.
 	@opt	number mode			The ease mode. One of MOAIEaseType.EASE_IN, MOAIEaseType.EASE_OUT, MOAIEaseType.FLAT MOAIEaseType.LINEAR,
@@ -248,7 +255,7 @@ int MOAIUntzSound::_play ( lua_State* L ) {
 /**	@name	seekVolume
 	@text	Animation helper for volume attribute,
 	
-	@in		MOAITransform self
+	@in		MOAIUntzSound self
 	@in		number vGoal		Desired resulting value for v.
 	@in		number length		Length of animation in seconds.
 	@opt	number mode			The ease mode. One of MOAIEaseType.EASE_IN, MOAIEaseType.EASE_OUT, MOAIEaseType.FLAT MOAIEaseType.LINEAR,
@@ -307,8 +314,8 @@ int MOAIUntzSound::_setLooping ( lua_State* L ) {
 	@text	Sets the start and end looping positions for the sound
 	
 	@in		MOAIUntzSound self
-	@in		double startTime
-	@in		double endTime
+	@in		number startTime
+	@in		number endTime
 	
 	@out	nil
 */
@@ -328,7 +335,7 @@ int MOAIUntzSound::_setLoopPoints ( lua_State* L ) {
 	@text	Sets the position of the sound cursor.
 	
 	@in		MOAIUntzSound self
-	@opt	boolean position		Default value is 0.
+	@opt	number position		Default value is 0.
 	@out	nil
 */
 int MOAIUntzSound::_setPosition ( lua_State* L ) {
@@ -346,7 +353,7 @@ int MOAIUntzSound::_setPosition ( lua_State* L ) {
 	@text	Sets the volume of the sound.
 	
 	@in		MOAIUntzSound self
-	@opt	boolean volume			Default value is 0.
+	@opt	number volume			Default value is 0.
 	@out	nil
 */
 int MOAIUntzSound::_setVolume ( lua_State* L ) {

@@ -11,15 +11,15 @@
 
 //----------------------------------------------------------------//
 /**	@name	apply
-	@text	Apply the anim at a given time or time step.
+	@text	Apply the animation at a given time or time step.
 
-	@overload	Apply the anim at time t0.
+	@overload	Apply the animation at time t0.
 
 		@in		MOAIAnim self
-		@opt	number t0 - Default value is 0.
+		@opt	number t0		Default value is 0.
 		@out	nil
 	
-	@overload	Apply the anim for the step t0 to t1.
+	@overload	Apply the animation for the step t0 to t1.
 
 		@in		MOAIAnim self
 		@in		number t0
@@ -76,9 +76,9 @@ int	MOAIAnim::_reserveLinks ( lua_State* L ) {
 	@in		MOAIAnim self
 	@in		number linkID
 	@in		MOAIAnimCurveBase curve
-	@in		MOAINode target - Target node.
-	@in		number attrID - Attribute of the target node to be driven by the curve.
-	@opt	boolean asDelta - 'true' to apply the curve as a delta instead of an absolute. Default value is false.
+	@in		MOAINode target				Target node.
+	@in		number attrID				Attribute of the target node to be driven by the curve.
+	@opt	boolean asDelta				'true' to apply the curve as a delta instead of an absolute. Default value is false.
 	@out	nil
 */
 int	MOAIAnim::_setLink ( lua_State* L ) {
@@ -169,6 +169,7 @@ void MOAIAnim::ClearLinks () {
 	for ( u32 i = 0; i < this->mLinks.Size (); ++i ) {
 		MOAIAnimLink& link = this->mLinks [ i ];
 		link.mCurve.Set ( *this, 0 );
+		link.mTarget.Set ( *this, 0 );
 	}
 	this->mLinks.Clear ();
 }
@@ -234,7 +235,7 @@ void MOAIAnim::SetLink ( u32 linkID, MOAIAnimCurveBase* curve, MOAINode* target,
 
 	MOAIAnimLink& link = this->mLinks [ linkID ];
 	link.mCurve.Set ( *this, curve );
-	link.mTarget	= target;
+	link.mTarget.Set ( *this, target );
 	link.mAttrID	= attrID;
 	link.mRelative	= relative;
 	

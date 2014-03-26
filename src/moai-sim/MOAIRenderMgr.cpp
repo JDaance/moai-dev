@@ -21,7 +21,7 @@ int MOAIRenderMgr::_getBufferTable ( lua_State* L ) {
 /**	@name	getPerformanceDrawCount	
 	@text	Returns the number of draw calls last frame.	
 
-	@out	number count Number of underlying graphics "draw" calls last frame.	
+	@out	number count		Number of underlying graphics "draw" calls last frame.	
 */	
 int MOAIRenderMgr::_getPerformanceDrawCount ( lua_State* L ) {
 
@@ -35,7 +35,7 @@ int MOAIRenderMgr::_getPerformanceDrawCount ( lua_State* L ) {
 // TODO: doxygen
 int MOAIRenderMgr::_setBufferTable ( lua_State* L ) {
 	MOAILuaState state ( L );
-	MOAIRenderMgr::Get ().mBufferTable.SetStrongRef ( state, 1 );
+	MOAIRenderMgr::Get ().mBufferTable.SetRef ( state, 1 );
 	return 0;
 }
 

@@ -64,8 +64,8 @@ int MOAICpConstraint::_getMaxForce ( lua_State* L ) {
 /**	@name	newDampedRotarySpring
 	@text	Creates a new damped rotary string between the two specified bodies.
 
-	@in		MOAICpShape first
-	@in		MOAICpShape second
+	@in		MOAICpBody first
+	@in		MOAICpBody second
 	@in		number restAngle			The angle at which the spring is at rest.
 	@in		number stiffness			The stiffness of the spring.
 	@in		number damping				The damping applied to the spring.
@@ -79,9 +79,6 @@ int MOAICpConstraint::_newDampedRotarySpring ( lua_State* L ) {
 	MOAICpBody* b = state.GetLuaObject < MOAICpBody >( 2, true );
 	
 	if ( !( a && b )) return 0;
-	
-	a->Retain ();
-	b->Retain ();
 		
 	cpFloat restAngle	= state.GetValue < cpFloat >( 3, 0 );
 	cpFloat stiffness	= state.GetValue < cpFloat >( 4, 0 );
@@ -90,7 +87,10 @@ int MOAICpConstraint::_newDampedRotarySpring ( lua_State* L ) {
 	MOAICpConstraint* constraint = new MOAICpConstraint ();
 	constraint->mConstraint = cpDampedRotarySpringNew ( a->mBody, b->mBody, restAngle, stiffness, damping );
 	constraint->mConstraint->data = constraint;
-		
+	
+	constraint->LuaRetain ( a );
+	constraint->LuaRetain ( b );
+	
 	constraint->PushLuaUserdata ( state );
 	return 1;
 }
@@ -99,8 +99,8 @@ int MOAICpConstraint::_newDampedRotarySpring ( lua_State* L ) {
 /**	@name	newDampedSpring
 	@text	Creates a new damped string between the two specified bodies.
 
-	@in		MOAICpShape first
-	@in		MOAICpShape second
+	@in		MOAICpBody first
+	@in		MOAICpBody second
 	@in		number x1					The X position of the first anchor.
 	@in		number y1					The Y position of the first anchor.
 	@in		number x2					The X position of the second anchor.
@@ -118,9 +118,6 @@ int MOAICpConstraint::_newDampedSpring ( lua_State* L ) {
 	MOAICpBody* b = state.GetLuaObject < MOAICpBody >( 2, true );
 	
 	if ( !( a && b )) return 0;
-	
-	a->Retain ();
-	b->Retain ();
 		
 	cpVect anchr1;
 	anchr1.x	= state.GetValue < cpFloat >( 3, 0 );
@@ -137,7 +134,10 @@ int MOAICpConstraint::_newDampedSpring ( lua_State* L ) {
 	MOAICpConstraint* constraint = new MOAICpConstraint ();
 	constraint->mConstraint = cpDampedSpringNew ( a->mBody, b->mBody, anchr1, anchr2, restLength, stiffness, damping );
 	constraint->mConstraint->data = constraint;
-		
+	
+	constraint->LuaRetain ( a );
+	constraint->LuaRetain ( b );
+	
 	constraint->PushLuaUserdata ( state );
 	return 1;
 }
@@ -146,8 +146,8 @@ int MOAICpConstraint::_newDampedSpring ( lua_State* L ) {
 /**	@name	newGearJoint
 	@text	Creates a new gear joint between the two specified bodies.
 
-	@in		MOAICpShape first
-	@in		MOAICpShape second
+	@in		MOAICpBody first
+	@in		MOAICpBody second
 	@in		number phase				The phase of the gear.
 	@in		number ratio				The gear ratio.
 	@out	MOAICpConstraint gear		The new gear joint.
@@ -160,9 +160,6 @@ int MOAICpConstraint::_newGearJoint ( lua_State* L ) {
 	MOAICpBody* b = state.GetLuaObject < MOAICpBody >( 2, true );
 	
 	if ( !( a && b )) return 0;
-	
-	a->Retain ();
-	b->Retain ();
 		
 	cpFloat phase	= state.GetValue < cpFloat >( 3, 0 );
 	cpFloat ratio	= state.GetValue < cpFloat >( 4, 0 );
@@ -171,6 +168,9 @@ int MOAICpConstraint::_newGearJoint ( lua_State* L ) {
 	constraint->mConstraint = cpGearJointNew ( a->mBody, b->mBody, phase, ratio );
 	constraint->mConstraint->data = constraint;
 		
+	constraint->LuaRetain ( a );
+	constraint->LuaRetain ( b );
+	
 	constraint->PushLuaUserdata ( state );
 	return 1;
 }
@@ -179,8 +179,8 @@ int MOAICpConstraint::_newGearJoint ( lua_State* L ) {
 /**	@name	newGrooveJoint
 	@text	Creates a new groove joint between the two specified bodies.
 
-	@in		MOAICpShape first
-	@in		MOAICpShape second
+	@in		MOAICpBody first
+	@in		MOAICpBody second
 	@in		number gx1
 	@in		number gy1
 	@in		number gx2
@@ -197,9 +197,6 @@ int MOAICpConstraint::_newGrooveJoint ( lua_State* L ) {
 	MOAICpBody* b = state.GetLuaObject < MOAICpBody >( 2, true );
 	
 	if ( !( a && b )) return 0;
-	
-	a->Retain ();
-	b->Retain ();
 		
 	cpVect groove_a;
 	groove_a.x	= state.GetValue < cpFloat >( 3, 0 );
@@ -216,7 +213,10 @@ int MOAICpConstraint::_newGrooveJoint ( lua_State* L ) {
 	MOAICpConstraint* constraint = new MOAICpConstraint ();
 	constraint->mConstraint = cpGrooveJointNew ( a->mBody, b->mBody, groove_a, groove_b, anchr2 );
 	constraint->mConstraint->data = constraint;
-		
+	
+	constraint->LuaRetain ( a );
+	constraint->LuaRetain ( b );
+	
 	constraint->PushLuaUserdata ( state );
 	return 1;
 }
@@ -225,8 +225,8 @@ int MOAICpConstraint::_newGrooveJoint ( lua_State* L ) {
 /**	@name	newPinJoint
 	@text	Creates a new pin joint between the two specified bodies.
 
-	@in		MOAICpShape first
-	@in		MOAICpShape second
+	@in		MOAICpBody first
+	@in		MOAICpBody second
 	@in		number ax1
 	@in		number ay1
 	@in		number ax2
@@ -242,9 +242,6 @@ int MOAICpConstraint::_newPinJoint ( lua_State* L ) {
 	
 	if ( !( a && b )) return 0;
 	
-	a->Retain ();
-	b->Retain ();
-		
 	cpVect anchr1;
 	anchr1.x	= state.GetValue < cpFloat >( 3, 0 );
 	anchr1.y	= state.GetValue < cpFloat >( 4, 0 );
@@ -256,7 +253,10 @@ int MOAICpConstraint::_newPinJoint ( lua_State* L ) {
 	MOAICpConstraint* constraint = new MOAICpConstraint ();
 	constraint->mConstraint = cpPinJointNew ( a->mBody, b->mBody, anchr1, anchr2 );
 	constraint->mConstraint->data = constraint;
-		
+	
+	constraint->LuaRetain ( a );
+	constraint->LuaRetain ( b );
+	
 	constraint->PushLuaUserdata ( state );
 	return 1;
 }
@@ -265,8 +265,8 @@ int MOAICpConstraint::_newPinJoint ( lua_State* L ) {
 /**	@name	newPivotJoint
 	@text	Creates a new pivot joint between the two specified bodies.
 
-	@in		MOAICpShape first
-	@in		MOAICpShape second
+	@in		MOAICpBody first
+	@in		MOAICpBody second
 	@in		number x
 	@in		number y
 	@opt	number ax
@@ -282,14 +282,14 @@ int MOAICpConstraint::_newPivotJoint ( lua_State* L ) {
 	
 	if ( !( a && b )) return 0;
 	
-	a->Retain ();
-	b->Retain ();
-	
 	cpVect pivot;
 	pivot.x		= state.GetValue < cpFloat >( 3, 0 );
 	pivot.y		= state.GetValue < cpFloat >( 4, 0 );
 	
 	MOAICpConstraint* constraint = new MOAICpConstraint ();
+	
+	constraint->LuaRetain ( a );
+	constraint->LuaRetain ( b );
 	
 	if ( state.CheckParams ( 5, "NN" )) {
 		
@@ -313,8 +313,8 @@ int MOAICpConstraint::_newPivotJoint ( lua_State* L ) {
 /**	@name	newRatchetJoint
 	@text	Creates a new ratchet joint between the two specified bodies.
 
-	@in		MOAICpShape first
-	@in		MOAICpShape second
+	@in		MOAICpBody first
+	@in		MOAICpBody second
 	@in		number phase				The phase of the gear.
 	@in		number ratchet				The ratchet value.
 	@out	MOAICpConstraint ratchet	The new pivot joint.
@@ -328,9 +328,6 @@ int MOAICpConstraint::_newRatchetJoint ( lua_State* L ) {
 	
 	if ( !( a && b )) return 0;
 	
-	a->Retain ();
-	b->Retain ();
-	
 	cpFloat phase	= state.GetValue < cpFloat >( 3, 0 );
 	cpFloat ratchet	= state.GetValue < cpFloat >( 4, 0 );
 	
@@ -338,6 +335,9 @@ int MOAICpConstraint::_newRatchetJoint ( lua_State* L ) {
 	constraint->mConstraint = cpRatchetJointNew ( a->mBody, b->mBody, phase, ratchet );
 	constraint->mConstraint->data = constraint;
 		
+	constraint->LuaRetain ( a );
+	constraint->LuaRetain ( b );
+	
 	constraint->PushLuaUserdata ( state );
 	return 1;
 }
@@ -346,8 +346,8 @@ int MOAICpConstraint::_newRatchetJoint ( lua_State* L ) {
 /**	@name	newRotaryLimitJoint
 	@text	Creates a new rotary limit joint between the two specified bodies.
 
-	@in		MOAICpShape first
-	@in		MOAICpShape second
+	@in		MOAICpBody first
+	@in		MOAICpBody second
 	@in		number min					The minimum rotary value.
 	@in		number max					The maximum rotary value.
 	@out	MOAICpConstraint limit		The new rotary limit joint.
@@ -361,16 +361,16 @@ int MOAICpConstraint::_newRotaryLimitJoint ( lua_State* L ) {
 	
 	if ( !( a && b )) return 0;
 	
-	a->Retain ();
-	b->Retain ();
-	
 	cpFloat min	= state.GetValue < cpFloat >( 3, 0 );
 	cpFloat max	= state.GetValue < cpFloat >( 4, 0 );
 	
 	MOAICpConstraint* constraint = new MOAICpConstraint ();
 	constraint->mConstraint = cpRotaryLimitJointNew ( a->mBody, b->mBody, min, max );
 	constraint->mConstraint->data = constraint;
-		
+	
+	constraint->LuaRetain ( a );
+	constraint->LuaRetain ( b );
+	
 	constraint->PushLuaUserdata ( state );
 	return 1;
 }
@@ -379,8 +379,8 @@ int MOAICpConstraint::_newRotaryLimitJoint ( lua_State* L ) {
 /**	@name	newSimpleMotor
 	@text	Creates a new simple motor joint between the two specified bodies.
 
-	@in		MOAICpShape first
-	@in		MOAICpShape second
+	@in		MOAICpBody first
+	@in		MOAICpBody second
 	@in		number rate					The rotation rate of the simple motor.
 	@out	MOAICpConstraint motor		The new simple motor joint.
 */
@@ -392,16 +392,16 @@ int MOAICpConstraint::_newSimpleMotor ( lua_State* L ) {
 	MOAICpBody* b = state.GetLuaObject < MOAICpBody >( 2, true );
 	
 	if ( !( a && b )) return 0;
-	
-	a->Retain ();
-	b->Retain ();
 		
 	cpFloat rate = state.GetValue < cpFloat >( 3, 0 );
 	
 	MOAICpConstraint* constraint = new MOAICpConstraint ();
 	constraint->mConstraint = cpSimpleMotorNew ( a->mBody, b->mBody, rate );
 	constraint->mConstraint->data = constraint;
-		
+	
+	constraint->LuaRetain ( a );
+	constraint->LuaRetain ( b );
+	
 	constraint->PushLuaUserdata ( state );
 	return 1;
 }
@@ -410,8 +410,8 @@ int MOAICpConstraint::_newSimpleMotor ( lua_State* L ) {
 /**	@name	newSlideJoint
 	@text	Creates a new slide joint between the two specified bodies.
 
-	@in		MOAICpShape first
-	@in		MOAICpShape second
+	@in		MOAICpBody first
+	@in		MOAICpBody second
 	@in		number ax1
 	@in		number ay1
 	@in		number ax2
@@ -428,9 +428,6 @@ int MOAICpConstraint::_newSlideJoint ( lua_State* L ) {
 	MOAICpBody* b = state.GetLuaObject < MOAICpBody >( 2, true );
 	
 	if ( !( a && b )) return 0;
-	
-	a->Retain ();
-	b->Retain ();
 		
 	cpVect anchr1;
 	anchr1.x	= state.GetValue < cpFloat >( 3, 0 );
@@ -446,7 +443,10 @@ int MOAICpConstraint::_newSlideJoint ( lua_State* L ) {
 	MOAICpConstraint* constraint = new MOAICpConstraint ();
 	constraint->mConstraint = cpSlideJointNew ( a->mBody, b->mBody, anchr1, anchr2, min, max );
 	constraint->mConstraint->data = constraint;
-		
+	
+	constraint->LuaRetain ( a );
+	constraint->LuaRetain ( b );
+	
 	constraint->PushLuaUserdata ( state );
 	return 1;
 }
@@ -535,8 +535,8 @@ MOAICpConstraint::MOAICpConstraint () :
 MOAICpConstraint::~MOAICpConstraint () {
 
 	if ( this->mConstraint ) {
-		(( MOAICpBody* )this->mConstraint->a->data )->Release ();
-		(( MOAICpBody* )this->mConstraint->b->data )->Release ();
+		this->LuaRelease (( MOAICpBody* )this->mConstraint->a->data );
+		this->LuaRelease (( MOAICpBody* )this->mConstraint->b->data );
 		cpConstraintFree ( this->mConstraint );
 	}
 }

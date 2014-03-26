@@ -39,12 +39,13 @@ class MOAIProp;
 	@const DEFAULT_STEP_MULTIPLIER			Value is 1
 */
 class MOAISim :
-	public MOAIGlobalClass < MOAISim, MOAIGlobalEventSource >,
-	public MOAIGlobalClassFinalizer {
+	public MOAIGlobalClass < MOAISim, MOAIGlobalEventSource > {
 public:
 
 	typedef void ( *EnterFullscreenModeFunc )		();
 	typedef void ( *ExitFullscreenModeFunc )		();
+	typedef void ( *ShowCursorFunc )				();
+	typedef void ( *HideCursorFunc )				();
 	typedef void ( *OpenWindowFunc )				( const char* title, int width, int height );
 	typedef void ( *SetSimStepFunc )				( double step );
 
@@ -89,13 +90,24 @@ private:
 	ExitFullscreenModeFunc		mExitFullscreenModeFunc;
 	OpenWindowFunc				mOpenWindowFunc;
 	SetSimStepFunc				mSetSimStepFunc;
+	ShowCursorFunc				mShowCursorFunc;
+	HideCursorFunc				mHideCursorFunc;
+	
+	u32					mGCActive;
+	u32					mGCStep;
+	bool				mForceGC;
+	
+	MOAILuaMemberRef	mLuaGCFunc;
 	
 	//----------------------------------------------------------------//
 	static int		_clearLoopFlags				( lua_State* L );
 	static int		_crash						( lua_State* L );
+	static int		_collectgarbage				( lua_State* L ); // replacement for Lua's collectgarbage
 	static int		_enterFullscreenMode		( lua_State* L );
 	static int		_exitFullscreenMode			( lua_State* L );
-	static int		_forceGarbageCollection		( lua_State* L );
+	static int		_showCursor					( lua_State* L );
+	static int		_hideCursor					( lua_State* L );
+	static int		_forceGC					( lua_State* L );
 	static int		_framesToTime				( lua_State* L );
 	static int		_getDeviceTime				( lua_State* L );
 	static int		_getElapsedFrames			( lua_State* L );
@@ -113,6 +125,8 @@ private:
 	static int		_reportLeaks				( lua_State* L );
 	static int		_setBoostThreshold			( lua_State* L );
 	static int		_setCpuBudget				( lua_State* L );
+	static int		_setGCActive				( lua_State* L );
+	static int		_setGCStep					( lua_State* L );
 	static int		_setHistogramEnabled		( lua_State* L );
 	static int		_setLeakTrackingEnabled		( lua_State* L );
 	static int		_setLongDelayThreshold		( lua_State* L );
@@ -161,6 +175,8 @@ public:
 	
 	GET_SET ( EnterFullscreenModeFunc, EnterFullscreenModeFunc, mEnterFullscreenModeFunc );
 	GET_SET ( ExitFullscreenModeFunc, ExitFullscreenModeFunc, mExitFullscreenModeFunc );
+	GET_SET ( ShowCursorFunc, ShowCursorFunc, mShowCursorFunc );
+	GET_SET ( HideCursorFunc, HideCursorFunc, mHideCursorFunc );
 	GET_SET ( OpenWindowFunc, OpenWindowFunc, mOpenWindowFunc );
 	GET_SET ( SetSimStepFunc, SetSimStepFunc, mSetSimStepFunc );
 	

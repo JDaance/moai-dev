@@ -4,7 +4,10 @@
 #ifndef	MOAIAPPANDROID_H
 #define	MOAIAPPANDROID_H
 
+#include <moai-sim/host.h>
 #include <moai-core/headers.h>
+
+#include <pthread.h>
 
 //================================================================//
 // MOAIAppAndroid
@@ -22,20 +25,31 @@ class MOAIAppAndroid :
 private:
 
 	enum {
+		APP_OPENED_FROM_URL,
 		SESSION_START,
 		SESSION_END,
 		BACK_BUTTON_PRESSED,
+		EVENT_PICTURE_TAKEN,
 		TOTAL,
 	};
 
-	MOAILuaRef	mListeners [ TOTAL ];
+	MOAILuaStrongRef	mListeners [ TOTAL ];
 
 	//----------------------------------------------------------------//
+	static int	_exitGame			( lua_State* L );
 	static int	_getUTCTime			( lua_State* L );
 	static int 	_getStatusBarHeight ( lua_State* L );
 	static int	_sendMail			( lua_State* L );
 	static int	_setListener		( lua_State* L );
 	static int	_share				( lua_State* L );
+
+
+	// ## CAMERA SUPPORT
+	static int _takePicture		( lua_State* L );
+	static int _getPictureCode	( lua_State* L );
+	static int _getPicturePath	( lua_State* L );
+
+	// ## /CAMERA SUPPORT
 
 public:
 
@@ -44,9 +58,19 @@ public:
 			MOAIAppAndroid				();
 			~MOAIAppAndroid				();
 	bool	NotifyBackButtonPressed		();
+	void	AppOpenedFromURL		( jstring url );
 	void	NotifyDidStartSession		( bool resumed );
 	void	NotifyWillEndSession		();
+
+//	void	NotifyPictureTaken			( int code, cc8* path );
+	void	NotifyPictureTaken			();
+	void	PushPictureData( MOAILuaState& state );
+	void	PushPictureCode( MOAILuaState& state );
+	void	PushPicturePath( MOAILuaState& state );
+
 	void	RegisterLuaClass			( MOAILuaState& state );
+
+
 };
 
 #endif

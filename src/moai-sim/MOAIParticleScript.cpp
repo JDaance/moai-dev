@@ -329,9 +329,9 @@ int MOAIParticleScript::_mul ( lua_State* L ) {
 
 //----------------------------------------------------------------//
 /**	@name	norm
-	@text	r0 = v0 / |v|
-	@text	r1 = v1 / |v|
-	@text	Where |v| == sqrt( v0^2 + v1^2)
+	@text	<p>r0 = v0 / |v|</p>
+			<p>r1 = v1 / |v|</p>
+			<p>Where |v| == sqrt( v0^2 + v1^2)</p>
 	
 	@in		MOAIParticleScript self
 	@in		number r0
@@ -348,9 +348,8 @@ int MOAIParticleScript::_norm ( lua_State* L ) {
 /**	@name	packConst
 	@text	Pack a const value into a particle script param.
 	
-	@in		MOAIParticleScript self
 	@in		number const		Const value to pack.
-	@out	nil
+	@out	number packed		The packed value.
 */
 int MOAIParticleScript::_packConst ( lua_State* L ) {
 	MOAILuaState state ( L );
@@ -367,9 +366,8 @@ int MOAIParticleScript::_packConst ( lua_State* L ) {
 /**	@name	packReg
 	@text	Pack a register index into a particle script param.
 	
-	@in		MOAIParticleScript self
 	@in		number regIdx		Register index to pack.
-	@out	nil
+	@out	number packed		The packed value.
 */
 int MOAIParticleScript::_packReg ( lua_State* L ) {
 	MOAILuaState state ( L );

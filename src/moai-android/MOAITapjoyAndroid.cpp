@@ -19,7 +19,7 @@ extern JavaVM* jvm;
 
 //----------------------------------------------------------------//
 /**	@name	getUserId
- 	@text	Gets the tapjoy user ID.
+ 	@text	Gets the Tapjoy user ID.
  
  	@out	string userId
  */
@@ -151,7 +151,7 @@ int MOAITapjoyAndroid::_setListener ( lua_State* L ) {
 
 	if ( idx < TOTAL ) {
 		
-		MOAITapjoyAndroid::Get ().mListeners [ idx ].SetStrongRef ( state, 2 );
+		MOAITapjoyAndroid::Get ().mListeners [ idx ].SetRef ( state, 2 );
 	}
 	
 	return 0;

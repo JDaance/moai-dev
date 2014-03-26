@@ -2,11 +2,11 @@ cmake_minimum_required ( VERSION 2.8.5 )
 
 project ( third-party )
 
-
-set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DTIXML_USE_STL -DGLEW_STATIC -DSQLITE_ENABLE_COLUMN_METADATA -Dfdatasync=fsync -DDARWIN_NO_CARBON" CACHE INTERNAL "doc string")
-set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTIXML_USE_STL -DGLEW_STATIC" CACHE INTERNAL "doc string")
-
-#set ( CMAKE_CURRENT_SOURCE_DIR "${ROOT_DIR}../../../3rdparty" )
+if (MSVC)
+  #this is someone elses code, lets not get spammed by their warnings
+  set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W0")
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W0")
+endif (MSVC)
 
 add_subdirectory ( clipper )
 add_subdirectory ( libtess2 )
@@ -16,11 +16,29 @@ add_subdirectory ( chipmunk )
 add_subdirectory ( contrib )
 add_subdirectory ( crypto )
 add_subdirectory ( curl )
+
+if (BUILD_IOS OR BUILD_ANDROID)
+	add_subdirectory ( cares )
+endif (BUILD_IOS OR BUILD_ANDROID)
 add_subdirectory ( expat )
 add_subdirectory ( freetype )
 add_subdirectory ( jansson )
 add_subdirectory ( jpg )
-add_subdirectory ( lua )
+
+set (LUA_HEADERS "")
+set (LUA_LIB "")
+#Lua or LuaJit?
+if (MOAI_LUAJIT)
+#	if ( BUILD_IOS )#
+#		set ( LUAJIT_DISABLE_JIT CACHE bool "Disable JIT." OFF )
+#	endif (BUILD_IOS )
+	add_subdirectory( luajit )
+else()
+	add_subdirectory ( lua )
+endif (MOAI_LUAJIT)
+set (LUA_HEADERS ${LUA_HEADERS} PARENT_SCOPE)
+set (LUA_LIB ${LUA_LIB} PARENT_SCOPE)
+
 add_subdirectory ( luaext )
 add_subdirectory ( mongoose )
 add_subdirectory ( ogg )
@@ -30,7 +48,22 @@ add_subdirectory ( sqlite3 )
 add_subdirectory ( ssl )
 add_subdirectory ( tinyxml )
 add_subdirectory ( tlsf )
+add_subdirectory ( vorbis )
+add_subdirectory ( zlib )
 
+#SDL is for pc only
+if (BUILD_LINUX OR BUILD_OSX OR BUILD_WINDOWS)
+  set(DIRECTX OFF CACHE BOOL "SDL DirectX")
+  set (SDL_SHARED OFF)
+  
+  add_subdirectory(sdl2)
+  if (BUILD_LINUX OR BUILD_WINDOWS)
+  add_subdirectory ( freeglut )
+  endif (BUILD_LINUX OR BUILD_WINDOWS)
+  add_subdirectory ( glew )
+endif (BUILD_LINUX OR BUILD_OSX OR BUILD_WINDOWS)
+
+#Build platform specific untz
 if (BUILD_ANDROID)
   add_subdirectory (untz-android)
 elseif (BUILD_IOS OR BUILD_OSX)
@@ -40,109 +73,8 @@ elseif (BUILD_WINDOWS)
 elseif (BUILD_HTML)
   add_subdirectory (untz-html)
 else ()
- add_subdirectory ( untz )
+  add_subdirectory ( untz )
 endif ()
 
-add_subdirectory ( vorbis )
-add_subdirectory ( zlib )
-
-if (BUILD_HTML OR BUILD_ANDROID OR BUILD_IOS)
-	set ( GLEW_SOURCES "")
-	set ( GLEW_INCLUDES "")
-else (BUILD_HTML OR BUILD_ANDROID OR BUILD_IOS)
-	add_subdirectory ( glew )
-endif (BUILD_HTML OR BUILD_ANDROID OR BUILD_IOS)
 
 
-if ( BUILD_ANDROID )
-  set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -include ${CMAKE_CURRENT_SOURCE_DIR}/../../src/zl-vfs/zl_replace.h" )
-   set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -include ${CMAKE_CURRENT_SOURCE_DIR}/../../src/zl-vfs/zl_replace.h" ) 
-endif ( BUILD_ANDROID )
-
-
-set ( THIRD_PARTY_INCLUDES 
-  
-  "../../src/"
-  
-  ${CLIPPER_INCLUDES}
-  ${LIBTESS2_INCLUDES}
-  
-  ${BOX2D_INCLUDES}
-  ${CHIPMUNK_INCLUDES}
-  ${CONTRIB_INCLUDES}
-  ${CRYPTO_INCLUDES}
-  ${CURL_INCLUDES}
-  ${EXPAT_INCLUDES}
-  ${FREETYPE_INCLUDES}
-  ${JANSSON_INCLUDES}
-  ${JPG_INCLUDES}
-  ${LUA_INCLUDES}
-  ${LUAEXT_INCLUDES}
-  ${MONGOOSE_INCLUDES}
-  ${OGG_INCLUDES}
-  ${PNG_INCLUDES}
-  ${SFMT_INCLUDES}
-  ${SQLITE3_INCLUDES}
-  ${SSL_INCLUDES}
-  ${TINYXML_INCLUDES}
-  ${TLSF_INCLUDES}
-  ${UNTZ_INCLUDES}
-  ${VORBIS_INCLUDES}
-  ${ZLIB_INCLUDES}
-  ${GLEW_INCLUDES}
-  "../../3rdparty/ooid-0.99/"
-  
-CACHE INTERNAL "doc string" )
-
-include_directories ( ${THIRD_PARTY_INCLUDES} )
-
-if ( BUILD_BLACKBERRY )
-  include_directories ( ${BLACKBERRY_INCLUDES} )
-endif ( BUILD_BLACKBERRY)
-
-add_library ( third-party STATIC 
-  
-  ${CLIPPER_SOURCES}
-  ${LIBTESS2_SOURCES}
-  
-  ${BOX2D_SOURCES}
-  ${CHIPMUNK_SOURCES}
-  ${CONTRIB_SOURCES}
-  ${CRYPTO_SOURCES}
-  ${CURL_SOURCES}
-  ${EXPAT_SOURCES}
-  ${FREETYPE_SOURCES}
-  ${JANSSON_SOURCES}
-  ${JPG_SOURCES}
-  ${LUA_SOURCES} 
-  ${LUAEXT_SOURCES}
-  ${MONGOOSE_SOURCES} 
-  ${OGG_SOURCES} 
-  ${PNG_SOURCES} 
-  ${SFMT_SOURCES}
-  ${SQLITE3_SOURCES} 
-  ${TINYXML_SOURCES}
-  ${TLSF_SOURCES}
-  ${UNTZ_SOURCES}
-  ${VORBIS_SOURCES}
-  ${ZLIB_SOURCES}
-  ${GLEW_SOURCES}
-  ${SSL_SOURCES}
-)
-
-if (BUILD_WINDOWS AND MOAI_UNTZ)
-  target_link_libraries ( third-party 
-    winmm
-    uuid
-    dxguid
-    strmiids
-    dsound
-    oleaut32
-  )
-endif (BUILD_WINDOWS AND MOAI_UNTZ)
-
-if (MOAI_LUAEXT)
-target_link_libraries ( third-party
-  luasocket
-)
-endif (MOAI_LUAEXT)

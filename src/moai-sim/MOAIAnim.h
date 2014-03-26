@@ -15,7 +15,7 @@ class MOAIAnimLink {
 public:
 
 	MOAILuaSharedPtr < MOAIAnimCurveBase > mCurve;
-	MOAIWeakPtr < MOAINode > mTarget;
+	MOAILuaSharedPtr < MOAINode > mTarget;
 	u32 mAttrID;
 	bool mRelative;
 };
@@ -24,7 +24,7 @@ public:
 // MOAIAnim
 //================================================================//
 /**	@name MOAIAnim
-	@text Bind anim curves to nodes and provides timer controls for anim playback.
+	@text Bind animation curves to nodes and provides timer controls for animation playback.
 */
 class MOAIAnim :
 	public virtual MOAITimer {

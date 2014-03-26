@@ -13,9 +13,9 @@
 //================================================================//
 /**	@name	MOAITapjoyAndroid
 	@text	Wrapper for Tapjoy integration on Android devices.
-			Tapjoy provides a turnkey advertising platform that 
+			Tapjoy provides a turnkey advertising platform that
 			delivers cost-effective, high-value new users and helps 
-			apps make money. Exposed to lua via MOAITapjoy on 
+			apps make money. Exposed to Lua via MOAITapjoy on 
 			all mobile platforms.
 
 	@const	TAPJOY_VIDEO_AD_BEGIN								Event code for Tapjoy video ad playback begin. Unused.
@@ -58,7 +58,7 @@ public:
         TAPJOY_VIDEO_STATUS_UNABLE_TO_PLAY_VIDEO,
 	};
 	
-	MOAILuaRef		mListeners [ TOTAL ];
+	MOAILuaStrongRef		mListeners [ TOTAL ];
 
 			MOAITapjoyAndroid	();
 			~MOAITapjoyAndroid	();

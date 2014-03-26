@@ -80,8 +80,8 @@ int MOAITextBox::_clearHighlights ( lua_State* L ) {
 	@text	Returns the alignment of the text
 
 	@in		MOAITextBox self
-	@out	enum horizontal alignment
-	@out	enum vertical alignment
+	@out	number hAlign			horizontal alignment
+	@out	number vAlign			vertical alignment
 */
 int MOAITextBox::_getAlignment ( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAITextBox, "U" )
@@ -119,7 +119,7 @@ int MOAITextBox::_getLineSpacing ( lua_State* L ) {
 
 //----------------------------------------------------------------//
 /**	@name	getRect
-	@text	Returns the two dimensional boundary of the text box.
+	@text	Returns the two-dimensional boundary of the text box.
 
 	@in		MOAITextBox self
 	@out	number xMin
@@ -143,7 +143,7 @@ int MOAITextBox::_getRect ( lua_State* L ) {
 
 //----------------------------------------------------------------//
 /**	@name	getStringBounds
-	@text	Returns the bounding rectange of a given substring on a
+	@text	Returns the bounding rectangle of a given substring on a
 			single line in the local space of the text box.
 
 	@in		MOAITextBox self
@@ -225,6 +225,7 @@ int MOAITextBox::_more ( lua_State* L ) {
 	@text	Advances to the next page of text (if any) or wraps to the start of the text (if at end).
 
 	@in		MOAITextBox self
+	@opt	boolean reveal		Default is true
 	@out	nil
 */
 int MOAITextBox::_nextPage ( lua_State* L ) {
@@ -274,8 +275,8 @@ int MOAITextBox::_revealAll ( lua_State* L ) {
 	@text	Sets the horizontal and/or vertical alignment of the text in the text box.
 
 	@in		MOAITextBox self
-	@in		enum hAlignment				Can be one of LEFT_JUSTIFY, CENTER_JUSTIFY or RIGHT_JUSTIFY.
-	@in		enum vAlignment				Can be one of LEFT_JUSTIFY, CENTER_JUSTIFY or RIGHT_JUSTIFY.
+	@in		number hAlignment				Can be one of LEFT_JUSTIFY, CENTER_JUSTIFY or RIGHT_JUSTIFY.
+	@in		number vAlignment				Can be one of LEFT_JUSTIFY, CENTER_JUSTIFY or RIGHT_JUSTIFY.
 	@out	nil
 */
 int MOAITextBox::_setAlignment ( lua_State* L ) {
@@ -302,6 +303,7 @@ int MOAITextBox::_setAlignment ( lua_State* L ) {
 	@overload
 		
 		@in		MOAITextBox self
+		@out	nil
 */
 int MOAITextBox::_setCurve ( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAITextBox, "U" )
@@ -353,12 +355,14 @@ int MOAITextBox::_setGlyphScale ( lua_State* L ) {
 		@in		number g
 		@in		number b
 		@opt	number a			Default value is 1.
+		@out	nil
 	
 	@overload
 		
 		@in		MOAITextBox self
 		@in		number index		Index of the first character in the substring.
 		@in		number size			Length of the substring.
+		@out	nil
 */
 int MOAITextBox::_setHighlight ( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAITextBox, "UNN" )
@@ -382,10 +386,11 @@ int MOAITextBox::_setHighlight ( lua_State* L ) {
 //----------------------------------------------------------------//
 /**	@name	setLineSpacing
 	@text	Sets additional space between lines in text units. '0' uses
-			the default spacing. Valus must be positive.
+			the default spacing. Values must be positive.
 
 	@in		MOAITextBox self
 	@in		number lineSpacing		Default value is 0.
+	@out	nil
 */
 int MOAITextBox::_setLineSpacing ( lua_State* L ) {
 	MOAI_LUA_SETUP ( MOAITextBox, "U" )
@@ -465,7 +470,7 @@ int MOAITextBox::_setReveal ( lua_State* L ) {
 	@text	If set to true text positions will snap to integers according to the viewport scale. Default value is true.
 
 	@in		MOAITextBox self
-	@in		bool snap				Whether text positions should snap to viewport scale
+	@in		boolean snap				Whether text positions should snap to viewport scale
 	@out	nil
 */
 int MOAITextBox::_setSnapToViewportScale ( lua_State* L ) {
@@ -578,7 +583,7 @@ int MOAITextBox::_setWordBreak ( lua_State* L ) {
 			Y moves up the screen).
 
 	@in		MOAITextBox self
-	@in		number yFlip				Whether the vertical rendering direction should be inverted.
+	@in		boolean yFlip				Whether the vertical rendering direction should be inverted.
 	@out	nil
 */
 int MOAITextBox::_setYFlip ( lua_State* L ) {
@@ -1157,16 +1162,6 @@ MOAITextBox::~MOAITextBox () {
 
 	this->ClearCurves ();
 	this->ClearHighlights ();
-	
-	// TODO: this is a known bug - releasing the dep links here
-	// will cause plenty o' crashing
-	// the case seems to be when the text box has ben garbage
-	// collected but is still in the node manager's update list
-	// the lua ref stuff is destroyed by the __gc method
-	// but it's needed by the links
-	// am wondering if the links are also being orphaned or
-	// compromised by the gc
-	
 	this->ResetLayout ();
 	this->ResetStyleMap ();
 	this->ResetStyleSet ();

@@ -43,7 +43,7 @@ int MOAIEnvironment::_getMACAddress ( lua_State* L ) {
 
 //----------------------------------------------------------------//
 /**	@name	setValue
-	@text	Sets an evironment value and also triggers the listener
+	@text	Sets an environment value and also triggers the listener
 			callback (if any).
 
 	@in		string key
@@ -191,12 +191,12 @@ void MOAIEnvironment::RegisterLuaClass ( MOAILuaState& state ) {
 	state.SetField ( -1, "CONNECTION_TYPE_WIFI", ( u32 )CONNECTION_TYPE_WIFI );
 	state.SetField ( -1, "CONNECTION_TYPE_WWAN", ( u32 )CONNECTION_TYPE_WWAN );
 	
-	state.SetField ( -1, "OS_BRAND_ANDROID", ( u32 )OS_BRAND_ANDROID );
-	state.SetField ( -1, "OS_BRAND_IOS", ( u32 )OS_BRAND_IOS );
-	state.SetField ( -1, "OS_BRAND_OSX", ( u32 )OS_BRAND_OSX );
-	state.SetField ( -1, "OS_BRAND_LINUX", ( u32 )OS_BRAND_LINUX );
-	state.SetField ( -1, "OS_BRAND_WINDOWS", ( u32 )OS_BRAND_WINDOWS );
-	state.SetField ( -1, "OS_BRAND_UNAVAILABLE", ( u32 )OS_BRAND_UNAVAILABLE );
+	state.SetField ( -1, "OS_BRAND_ANDROID", OS_BRAND_ANDROID );
+	state.SetField ( -1, "OS_BRAND_IOS", OS_BRAND_IOS );
+	state.SetField ( -1, "OS_BRAND_OSX", OS_BRAND_OSX );
+	state.SetField ( -1, "OS_BRAND_LINUX", OS_BRAND_LINUX );
+	state.SetField ( -1, "OS_BRAND_WINDOWS", OS_BRAND_WINDOWS );
+	state.SetField ( -1, "OS_BRAND_UNAVAILABLE", OS_BRAND_UNAVAILABLE );
 
 	luaL_Reg regTable [] = {
 		{ "generateGUID",		_generateGUID },

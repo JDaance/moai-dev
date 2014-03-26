@@ -155,10 +155,10 @@ int MOAIAdColonyAndroid::_init ( lua_State* L ) {
 //----------------------------------------------------------------//
 /**	@name	playVideo
 	@text	Play an AdColony video ad.
-	
-	@in 	string	zone			The zone from which to play a video ad.
-	@opt	bool	prompt			Determines whether the user is asked whether they want to play a video ad or not. Default is true.
-	@opt	bool	confirm			Determines whether the user is presented with a confirmation dialog after video ad playback completes. Default is true.
+ 
+	@in 	string zone				The zone from which to play a video ad.
+	@opt	boolean prompt			Determines whether the user is asked whether they want to play a video ad or not. Default is true.
+	@opt	boolean confirm			Determines whether the user is presented with a confirmation dialog after video ad playback completes. Default is true.
 	@out 	nil
 */
 int MOAIAdColonyAndroid::_playVideo ( lua_State* L ) {
@@ -212,8 +212,8 @@ int MOAIAdColonyAndroid::_setListener ( lua_State* L ) {
 /**	@name	videoReadyForZone
 	@text	Check the readiness of a video ad for a given zone.
 	
-	@in 	string	zone			The zone from which to check for a video ad.
-	@out 	bool					True, if a video ad is ready to play.
+	@in 	string zone				The zone from which to check for a video ad.
+	@out 	boolean isReady			True, if a video ad is ready to play.
 */
 int MOAIAdColonyAndroid::_videoReadyForZone ( lua_State *L ) {
 	
@@ -254,9 +254,9 @@ int MOAIAdColonyAndroid::_videoReadyForZone ( lua_State *L ) {
 // MOAIAdColonyAndroid
 //================================================================//
 //----------------------------------------------------------------//
-void MOAIAdColonyAndroid::NotifyVideoComplete () {	
+void MOAIAdColonyAndroid::NotifyVideoComplete (int success) {	
 	
-	MOAILuaRef& callback = this->mListeners [ VIDEO_ENDED_IN_ZONE ];
+	MOAILuaRef& callback = ( success == 1) ? this->mListeners [ VIDEO_ENDED_IN_ZONE ]: this->mListeners [ VIDEO_FAILED_IN_ZONE ];
 	
 	if ( callback ) {
 		
@@ -303,9 +303,9 @@ void MOAIAdColonyAndroid::RegisterLuaClass ( MOAILuaState& state ) {
 //================================================================//
 
 //----------------------------------------------------------------//
-extern "C" void Java_com_ziplinegames_moai_MoaiAdColony_AKUNotifyAdColonyVideoComplete ( JNIEnv* env, jclass obj ) {
+extern "C" void Java_com_ziplinegames_moai_MoaiAdColony_AKUNotifyAdColonyVideoComplete ( JNIEnv* env, jclass obj, jint success ) {
 
-	MOAIAdColonyAndroid::Get ().NotifyVideoComplete ();
+	MOAIAdColonyAndroid::Get ().NotifyVideoComplete (success);
 }
 
 #endif

@@ -47,13 +47,12 @@ public:
 	bool			GetFieldWithType		( int idx, int key, int type );
 	static cc8*		GetLuaTypeName			( int type );
 	void*			GetPtrUserData			( int idx );
+	STLString		GetStackDump			();
 	STLString		GetStackTrace			( int level );
-	MOAILuaRef		GetStrongRef			( int idx );
 	int				GetTop					();
 	void*			GetUserData				( int idx, void* value );
 	void*			GetUserData				( int idx, cc8* name, void* value );
 	STLString		GetValue				( int idx, cc8* value );
-	MOAILuaRef		GetWeakRef				( int idx );
 	bool			HasField				( int idx, cc8* name );
 	bool			HasField				( int idx, int key );
 	bool			HasField				( int idx, cc8* name, int type );
@@ -71,6 +70,8 @@ public:
 	void			Pop						( int n );
 	bool			PrepMemberFunc			( int idx, cc8* name );
 	bool			PrintErrors				( FILE* file, int status );
+	void			PrintStackDump			();
+	void			PrintStackDump			( FILE* file );
 	void			PrintStackTrace			( FILE* file, int level );
 	void			Push					();
 	void			Push					( bool value );

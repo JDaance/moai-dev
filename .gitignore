@@ -30,3 +30,7 @@ test/xml-results
 .buildpath
 .project
 .idea
+cmake/projects/
+
+bin/api-reference-parser/vendor
+docs/api-reference
