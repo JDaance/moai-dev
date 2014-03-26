@@ -39,7 +39,7 @@
 	#ifndef AKU_WITH_SIM
 		#define AKU_WITH_SIM 1
 	#endif
-	
+
 	#ifndef AKU_WITH_TEST
 		#define AKU_WITH_TEST 0
 	#endif

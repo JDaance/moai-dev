@@ -8,7 +8,6 @@ if (MSVC)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W0")
 endif (MSVC)
 
-add_subdirectory ( clipper )
 add_subdirectory ( libtess2 )
 
 add_subdirectory ( box2d )

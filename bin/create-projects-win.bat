@@ -50,6 +50,8 @@ cmake ^
 -DMOAI_VORBIS=TRUE ^
 -DMOAI_UNTZ=TRUE ^
 -DMOAI_LUAJIT=TRUE ^
+-DPLUGIN_SKYTURNS-GEOMETRY-GENERATOR=1 ^
+-DPLUGIN_DIR=E:/dev/projekt/skyturns/moai-plugins ^
 ..\..\
 
 :end

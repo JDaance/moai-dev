@@ -1,18 +1,14 @@
 cmake_minimum_required ( VERSION 2.8.5 )
 project ( libtess2 )
 
-set ( CMAKE_CURRENT_SOURCE_DIR "../../3rdparty/libtess2/Source/" )
+set ( CMAKE_CURRENT_SOURCE_DIR "${MOAI_ROOT}/3rdparty/libtess2/" )
 
 set ( LIBTESS2_INCLUDES "../../3rdparty/libtess2/Include" CACHE INTERNAL "doc string" )
 
-set ( LIBTESS2_SOURCES 
+file ( GLOB_RECURSE LIBTESS2_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/Source/*.c" )
+file ( GLOB_RECURSE LIBTESS2_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/Source/*.h" )
 
-    ${CMAKE_CURRENT_SOURCE_DIR}bucketalloc.c
-    ${CMAKE_CURRENT_SOURCE_DIR}dict.c
-    ${CMAKE_CURRENT_SOURCE_DIR}geom.c
-    ${CMAKE_CURRENT_SOURCE_DIR}mesh.c
-    ${CMAKE_CURRENT_SOURCE_DIR}priorityq.c
-    ${CMAKE_CURRENT_SOURCE_DIR}sweep.c
-    ${CMAKE_CURRENT_SOURCE_DIR}tess.c
+add_library( libtess2 STATIC ${LIBTESS2_SOURCES} ${LIBTESS2_HEADERS} )
 
-CACHE INTERNAL "doc string" )
+target_include_directories ( libtess2 PUBLIC ${LIBTESS2_INCLUDES})
+set_target_properties( libtess2 PROPERTIES FOLDER Third-Party )
