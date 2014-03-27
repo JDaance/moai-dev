@@ -315,6 +315,7 @@ void _AKUOpenWindowFunc ( const char* title, int width, int height ) {
 		glutKeyboardFunc ( _onKeyDown );
 		glutKeyboardUpFunc ( _onKeyUp );
 		glutSpecialFunc ( _onSpecialFunc );
+		glutSpecialUpFunc ( _onSpecialUpFunc );
 
 		glutMouseFunc ( _onMouseButton );
 		glutMotionFunc ( _onMouseDrag );
@@ -385,9 +386,9 @@ int GlutHost ( int argc, char** argv ) {
 
 	glutInit ( &argc, argv );
 
-	AKURunString("MOAIEnvironment.isWindows = true");
-
 	GlutRefreshContext ( argc, argv);
+
+	AKURunString("MOAIEnvironment.isWindows = true");
 
 	AKUModulesParseArgs ( argc, argv );
 
