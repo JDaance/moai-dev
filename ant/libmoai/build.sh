@@ -34,7 +34,7 @@ twitter_flags=
 buildtype_flags="Debug"
 windows_flags=
 
-while [ $# -gt 0 ];	do
+while [ $# -gt 0 ]; do
     case "$1" in
         --use-untz)  use_untz="$2"; shift;;
         --use-luajit)  use_luajit="$2"; shift;;
@@ -52,23 +52,23 @@ while [ $# -gt 0 ];	do
             echo >&2 \
                 $usage
             exit 1;;
-        *)  break;;	# terminate while loop
+        *)  break;; # terminate while loop
     esac
     shift
 done
 make_flags=
 if [ x"$windows_flags" != x ]; then
-  make_flags=-DCMAKE_MAKE_PROGRAM="${ANDROID_NDK}/prebuilt/windows/bin/make.exe"
+  make_flags=-DCMAKE_MAKE_PROGRAM="${ANDROID_NDK}/prebuilt/windows-x86_64/bin/make.exe"
 fi
 
 if [ x"$use_untz" != xtrue ] && [ x"$use_untz" != xfalse ]; then
     echo $usage
-    exit 1		
+    exit 1      
 fi
 
 if [ x"$use_luajit" != xtrue ] && [ x"$use_luajit" != xfalse ]; then
     echo $usage
-    exit 1		
+    exit 1      
 fi
 
 should_clean=false
@@ -209,6 +209,8 @@ cmake -DDISABLED_EXT="$disabled_ext" -DMOAI_BOX2D=1 \
 -DANDROID_NDK=${ANDROID_NDK}  \
 -DCMAKE_BUILD_TYPE=$buildtype_flags \
 "${windows_flags}" "${make_flags}" \
+-DPLUGIN_SKYTURNS-GEOMETRY-GENERATOR=1 \
+-DPLUGIN_DIR=E:/dev/projekt/skyturns/moai-plugins \
 ../
 #build them    
 if [ x"$windows_flags" != x ]; then
