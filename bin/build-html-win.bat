@@ -1,4 +1,4 @@
-@echo off
+:: @echo off
 if NOT "%EMSCRIPTEN_HOME%"=="" goto COMPILE
 echo "EMSCRIPTEN_HOME is not defined. Please set to the location of your emscripten install (path)"
 goto :END
@@ -12,9 +12,9 @@ goto ERROR
 
 cd %~dp0/..
 cd cmake
-rmdir /s /q build
-mkdir build
-cd build
+rmdir /s /q build-html
+mkdir build-html
+cd build-html
 cmake ^
 -DEMSCRIPTEN_ROOT_PATH=%EMSCRIPTEN_HOME% ^
 -DCMAKE_TOOLCHAIN_FILE=%EMSCRIPTEN_HOME%\cmake\Platform\Emscripten.cmake ^
@@ -37,6 +37,8 @@ cmake ^
 -DMOAI_VORBIS=FALSE ^
 -DMOAI_HTTP_CLIENT=FALSE ^
 -DMOAI_UNTZ=TRUE ^
+-DPLUGIN_SKYTURNS-GEOMETRY-GENERATOR=1 ^
+-DPLUGIN_DIR=E:/dev/projekt/skyturns/moai-plugins ^
 -G "MinGW Makefiles" ^
 ..\
 
