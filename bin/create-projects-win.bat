@@ -18,7 +18,7 @@ if "%generator%"=="" (
 	@echo Unknown argument "%1". Valid values are vs2008, vs2010, vs2012, vs2013. Exiting.
 	goto end
 )
-set targetDir=projects\%arg1%
+set targetDir=..\projects\%arg1%
 
 @echo on
 
@@ -49,10 +49,11 @@ cmake ^
 -DMOAI_SFMT=TRUE ^
 -DMOAI_VORBIS=TRUE ^
 -DMOAI_UNTZ=TRUE ^
--DMOAI_LUAJIT=TRUE ^
+-DMOAI_LUAJIT=FALSE ^
+-DMOAI_HTTP_CLIENT=TRUE ^
 -DPLUGIN_SKYTURNS-GEOMETRY-GENERATOR=1 ^
 -DPLUGIN_DIR=E:/dev/projekt/skyturns/moai-plugins ^
-..\..\
+..\..\cmake
 
 :end
 
