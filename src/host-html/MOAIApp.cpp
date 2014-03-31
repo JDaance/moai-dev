@@ -13,7 +13,7 @@
 int MOAIApp::_setOnJsMessageCallback ( lua_State* L ) {
 	MOAILuaState state ( L );
 	
-	MOAIApp::Get ().onJsMessageCallback.SetRef ( *(MOAIApp::Get ()), state, 1 );
+	MOAIApp::Get ().onJsMessageCallback.SetRef ( state, 1 );
 	
 	return 0;
 }
@@ -65,7 +65,7 @@ void MOAIApp::Reset () {
 //----------------------------------------------------------------//
 void MOAIApp::HandleMessageFromJs ( const char* jsonString ) {
 
-	MOAILuaRef& callback = MOAIApp::Get ().onJsMessageCallback;
+	MOAILuaStrongRef& callback = MOAIApp::Get ().onJsMessageCallback;
 
 	if ( callback ) {
 		MOAIScopedLuaState L = MOAILuaRuntime::Get ().State (); // empty stack
