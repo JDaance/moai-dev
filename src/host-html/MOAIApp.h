@@ -10,7 +10,7 @@ class MOAIApp :
 	public MOAIGlobalClass < MOAIApp, MOAILuaObject > {
 private:
 	
-	MOAILuaRef				onJsMessageCallback;
+	MOAILuaMemberRef		onJsMessageCallback;
 
 	//----------------------------------------------------------------//
 	static int		_setOnJsMessageCallback					( lua_State* L );

@@ -13,7 +13,7 @@
 int MOAIApp::_setOnJsMessageCallback ( lua_State* L ) {
 	MOAILuaState state ( L );
 	
-	MOAIApp::Get ().onJsMessageCallback.SetStrongRef ( state, 1 );
+	MOAIApp::Get ().onJsMessageCallback.SetRef ( *(MOAIApp::Get ()), state, 1 );
 	
 	return 0;
 }
