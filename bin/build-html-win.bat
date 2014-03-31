@@ -38,7 +38,7 @@ cmake ^
 -DMOAI_HTTP_CLIENT=FALSE ^
 -DMOAI_UNTZ=TRUE ^
 -DPLUGIN_SKYTURNS-GEOMETRY-GENERATOR=1 ^
--DPLUGIN_DIR=E:/dev/projekt/skyturns/moai-plugins ^
+-DPLUGIN_DIR=/media/sf_ubuntu/skyturns/moai-plugins ^
 -G "MinGW Makefiles" ^
 ..\
 
