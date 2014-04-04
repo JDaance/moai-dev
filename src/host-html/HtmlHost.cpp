@@ -179,12 +179,13 @@ void Dummy() {
 }
 
 void RefreshContext () {
-	REGISTER_LUA_CLASS ( MOAIApp )	
 
 	AKUAppInitialize ();
 	AKUModulesAppInitialize ();
 
 	AKUCreateContext ();
+	
+	REGISTER_LUA_CLASS ( MOAIApp )	
 
     AKUModulesContextInitialize ();
 	AKUModulesRunLuaAPIWrapper ();
