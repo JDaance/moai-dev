@@ -39,7 +39,9 @@ var LibraryMOAI = {
   },
 
   PushMessageToJs: function(jsonString) {
-    moaijs.PushMessageToJs(Module.Pointer_stringify(jsonString));
+    if (window.RecieveLuaMessage) {
+      window.RecieveLuaMessage(Module.Pointer_stringify(jsonString));
+    }
   }
 }
 
