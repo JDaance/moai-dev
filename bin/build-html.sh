@@ -45,7 +45,7 @@ cmake \
 -DMOAI_HTTP_CLIENT=FALSE \
 -DMOAI_UNTZ=TRUE \
 -DPLUGIN_SKYTURNS-GEOMETRY-GENERATOR=1 \
--DPLUGIN_DIR=~/dev/skyturns/moai-plugins \
+-DPLUGIN_DIR=/home/skyturns/dev/skyturns/moai-plugins \
 ../
 if [[ $? -ne 0 ]]; then
     exit 1
