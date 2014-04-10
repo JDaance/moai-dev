@@ -9,9 +9,6 @@ extern "C" {
 	extern int luaopen_luacurl			( lua_State *L );
 	extern int luaopen_luasql_sqlite3	( lua_State *L );
 	extern int luapreload_fullluasocket ( lua_State *L );
-#ifdef MOAI_USE_SHINY
-	extern int luaopen_ShinyLua			( lua_State *L );
-#endif
 }
 
 //================================================================//
@@ -48,12 +45,3 @@ void AKULuaExtContextInitialize () {
 
 }
 
-
-//----------------------------------------------------------------//
-#ifdef MOAI_USE_SHINY
-void AKUExtLoadShinylua () {
-
-	lua_State* state = AKUGetLuaState ();
-	luaopen_ShinyLua ( state );
-}
-#endif
