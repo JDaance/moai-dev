@@ -29,16 +29,9 @@ int MOAIApp::_postMessageToJs ( lua_State* L ) {
 	MOAILuaState state ( L );
 
 	// position 1 is message object
-
-	int result = MOAIJsonParser::Encode(L); // pushes string onto top
-	if (result == 1) {
-		cc8* jsonString	= state.GetValue < cc8* >( -1, NULL );
-
-		lua_pop(L, 1); // clean up state so that any calls triggered from JS work on a clean state
-		PushMessageToJs(jsonString);
-	} else {
-		MOAIPrint("Error posting message to JS, json serialization failed");
-	}
+	cc8* string	= state.GetValue < cc8* >( -1, NULL );
+	PushMessageToJs(string);
+		
 	return 0;
 }
  
@@ -63,21 +56,16 @@ void MOAIApp::Reset () {
 }
 
 //----------------------------------------------------------------//
-void MOAIApp::HandleMessageFromJs ( const char* jsonString ) {
+void MOAIApp::HandleMessageFromJs ( const char* string ) {
 
 	MOAILuaStrongRef& callback = MOAIApp::Get ().onJsMessageCallback;
 
 	if ( callback ) {
 		MOAIScopedLuaState L = MOAILuaRuntime::Get ().State (); // empty stack
-		lua_pushstring ( L, jsonString ); // stack = S
-		int result = MOAIJsonParser::Decode(L); // will decode string from stack and push table to stack, stack = T
-		if (result == 1) {
-			callback.PushRef( L ); // stack = TF
-			lua_insert( L, -2 ); // stack = FT
-			L.DebugCall ( 1, 0 ); // call
-		} else {
-			MOAIPrint("Error parsing message from JS, json decoding failed\n");		
-		}
+		lua_pushstring ( L, string ); // stack = S
+		callback.PushRef( L ); // stack = SF
+		lua_insert( L, -2 ); // stack = FS
+		L.DebugCall ( 1, 0 ); // call, stack =
 	}
 }
 
