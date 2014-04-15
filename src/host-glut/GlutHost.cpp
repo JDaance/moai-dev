@@ -135,24 +135,20 @@ static void _onSpecialFunc ( int key, int x, int y ) {
 	}
 
 	if ( key == GLUT_KEY_F2 ) {
-                AKUSoftReleaseGfxResources ( 0 );
-        }
-
-        else {
-
-                AKUEnqueueKeyboardEvent ( GlutInputDeviceID::DEVICE, GlutInputDeviceSensorID::KEYBOARD, key + 1000, true );
-
-        }
+        AKUSoftReleaseGfxResources ( 0 );
+    } else {
+        AKUEnqueueKeyboardEvent ( GlutInputDeviceID::DEVICE, GlutInputDeviceSensorID::KEYBOARD, key + 300, true );
+    }
 }
 
 //----------------------------------------------------------------//
 static void _onSpecialUpFunc ( int key, int x, int y ) {
-        ( void )x;
-        ( void )y;
+    ( void )x;
+    ( void )y;
 
-        _updateModifiers ();
+    _updateModifiers ();
 
-        AKUEnqueueKeyboardEvent ( GlutInputDeviceID::DEVICE, GlutInputDeviceSensorID::KEYBOARD, key + 1000, false );
+    AKUEnqueueKeyboardEvent ( GlutInputDeviceID::DEVICE, GlutInputDeviceSensorID::KEYBOARD, key + 300, false );
 }
 
 //----------------------------------------------------------------//
