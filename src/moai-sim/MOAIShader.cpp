@@ -188,6 +188,42 @@ void MOAIShaderUniform::Clear () {
 }
 
 //----------------------------------------------------------------//
+void MOAIShaderUniform::GetValue ( MOAIAttrOp& attrOp ) {
+
+	switch ( this->mType ) {
+			
+		case UNIFORM_FLOAT: {
+			
+			attrOp.Apply ( this->mFloat, MOAIAttrOp::GET, MOAIAttrOp::ATTR_READ_WRITE );
+			break;
+		}
+		case UNIFORM_INT: {
+			
+			attrOp.Apply ( this->mInt, MOAIAttrOp::GET, MOAIAttrOp::ATTR_READ_WRITE );
+			break;
+		}
+	}
+}
+
+//----------------------------------------------------------------//
+void MOAIShaderUniform::SetAttrFlags ( MOAIAttrOp& attrOp ) {
+    
+	switch ( this->mType ) {
+			
+		case UNIFORM_FLOAT:
+		case UNIFORM_INT:
+			
+			attrOp.SetFlags ( MOAIAttrOp::ATTR_READ_WRITE );
+            break;
+
+        default:
+
+            attrOp.SetFlags ( MOAIAttrOp::ATTR_WRITE );
+            break;
+	}
+}
+
+//----------------------------------------------------------------//
 MOAIShaderUniform::MOAIShaderUniform () :
 	mAddr ( 0 ),
 	mType ( UNIFORM_NONE ),
@@ -664,8 +700,8 @@ bool MOAIShader::ApplyAttrOp ( u32 attrID, MOAIAttrOp& attrOp, u32 op ) {
 	if ( attrID >= this->mUniforms.Size ()) return false;
 
 	if ( op == MOAIAttrOp::CHECK ) {
-		attrOp.SetFlags ( MOAIAttrOp::ATTR_WRITE );
-		return true;
+		this->mUniforms [ attrID ].SetAttrFlags ( attrOp );
+        return true;
 	}
 	
 	if ( op == MOAIAttrOp::SET ) {
@@ -675,6 +711,11 @@ bool MOAIShader::ApplyAttrOp ( u32 attrID, MOAIAttrOp& attrOp, u32 op ) {
 	
 	if ( op == MOAIAttrOp::ADD ) {
 		this->mUniforms [ attrID ].AddValue ( attrOp );
+		return true;
+	}
+    
+    if ( op == MOAIAttrOp::GET ) {
+		this->mUniforms [ attrID ].GetValue ( attrOp );
 		return true;
 	}
 	
