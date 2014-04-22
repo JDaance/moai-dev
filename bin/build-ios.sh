@@ -191,8 +191,8 @@ ruby ../host-ios/build_resources.rb "${LUASRC}"
 echo "Creating xcode project"
 
 #create our makefiles
-cmake -DDISABLED_EXT="$disabled_ext" -DMOAI_BOX2D=1 \
--DMOAI_CHIPMUNK=1 -DMOAI_CURL=1 -DMOAI_CRYPTO=0 -DMOAI_EXPAT=1 -DMOAI_FREETYPE=1 \
+cmake -DDISABLED_EXT="$disabled_ext" -DMOAI_BOX2D=0 \
+-DMOAI_CHIPMUNK=0 -DMOAI_CURL=1 -DMOAI_CRYPTO=0 -DMOAI_EXPAT=1 -DMOAI_FREETYPE=1 \
 -DMOAI_HTTP_CLIENT=1 -DMOAI_JSON=1 -DMOAI_JPG=1 -DMOAI_LUAEXT=1 \
 -DMOAI_MONGOOSE=1 -DMOAI_OGG=1 -DMOAI_OPENSSL=0 -DMOAI_SQLITE3=1 \
 -DMOAI_TINYXML=1 -DMOAI_PNG=1 -DMOAI_SFMT=1 -DMOAI_VORBIS=1 $untz_param \
@@ -203,6 +203,8 @@ cmake -DDISABLED_EXT="$disabled_ext" -DMOAI_BOX2D=1 \
 -DAPP_ID="${APP_ID}" \
 -DAPP_VERSION="${APP_VERSION}" \
 -DCMAKE_BUILD_TYPE=$buildtype_flags \
+-DPLUGIN_SKYTURNS-GEOMETRY-GENERATOR=1 \
+-DPLUGIN_DIR=/inputcorrectdirhere/dev/skyturns/moai-plugins \
 -G "Xcode" \
 ../
 

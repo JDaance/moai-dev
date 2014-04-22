@@ -19,7 +19,7 @@ cmake ^
 -DEMSCRIPTEN_ROOT_PATH=%EMSCRIPTEN_HOME% ^
 -DCMAKE_TOOLCHAIN_FILE=%EMSCRIPTEN_HOME%\cmake\Platform\Emscripten.cmake ^
 -DBUILD_HTML=TRUE ^
--DMOAI_BOX2D=TRUE ^
+-DMOAI_BOX2D=FALSE ^
 -DMOAI_CHIPMUNK=FALSE ^
 -DMOAI_CURL=FALSE ^
 -DMOAI_CRYPTO=FALSE ^
@@ -38,7 +38,7 @@ cmake ^
 -DMOAI_HTTP_CLIENT=FALSE ^
 -DMOAI_UNTZ=TRUE ^
 -DPLUGIN_SKYTURNS-GEOMETRY-GENERATOR=1 ^
--DPLUGIN_DIR=/media/sf_ubuntu/skyturns/moai-plugins ^
+-DPLUGIN_DIR=E:\dev\projekt\skyturns\moai-plugins ^
 -G "MinGW Makefiles" ^
 ..\
 
