@@ -204,7 +204,7 @@ cmake -DDISABLED_EXT="$disabled_ext" -DMOAI_BOX2D=0 \
 -DAPP_VERSION="${APP_VERSION}" \
 -DCMAKE_BUILD_TYPE=$buildtype_flags \
 -DPLUGIN_SKYTURNS-GEOMETRY-GENERATOR=1 \
--DPLUGIN_DIR=/inputcorrectdirhere/dev/skyturns/moai-plugins \
+-DPLUGIN_DIR=/Users/jr/dev/projekt/skyturns/moai-plugins \
 -G "Xcode" \
 ../
 
