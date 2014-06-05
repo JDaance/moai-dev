@@ -217,12 +217,12 @@ echo "Build Directory : ${build_dir}"
 
 # Copy libs
 cd ../..
-if [ -d "release/ios/${buildtype_flags}" ]; then
-    rm -fr release/ios/${buildtype_flags}
+if [ -d "release/ios/${ARCH}/${buildtype_flags}" ]; then
+    rm -fr release/ios/${ARCH}/${buildtype_flags}
 fi
 
-mkdir -p release/ios/${buildtype_flags}/app
-mkdir -p release/ios/${buildtype_flags}/lib
+mkdir -p release/ios/${ARCH}/${buildtype_flags}/app
+mkdir -p release/ios/${ARCH}/${buildtype_flags}/lib
 
-find cmake/build -name "*.app" | xargs -J % cp -fRp % release/ios/${buildtype_flags}/app
-find cmake/build -name "*.a" | xargs -J % cp -fp % release/ios/${buildtype_flags}/lib
+find cmake/build -name "*.app" | xargs -J % cp -fRp % release/ios/${ARCH}/${buildtype_flags}/app
+find cmake/build -name "*.a" | xargs -J % cp -fp % release/ios/${ARCH}/${buildtype_flags}/lib
