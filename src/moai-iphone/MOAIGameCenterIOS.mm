@@ -1,6 +1,8 @@
 // Copyright (c) 2010-2011 Zipline Games, Inc. All Rights Reserved.
 // http://getmoai.com
 
+#ifndef DISABLE_GAMECENTER
+
 #include "pch.h"
 
 #import <moai-iphone/MOAIGameCenterIOS.h>
@@ -471,3 +473,5 @@ void MOAIGameCenterIOS::ReportScore ( s64 score, cc8* category ) {
 		}
 	}
 @end
+
+#endif // DISABLE_GAMECENTER

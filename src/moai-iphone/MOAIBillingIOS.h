@@ -4,6 +4,8 @@
 #ifndef	MOAIBILLINGIOS_H
 #define	MOAIBILLINGIOS_H
 
+#ifndef DISABLE_BILLING
+
 #import <Foundation/Foundation.h>
 #import <StoreKit/StoreKit.h>
 #import <UIKit/UIKit.h>
@@ -75,5 +77,7 @@ public:
 	void	PushPaymentTransaction				( lua_State* L, SKPaymentTransaction* transaction );
 	void	RegisterLuaClass					( MOAILuaState& state );
 };
+
+#endif // DISABLE_BILLING
 
 #endif

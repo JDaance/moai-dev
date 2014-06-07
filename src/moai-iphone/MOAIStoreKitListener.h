@@ -4,6 +4,8 @@
 // http://getmoai.com
 //----------------------------------------------------------------//
 
+#ifndef DISABLE_BILLING
+
 #import <Foundation/Foundation.h>
 #import <StoreKit/StoreKit.h>
 #import <UIKit/UIKit.h>
@@ -16,3 +18,5 @@
 }
 
 @end
+
+#endif // DISABLE_BILLING

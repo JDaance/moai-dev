@@ -4,6 +4,8 @@
 // http://getmoai.com
 //----------------------------------------------------------------//
 
+#ifndef DISABLE_BILLING
+
 #import <moai-core/host.h>
 #import <moai-iphone/AKU-iphone.h>
 #import <moai-iphone/MOAIStoreKitListener.h>
@@ -71,3 +73,5 @@
 	}
 
 @end
+
+#endif // DISABLE_BILLING

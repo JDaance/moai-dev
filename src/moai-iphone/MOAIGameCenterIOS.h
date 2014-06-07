@@ -4,6 +4,8 @@
 #ifndef	MOAIGAMECENTERIOS_H
 #define	MOAIGAMECENTERIOS_H
 
+#ifndef DISABLE_GAMECENTER
+
 #import <GameKit/GameKit.h>
 #import <moai-core/headers.h>
 
@@ -88,5 +90,7 @@ public:
 @private
 }
 @end
+
+#endif // DISABLE_GAMECENTER
 
 #endif
