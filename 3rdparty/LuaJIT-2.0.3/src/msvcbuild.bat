@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 @rem Script to build LuaJIT with MSVC.
 @rem Copyright (C) 2005-2014 Mike Pall. See Copyright Notice in luajit.h
 @rem
@@ -223,4 +222,3 @@ if exist luajit.exe.manifest^
 :FAIL
 @echo You must open a "Visual Studio .NET Command Prompt" to run this script
 :END
->>>>>>> cea502de7c2677dc8f76d7eafbb2533c535c829d
