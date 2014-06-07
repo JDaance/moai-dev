@@ -1,6 +1,8 @@
 // Copyright (c) 2010-2011 Zipline Games, Inc. All Rights Reserved.
 // http://getmoai.com
 
+#ifndef DISABLE_BILLING
+
 #include "pch.h"
 #import <StoreKit/StoreKit.h>
 #import <moai-iphone/MOAIBillingIOS.h>
@@ -373,3 +375,5 @@ void MOAIBillingIOS::RegisterLuaClass ( MOAILuaState& state ) {
 
 	luaL_register ( state, 0, regTable );
 }
+
+#endif DISABLE_BILLING

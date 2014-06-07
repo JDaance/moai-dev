@@ -41,8 +41,8 @@ usage() {
 usage: $0
     [--use-untz true | false] [--disable-adcolony] [--disable-billing]
     [--disable-chartboost] [--disable-crittercism] [--disable-facebook]
-    [--disable-mobileapptracker] [--disable-push] [--disable-tapjoy]
-    [--disable-twitter] [--simulator] [--release]
+    [--disable-gamecenter] [--disable-mobileapptracker] [--disable-push] 
+    [--disable-tapjoy] [--disable-twitter] [--simulator] [--release]
     <lua-src-path>
 EOF
     exit 1
@@ -71,6 +71,7 @@ while [ $# -gt 0 ];	do
         --disable-chartboost)  chartboost_flags="-DDISABLE_CHARTBOOST";;
         --disable-crittercism)  crittercism_flags="-DDISABLE_CRITTERCISM";;
         --disable-facebook)  facebook_flags="-DDISABLE_FACEBOOK";;
+        --disable-gamecenter)  gamecenter_flags="-DDISABLE_GAMECENTER";;
         --disable-mobileapptracker)  mobileapptracker_flags="-DDISABLE_MOBILEAPPTRACKER";;
         --disable-push)  push_flags="-DDISABLE_NOTIFICATIONS";;
         --disable-tapjoy)  tapjoy_flags="-DDISABLE_TAPJOY";;
@@ -155,6 +156,11 @@ fi
 if [ x"$facebook_flags" != x ]; then
     echo "Facebook will be disabled"
     disabled_ext="${disabled_ext}FACEBOOK;"
+fi 
+
+if [ x"$gamecenter_flags" != x ]; then
+    echo "Gamecenter will be disabled"
+    disabled_ext="${disabled_ext}GAMECENTER;"
 fi 
 
 if [ x"$mobileapptracker_flags" != x ]; then
