@@ -76,6 +76,7 @@ function makeBoxMesh ( xMin, yMin, zMin, xMax, yMax, zMax, texture )
 	vertexFormat:declareColor ( 3, MOAIVertexFormat.GL_UNSIGNED_BYTE )
 
 	local vbo = MOAIVertexBuffer.new ()
+	vbo:reserveVBOs(1)
 	vbo:setFormat ( vertexFormat )
 	vbo:reserveVerts ( 36 )
 	
