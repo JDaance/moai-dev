@@ -1098,14 +1098,22 @@ u32 zglCreateBuffer () {
 
 //----------------------------------------------------------------//
 void* zglMapBuffer ( u32 target ) {
-
+	
+#ifdef MOAI_OS_WINDOWS
+	return glMapBuffer ( _remapEnum ( target ), 0x88B9 );
+#elif
 	return glMapBufferOES ( _remapEnum ( target ), 0x88B9 ); // TODO: what's wrong with Xcode?
+#endif
 }
 
 //----------------------------------------------------------------//
 void zglUnmapBuffer ( u32 target ) {
-
+	
+#ifdef MOAI_OS_WINDOWS
+	glUnmapBuffer ( _remapEnum ( target ));
+#elif
 	glUnmapBufferOES ( _remapEnum ( target ));
+#endif
 }
 
 //================================================================//
@@ -1120,22 +1128,34 @@ extern GLvoid glDeleteVertexArraysOES ( GLsizei n, const GLuint *arrays );
 
 //----------------------------------------------------------------//
 void zglBindVertexArray ( u32 vertexArrayID ) {
-
+	
+#ifdef MOAI_OS_WINDOWS
+	glBindVertexArray ( vertexArrayID );
+#elif
 	glBindVertexArrayOES ( vertexArrayID ); // TODO:
+#endif
 }
 
 //----------------------------------------------------------------//
 u32 zglCreateVertexArray () {
 
 	u32 vertexArrayID;
+#ifdef MOAI_OS_WINDOWS
+	glGenVertexArrays ( 1, &vertexArrayID );
+#elif
 	glGenVertexArraysOES ( 1, &vertexArrayID ); // TODO:
+#endif
 	return vertexArrayID;
 }
 
 //----------------------------------------------------------------//
 void zglDeleteVertexArray ( u32 vertexArrayID ) {
-
+	
+#ifdef MOAI_OS_WINDOWS
+	glDeleteVertexArrays ( 1, &vertexArrayID );
+#elif
 	glDeleteVertexArraysOES ( 1, &vertexArrayID ); // TODO:
+#endif
 }
 
 #endif
