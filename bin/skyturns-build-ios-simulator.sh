@@ -1,0 +1,1 @@
+bin/build-ios.sh --disable-adcolony --disable-billing --disable-chartboost --disable-crittercism --disable-facebook --disable-mobileapptracker --disable-push --disable-tapjoy --disable-twitter --disable-gamecenter --simulator /Users/jr/dev/projekt/skyturns/lua ; afplay /System/Library/Sounds/Submarine.aiff -v 10
