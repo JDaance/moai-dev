@@ -20,7 +20,7 @@ void MOAIDataIOTask::Execute () {
 		}
 	}
 	else if ( this->mAction == SAVE_ACTION ) {
-		this->mData->Save ( this->mFilename );
+		this->mResult = this->mData->Save ( this->mFilename );
 	}
 }
 
@@ -28,6 +28,7 @@ void MOAIDataIOTask::Execute () {
 void MOAIDataIOTask::Init ( cc8* filename, MOAIDataBuffer& target, u32 action ) {
 
 	this->mFilename = filename;
+	this->mResult = false;
 	this->mData.Set ( *this, &target );
 	this->mAction = action;
 }
@@ -59,7 +60,8 @@ void MOAIDataIOTask::Publish () {
 		MOAIScopedLuaState state = MOAILuaRuntime::Get ().State ();
 		if ( this->mOnFinish.PushRef ( state )) {
 			this->mData->PushLuaUserdata ( state );
-			state.DebugCall ( 1, 0 );
+			state.Push(this->mResult);
+			state.DebugCall ( 2, 0 );
 		}
 	}
 }
