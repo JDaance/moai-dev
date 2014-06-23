@@ -138,6 +138,7 @@ protected:
 	void			OnDestroy					();
 	void			OnInvalidate				();
 	void			OnLoad						();
+	void			OnUnbind					();
 	void			UpdatePenColor				( float r, float g, float b, float a );
 	void			UpdatePipelineTransforms	( const ZLMatrix4x4& world, const ZLMatrix4x4& view, const ZLMatrix4x4& proj );
 	void			UpdateWorldTransformList	( MOAITransformList *transforms );

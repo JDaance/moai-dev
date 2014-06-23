@@ -123,7 +123,6 @@ void MOAIMesh::DrawIndex ( u32 idx, float xOff, float yOff, float zOff, float xS
 	// TODO: make use of offset and scale
 
 	if ( !this->mVertexBuffer ) return;
-	if ( !this->mVertexBuffer->IsValid ()) return;
 
 	if ( this->mVertexBuffer->Bind ()) {
 		
@@ -163,7 +162,7 @@ ZLBox MOAIMesh::GetItemBounds ( u32 idx ) {
 
 //----------------------------------------------------------------//
 MOAIMesh::MOAIMesh () :
-	mPrimType ( 0 ),
+	mPrimType ( ZGL_PRIM_TRIANGLES  ),
 	mPenWidth ( 1.0f ),
 	mPointSize ( 1.0f ) {
 
