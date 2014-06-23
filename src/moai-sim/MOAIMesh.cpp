@@ -139,11 +139,13 @@ void MOAIMesh::DrawIndex ( u32 idx, float xOff, float yOff, float zOff, float xS
 		if ( this->mIndexBuffer ) {
 			if ( this->mIndexBuffer->LoadGfxState ()) {
 				zglDrawElements ( this->mPrimType, this->mIndexBuffer->GetIndexCount (), ZGL_TYPE_UNSIGNED_SHORT, 0 );
+				this->mIndexBuffer->Unbind();
 			}
 		}
 		else {
 			zglDrawArrays ( this->mPrimType, 0, this->mVertexBuffer->GetVertexCount ());
 		}
+		this->mVertexBuffer->Unbind();
 	}
 }
 

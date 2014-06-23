@@ -36,6 +36,7 @@ using namespace std;
 	#include <GLES/glext.h>
 	#include <GLES2/gl2.h>
 	#include <GLES2/gl2ext.h>
+	#include <EGL/egl.h>
 #endif
 
 #ifdef MOAI_OS_LINUX
@@ -85,6 +86,16 @@ static bool	sIsOpenGLES					= false;
 static bool	sIsProgrammable				= false;
 static u32	sMaxTextureUnits			= 0;
 static u32	sMaxTextureSize				= 0;
+
+#ifdef MOAI_OS_ANDROID
+PFNGLGENVERTEXARRAYSOESPROC glGenVertexArraysOESEXT=NULL;
+PFNGLBINDVERTEXARRAYOESPROC glBindVertexArrayOESEXT=NULL;
+PFNGLDELETEVERTEXARRAYSOESPROC glDeleteVertexArraysOESEXT=NULL;
+
+#define glGenVertexArraysOES glGenVertexArraysOESEXT
+#define glBindVertexArrayOES glBindVertexArrayOESEXT
+#define glDeleteVertexArraysOES glDeleteVertexArraysOESEXT
+#endif
 
 //================================================================//
 // enums
@@ -483,11 +494,11 @@ void zglInitialize () {
 		sIsFramebufferSupported = true;
 	#endif
 
-		#ifdef EMSCRIPTEN 
-			isOpenGLES = true;
-			sIsProgrammable = true;
-			sIsFramebufferSupported = true;
-		#endif
+	#ifdef EMSCRIPTEN 
+		isOpenGLES = true;
+		sIsProgrammable = true;
+		sIsFramebufferSupported = true;
+	#endif
 	
 	#if defined ( __GLEW_H__ )
 	
@@ -520,6 +531,17 @@ void zglInitialize () {
 			}
 		}
 
+	#endif
+
+	#ifdef MOAI_OS_ANDROID
+		glGenVertexArraysOESEXT=(PFNGLGENVERTEXARRAYSOESPROC)eglGetProcAddress("glGenVertexArraysOES");
+		assert(glGenVertexArraysOESEXT);
+
+		glBindVertexArrayOESEXT=(PFNGLBINDVERTEXARRAYOESPROC)eglGetProcAddress("glBindVertexArrayOES");
+		assert(glBindVertexArrayOESEXT);
+
+		glDeleteVertexArraysOESEXT=(PFNGLDELETEVERTEXARRAYSOESPROC)eglGetProcAddress("glDeleteVertexArraysOES");
+		assert(glDeleteVertexArraysOESEXT);
 	#endif
 	
 	int maxTextureUnits = 0;
@@ -1101,7 +1123,7 @@ void* zglMapBuffer ( u32 target ) {
 	
 #ifdef MOAI_OS_WINDOWS
 	return glMapBuffer ( _remapEnum ( target ), 0x88B9 );
-#elif
+#else
 	return glMapBufferOES ( _remapEnum ( target ), 0x88B9 ); // TODO: what's wrong with Xcode?
 #endif
 }
@@ -1111,7 +1133,7 @@ void zglUnmapBuffer ( u32 target ) {
 	
 #ifdef MOAI_OS_WINDOWS
 	glUnmapBuffer ( _remapEnum ( target ));
-#elif
+#else
 	glUnmapBufferOES ( _remapEnum ( target ));
 #endif
 }
@@ -1120,18 +1142,20 @@ void zglUnmapBuffer ( u32 target ) {
 // vertex array
 //================================================================//
 
-// TODO: should not have to do this
-// this is to suppress a false positive error in Xcode
-extern GLvoid glBindVertexArrayOES ( GLuint array );
-extern GLvoid glGenVertexArraysOES ( GLsizei n, GLuint *arrays );
-extern GLvoid glDeleteVertexArraysOES ( GLsizei n, const GLuint *arrays );
+#ifdef MOAI_OS_IPHONE
+	// TODO: should not have to do this
+	// this is to suppress a false positive error in Xcode
+	extern GLvoid glBindVertexArrayOES ( GLuint array );
+	extern GLvoid glGenVertexArraysOES ( GLsizei n, GLuint *arrays );
+	extern GLvoid glDeleteVertexArraysOES ( GLsizei n, const GLuint *arrays );
+#endif
 
 //----------------------------------------------------------------//
 void zglBindVertexArray ( u32 vertexArrayID ) {
 	
 #ifdef MOAI_OS_WINDOWS
 	glBindVertexArray ( vertexArrayID );
-#elif
+#else
 	glBindVertexArrayOES ( vertexArrayID ); // TODO:
 #endif
 }
@@ -1142,7 +1166,7 @@ u32 zglCreateVertexArray () {
 	u32 vertexArrayID;
 #ifdef MOAI_OS_WINDOWS
 	glGenVertexArrays ( 1, &vertexArrayID );
-#elif
+#else
 	glGenVertexArraysOES ( 1, &vertexArrayID ); // TODO:
 #endif
 	return vertexArrayID;
@@ -1153,7 +1177,7 @@ void zglDeleteVertexArray ( u32 vertexArrayID ) {
 	
 #ifdef MOAI_OS_WINDOWS
 	glDeleteVertexArrays ( 1, &vertexArrayID );
-#elif
+#else
 	glDeleteVertexArraysOES ( 1, &vertexArrayID ); // TODO:
 #endif
 }
