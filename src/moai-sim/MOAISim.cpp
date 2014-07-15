@@ -1036,7 +1036,6 @@ void MOAISim::Update () {
 
 	// reset sim time on start
 	if ( this->mLoopState == START ) {
-		
 		this->mRealTime = this->mSimTime;
 		this->mLoopState = RUNNING;
 		
@@ -1044,6 +1043,10 @@ void MOAISim::Update () {
 		// subtract the elapsed CPU time from the budget
 		budget -= this->StepSim ( 0.0, 1 );
 	}
+
+	this->StepSim ( interval, 1 );
+
+	/*
 
 	// 'gap' is the time left to make up between sim time and real time
 	// i.e. the time deficit
@@ -1117,7 +1120,7 @@ void MOAISim::Update () {
 	// if real time is behind sim time (for whatever reason), catch up
 	if (( this->mLoopFlags & SIM_LOOP_NO_SURPLUS ) && ( this->mRealTime < this->mSimTime )) {
 		this->mRealTime = this->mSimTime;
-	}
+	}*/
 	
 	// Measure performance
 	double simEndTime = ZLDeviceTime::GetTimeInSeconds ();
