@@ -14,7 +14,6 @@ class MOAIVertexFormat;
 class MOAIVbo {
 public:
 
-	u32		mVAO; // vertex array
 	u32		mVBO; // vertex buffer
 };
 

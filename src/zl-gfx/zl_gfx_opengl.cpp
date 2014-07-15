@@ -1089,6 +1089,11 @@ void zglBufferData ( u32 target, u32 size, const void* data, u32 usage ) {
 }
 
 //----------------------------------------------------------------//
+void zglBufferSubData ( u32 target, u32 start, u32 size, const void* data ) {
+	glBufferSubData ( _remapEnum ( target ), ( GLsizeiptr )start, ( GLsizeiptr )size, ( const GLvoid* )data );
+}
+
+//----------------------------------------------------------------//
 u32 zglCreateBuffer () {
 
 	u32 bufferID;

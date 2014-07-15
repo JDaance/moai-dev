@@ -231,15 +231,15 @@ void MOAIVertexBuffer::OnBind () {
 		if ( this->mIsDirty ) {
 			
 			zglBindBuffer ( ZGL_BUFFER_TARGET_ARRAY, vbo.mVBO );
-			void* buffer = zglMapBuffer ( ZGL_BUFFER_TARGET_ARRAY );
-			memcpy ( buffer, this->mBuffer, this->mStream.GetLength ());
-			zglUnmapBuffer ( ZGL_BUFFER_TARGET_ARRAY );
+			zglBufferSubData ( ZGL_BUFFER_TARGET_ARRAY, 0, this->mStream.GetLength (), this->mBuffer );
 			zglBindBuffer ( ZGL_BUFFER_TARGET_ARRAY, 0 );
 			
 			this->mIsDirty = false;
 		}
 		
-		zglBindVertexArray ( vbo.mVAO );
+		zglBindBuffer ( ZGL_BUFFER_TARGET_ARRAY, vbo.mVBO );
+		const MOAIVertexFormat* format = this->GetFormat ();
+		MOAIGfxDevice::Get ().SetVertexFormat ( *format, 0 );
 	}
 	else {
 	
@@ -266,24 +266,16 @@ void MOAIVertexBuffer::OnCreate () {
 
 		for ( u32 i = 0; i < this->mVBOs.Size (); ++i ) {
 			MOAIVbo& vbo = this->mVBOs [ i ];
-			
-			vbo.mVAO = zglCreateVertexArray ();
-			if ( vbo.mVAO ) {
-				zglBindVertexArray ( vbo.mVAO );
 				
-				vbo.mVBO = zglCreateBuffer ();
-				if ( vbo.mVBO ) {
+			vbo.mVBO = zglCreateBuffer ();
+			if ( vbo.mVBO ) {
 				
-					zglBindBuffer ( ZGL_BUFFER_TARGET_ARRAY, vbo.mVBO );
-					zglBufferData ( ZGL_BUFFER_TARGET_ARRAY, this->mStream.GetLength (), 0, this->mHint );
-					format->Bind ( 0 );
-					count++;
-				}
-				
-				zglBindVertexArray ( 0 );
-				zglBindBuffer ( ZGL_BUFFER_TARGET_ARRAY, 0 );
-				format->Unbind ();
+				zglBindBuffer ( ZGL_BUFFER_TARGET_ARRAY, vbo.mVBO );
+				zglBufferData ( ZGL_BUFFER_TARGET_ARRAY, this->mStream.GetLength (), 0, this->mHint );
+				count++;
 			}
+				
+			zglBindBuffer ( ZGL_BUFFER_TARGET_ARRAY, 0 );
 		}
 		
 		this->mIsValid = count == this->mVBOs.Size ();
@@ -325,12 +317,11 @@ void MOAIVertexBuffer::OnLoad () {
 
 //----------------------------------------------------------------//
 void MOAIVertexBuffer::OnUnbind () {
-
-	if ( this->mUseVBOs ) {
-		zglBindVertexArray ( 0 );
-	}
-	else if ( this->GetFormat ()) {
+	if ( this->GetFormat ()) {
 		MOAIGfxDevice::Get ().SetVertexFormat ();
+		if ( this->mUseVBOs ) {
+			zglBindBuffer ( ZGL_BUFFER_TARGET_ARRAY, 0 );
+		}
 	}
 }
 
@@ -378,7 +369,6 @@ void MOAIVertexBuffer::ReserveVBOs ( u32 gpuBuffers ) {
 	
 		MOAIVbo blank;
 	
-		blank.mVAO = 0;
 		blank.mVBO = 0;
 		
 		this->mVBOs.Resize ( gpuBuffers, blank );
