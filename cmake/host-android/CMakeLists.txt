@@ -33,7 +33,6 @@ target_link_libraries ( moai
    log
    GLESv1_CM
    GLESv2
-   EGL
 )
 
 #emulate the android ndk build script to help with debugging

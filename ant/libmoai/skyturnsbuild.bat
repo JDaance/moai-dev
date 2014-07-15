@@ -1,1 +1,0 @@
-build.bat --disable-adcolony --disable-billing --disable-chartboost --disable-facebook --disable-tapjoy --disable-twitter

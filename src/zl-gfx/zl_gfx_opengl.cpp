@@ -36,7 +36,6 @@ using namespace std;
 	#include <GLES/glext.h>
 	#include <GLES2/gl2.h>
 	#include <GLES2/gl2ext.h>
-	#include <EGL/egl.h>
 #endif
 
 #ifdef MOAI_OS_LINUX
@@ -86,16 +85,6 @@ static bool	sIsOpenGLES					= false;
 static bool	sIsProgrammable				= false;
 static u32	sMaxTextureUnits			= 0;
 static u32	sMaxTextureSize				= 0;
-
-#ifdef MOAI_OS_ANDROID
-PFNGLGENVERTEXARRAYSOESPROC glGenVertexArraysOESEXT=NULL;
-PFNGLBINDVERTEXARRAYOESPROC glBindVertexArrayOESEXT=NULL;
-PFNGLDELETEVERTEXARRAYSOESPROC glDeleteVertexArraysOESEXT=NULL;
-
-#define glGenVertexArraysOES glGenVertexArraysOESEXT
-#define glBindVertexArrayOES glBindVertexArrayOESEXT
-#define glDeleteVertexArraysOES glDeleteVertexArraysOESEXT
-#endif
 
 //================================================================//
 // enums
@@ -531,17 +520,6 @@ void zglInitialize () {
 			}
 		}
 
-	#endif
-
-	#ifdef MOAI_OS_ANDROID
-		glGenVertexArraysOESEXT=(PFNGLGENVERTEXARRAYSOESPROC)eglGetProcAddress("glGenVertexArraysOES");
-		assert(glGenVertexArraysOESEXT);
-
-		glBindVertexArrayOESEXT=(PFNGLBINDVERTEXARRAYOESPROC)eglGetProcAddress("glBindVertexArrayOES");
-		assert(glBindVertexArrayOESEXT);
-
-		glDeleteVertexArraysOESEXT=(PFNGLDELETEVERTEXARRAYSOESPROC)eglGetProcAddress("glDeleteVertexArraysOES");
-		assert(glDeleteVertexArraysOESEXT);
 	#endif
 	
 	int maxTextureUnits = 0;
@@ -1123,8 +1101,8 @@ void* zglMapBuffer ( u32 target ) {
 	
 #ifdef MOAI_OS_WINDOWS
 	return glMapBuffer ( _remapEnum ( target ), 0x88B9 );
-#else
-	return glMapBufferOES ( _remapEnum ( target ), 0x88B9 ); // TODO: what's wrong with Xcode?
+#elif MOAI_OS_IPHONE
+	return glMapBufferOES ( _remapEnum ( target ), 0x88B9 );
 #endif
 }
 
@@ -1133,7 +1111,7 @@ void zglUnmapBuffer ( u32 target ) {
 	
 #ifdef MOAI_OS_WINDOWS
 	glUnmapBuffer ( _remapEnum ( target ));
-#else
+#elif MOAI_OS_IPHONE
 	glUnmapBufferOES ( _remapEnum ( target ));
 #endif
 }
@@ -1155,8 +1133,8 @@ void zglBindVertexArray ( u32 vertexArrayID ) {
 	
 #ifdef MOAI_OS_WINDOWS
 	glBindVertexArray ( vertexArrayID );
-#else
-	glBindVertexArrayOES ( vertexArrayID ); // TODO:
+#elif MOAI_OS_IPHONE
+	glBindVertexArrayOES ( vertexArrayID );
 #endif
 }
 
@@ -1166,8 +1144,8 @@ u32 zglCreateVertexArray () {
 	u32 vertexArrayID;
 #ifdef MOAI_OS_WINDOWS
 	glGenVertexArrays ( 1, &vertexArrayID );
-#else
-	glGenVertexArraysOES ( 1, &vertexArrayID ); // TODO:
+#elif MOAI_OS_IPHONE
+	glGenVertexArraysOES ( 1, &vertexArrayID );
 #endif
 	return vertexArrayID;
 }
@@ -1177,8 +1155,8 @@ void zglDeleteVertexArray ( u32 vertexArrayID ) {
 	
 #ifdef MOAI_OS_WINDOWS
 	glDeleteVertexArrays ( 1, &vertexArrayID );
-#else
-	glDeleteVertexArraysOES ( 1, &vertexArrayID ); // TODO:
+#elif MOAI_OS_IPHONE
+	glDeleteVertexArraysOES ( 1, &vertexArrayID );
 #endif
 }
 
