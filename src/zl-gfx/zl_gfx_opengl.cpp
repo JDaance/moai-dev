@@ -1073,11 +1073,6 @@ void zglRenderbufferStorage ( u32 internalFormat, u32 width, u32 height ) {
 // buffer
 //================================================================//
 
-// TODO: should not have to do this
-// this is to suppress a false positive error in Xcode
-extern GLvoid* glMapBufferOES ( GLenum target, GLenum access );
-extern GLboolean glUnmapBufferOES ( GLenum target );
-
 //----------------------------------------------------------------//
 void zglBindBuffer ( u32 target, u32 buffer ) {
 	glBindBuffer ( _remapEnum ( target ), buffer );
@@ -1099,70 +1094,6 @@ u32 zglCreateBuffer () {
 	u32 bufferID;
 	glGenBuffers ( 1, &bufferID );
 	return bufferID;
-}
-
-//----------------------------------------------------------------//
-void* zglMapBuffer ( u32 target ) {
-	
-#ifdef MOAI_OS_WINDOWS
-	return glMapBuffer ( _remapEnum ( target ), 0x88B9 );
-#elif MOAI_OS_IPHONE
-	return glMapBufferOES ( _remapEnum ( target ), 0x88B9 );
-#endif
-}
-
-//----------------------------------------------------------------//
-void zglUnmapBuffer ( u32 target ) {
-	
-#ifdef MOAI_OS_WINDOWS
-	glUnmapBuffer ( _remapEnum ( target ));
-#elif MOAI_OS_IPHONE
-	glUnmapBufferOES ( _remapEnum ( target ));
-#endif
-}
-
-//================================================================//
-// vertex array
-//================================================================//
-
-#ifdef MOAI_OS_IPHONE
-	// TODO: should not have to do this
-	// this is to suppress a false positive error in Xcode
-	extern GLvoid glBindVertexArrayOES ( GLuint array );
-	extern GLvoid glGenVertexArraysOES ( GLsizei n, GLuint *arrays );
-	extern GLvoid glDeleteVertexArraysOES ( GLsizei n, const GLuint *arrays );
-#endif
-
-//----------------------------------------------------------------//
-void zglBindVertexArray ( u32 vertexArrayID ) {
-	
-#ifdef MOAI_OS_WINDOWS
-	glBindVertexArray ( vertexArrayID );
-#elif MOAI_OS_IPHONE
-	glBindVertexArrayOES ( vertexArrayID );
-#endif
-}
-
-//----------------------------------------------------------------//
-u32 zglCreateVertexArray () {
-
-	u32 vertexArrayID;
-#ifdef MOAI_OS_WINDOWS
-	glGenVertexArrays ( 1, &vertexArrayID );
-#elif MOAI_OS_IPHONE
-	glGenVertexArraysOES ( 1, &vertexArrayID );
-#endif
-	return vertexArrayID;
-}
-
-//----------------------------------------------------------------//
-void zglDeleteVertexArray ( u32 vertexArrayID ) {
-	
-#ifdef MOAI_OS_WINDOWS
-	glDeleteVertexArrays ( 1, &vertexArrayID );
-#elif MOAI_OS_IPHONE
-	glDeleteVertexArraysOES ( 1, &vertexArrayID );
-#endif
 }
 
 #endif
