@@ -290,7 +290,7 @@ void MOAIVertexBuffer::OnCreate () {
 	}
 	else {
 		const MOAIVertexFormat* format = this->GetFormat ();
-		this->mIsValid = ( format && this->mStream.GetLength ());
+		this->mIsValid = ( format && true );
 	}
 }
 
