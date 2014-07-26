@@ -12,8 +12,6 @@
 #include <moai-core/MOAILuaState-impl.h>
 #include <moai-core/MOAILuaClass-impl.h>
 
-#define MOAI_WITH_LUAJIT 1
-
 #if !MOAI_WITH_LUAJIT
 	#include <lstate.h>
 #endif
