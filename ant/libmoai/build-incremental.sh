@@ -73,65 +73,6 @@ if [ x"$use_luajit" != xtrue ] && [ x"$use_luajit" != xfalse ]; then
     exit 1      
 fi
 
-should_clean=false
-
-# if libmoai already exists, find out which package it was build for
-if [ -f libs/package.txt ]; then
-    existing_use_untz=$( sed -n '1p' libs/package.txt )
-    existing_use_luajit=$( sed -n '2p' libs/package.txt )
-    existing_adcolony_flags=$( sed -n '3p' libs/package.txt )
-    existing_billing_flags=$( sed -n '4p' libs/package.txt )
-    existing_chartboost_flags=$( sed -n '5p' libs/package.txt )
-    existing_crittercism_flags=$( sed -n '6p' libs/package.txt )
-    existing_facebook_flags=$( sed -n '7p' libs/package.txt )
-    existing_push_flags=$( sed -n '8p' libs/package.txt )
-    existing_tapjoy_flags=$( sed -n '9p' libs/package.txt )
-    existing_twitter_flags=$( sed -n '10p' libs/package.txt )
-
-
-
-    if [ x"$existing_use_untz" != x"$use_untz" ]; then
-        should_clean=true
-    fi
-
-
-    if [ x"$existing_adcolony_flags" != x"$adcolony_flags" ]; then
-        should_clean=true
-    fi
-
-    if [ x"$existing_billing_flags" != x"$billing_flags" ]; then
-        should_clean=true
-    fi
-
-    if [ x"$existing_chartboost_flags" != x"$chartboost_flags" ]; then
-        should_clean=true
-    fi
-
-    if [ x"$existing_crittercism_flags" != x"$crittercism_flags" ]; then
-        should_clean=true
-    fi
-
-    if [ x"$existing_facebook_flags" != x"$facebook_flags" ]; then
-        should_clean=true
-    fi
-
-    if [ x"$existing_push_flags" != x"$push_flags" ]; then
-        should_clean=true
-    fi
-
-    if [ x"$existing_tapjoy_flags" != x"$tapjoy_flags" ]; then
-        should_clean=true
-    fi
-    if [ x"$existing_twitter_flags" != x"$twitter_flags" ]; then
-        should_clean=true
-    fi
-
-fi
-
-if [ x"$should_clean" = xtrue ]; then
-    ./clean.sh
-fi
-
 # echo message about what we are doing
 echo "Building libmoai.so via CMAKE"
 
@@ -195,8 +136,6 @@ fi
 
 build_dir=${PWD}
 cd ../../cmake
-rm -rf build
-mkdir build
 cd build
  
 #create our makefiles
