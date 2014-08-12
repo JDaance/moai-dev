@@ -222,6 +222,22 @@ int MOAIFrameBuffer::_grabNextFrame ( lua_State* L ) {
 }
 
 //----------------------------------------------------------------//
+/**	@name	onRender
+	@text	Callback for when frame buffer is rendered
+
+	@in		MOAIFrameBuffer self
+	@in		function callback		The function to execute when a frame has been rendered
+	@out	nil
+*/
+int MOAIFrameBuffer::_onRender ( lua_State* L ) {
+	MOAI_LUA_SETUP ( MOAIFrameBuffer, "U" )
+
+	self->mOnRender.SetRef ( *self, state, 2 );
+
+	return 0;
+}
+
+//----------------------------------------------------------------//
 /**	@name	setRenderTable
 	@text	Sets the table to be used for rendering. This should be
 			an array indexed from 1 consisting of MOAIRenderable objects
@@ -316,6 +332,7 @@ void MOAIFrameBuffer::RegisterLuaFuncs ( MOAILuaState& state ) {
 		{ "getPerformanceDrawCount",	_getPerformanceDrawCount },
 		{ "getRenderTable",				_getRenderTable },
 		{ "grabNextFrame",				_grabNextFrame },
+		{ "onRender",					_onRender },
 		{ "setRenderTable",				_setRenderTable },
 		{ NULL, NULL }
 	};
@@ -355,6 +372,13 @@ void MOAIFrameBuffer::Render () {
 			if ( this->mOnFrameFinish.PushRef ( state )) {
 				state.DebugCall ( 0, 0 );
 			}
+		}
+	}
+	
+	if ( this->mOnRender ) {
+		MOAIScopedLuaState state = MOAILuaRuntime::Get ().State ();
+		if ( this->mOnRender.PushRef ( state )) {
+			state.DebugCall ( 0, 0 );
 		}
 	}
 	
