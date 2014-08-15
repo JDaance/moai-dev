@@ -228,7 +228,8 @@ end
 --============================================================--
 -- MOAIHttpTask
 --============================================================--
-MOAIHttpTask = MOAIHttpTaskNSURL or MOAIHttpTaskNaCl or MOAIHttpTaskCurl 
+MOAIHttpTask = MOAIHttpTaskNSURL or MOAIHttpTaskNaCl or MOAIHttpTaskCurl
+print("Set MOAIHttpTask - is NSURL: ", tostring(MOAIHttpTask == MOAIHttpTaskNSURL))
 
 --============================================================--
 -- MOAILayer
