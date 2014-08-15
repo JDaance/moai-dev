@@ -229,14 +229,7 @@ end
 -- MOAIHttpTask
 --============================================================--
 MOAIHttpTask = MOAIHttpTaskNSURL or MOAIHttpTaskNaCl or MOAIHttpTaskCurl
-print("Set MOAIHttpTask")
-print("is NSURL: ", tostring(MOAIHttpTask == MOAIHttpTaskNSURL))
-print("is NaCl: ", tostring(MOAIHttpTask == MOAIHttpTaskNaCl))
-print("is Curl: ", tostring(MOAIHttpTask == MOAIHttpTaskCurl))
-print("tostring(MOAIHttpTask):", tostring(MOAIHttpTask))
-print("tostring(MOAIHttpTaskNSURL):", tostring(MOAIHttpTaskNSURL))
-print("tostring(MOAIHttpTaskNaCl):", tostring(MOAIHttpTaskNaCl))
-print("tostring(MOAIHttpTaskCurl):", tostring(MOAIHttpTaskCurl))
+print("Set MOAIHttpTask - is NSURL: ", tostring(MOAIHttpTask == MOAIHttpTaskNSURL))
 
 --============================================================--
 -- MOAILayer
