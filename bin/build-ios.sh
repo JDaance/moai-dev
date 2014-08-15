@@ -43,6 +43,7 @@ usage: $0
     [--disable-chartboost] [--disable-crittercism] [--disable-facebook]
     [--disable-gamecenter] [--disable-mobileapptracker] [--disable-push] 
     [--disable-tapjoy] [--disable-twitter] [--simulator] [--release]
+    [--incremental]
     <lua-src-path>
 EOF
     exit 1
@@ -62,6 +63,7 @@ twitter_flags=
 buildtype_flags="Debug"
 windows_flags=
 simulator="false"
+incremental="false"
 
 while [ $# -gt 0 ];	do
     case "$1" in
@@ -78,6 +80,7 @@ while [ $# -gt 0 ];	do
         --disable-twitter)  twitter_flags="-DDISABLE_TWITTER";;
         --release) buildtype_flags="Release";;
         --simulator) simulator="true";;
+        --incremental) incremental="true";;
         -*) usage;;
         *)  break;;	# terminate while loop
     esac
@@ -187,8 +190,12 @@ build_dir=${PWD}
 
 cd `dirname $0`/..
 cd cmake
-rm -rf build
-mkdir build
+
+if [ x"$incremental" == xfalse ]; then
+    rm -rf build
+    mkdir build
+fi
+
 cd build
 
 echo "Building resource list from ${LUASRC}"

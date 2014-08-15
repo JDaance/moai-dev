@@ -18,7 +18,7 @@ fi
 usage="usage: $0  \
     [--use-untz true | false] [--use-luajit true | false] [--disable-adcolony] [--disable-billing] \
     [--disable-chartboost] [--disable-crittercism] [--disable-facebook] [--disable-push] [--disable-tapjoy] \
-    [--disable-twitter] [--disable-playservices] [--windows] [--release]"
+    [--disable-twitter] [--disable-playservices] [--windows] [--release] [--incremental]"
 
 use_untz="true"
 use_luajit="false"
@@ -34,6 +34,7 @@ twitter_flags=
 buildtype_flags="Debug"
 windows_flags=
 playservices_flags=
+incremental="false"
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -50,6 +51,7 @@ while [ $# -gt 0 ]; do
         --disable-playservices)  playservices_flags="-DDISABLE_PLAYSERVICES";;
         --release) buildtype_flags="Release";;
         --windows) windows_flags=-G"MinGW Makefiles";; 
+        --incremental) incremental="true";;
         -*)
             echo >&2 \
                 $usage
@@ -195,8 +197,12 @@ fi
 
 build_dir=${PWD}
 cd ../../cmake
-rm -rf build
-mkdir build
+
+if [ x"$incremental" == xfalse ]; then
+    rm -rf build
+    mkdir build
+fi
+
 cd build
  
 #create our makefiles
