@@ -178,8 +178,8 @@ ZLMatrix4x4 MOAICamera::GetProjMtx ( const MOAIViewport& viewport ) const {
 	}
 	else {
 		
-		float xs = Cot (( this->mFieldOfView * ( float )D2R ) / 2.0f );
-		float ys = xs * viewport.GetAspect ();
+		float ys = Cot (( this->mFieldOfView * ( float )D2R ) / 2.0f );
+		float xs = ys / viewport.GetAspect ();
 		
 		//xs *= viewScale.mX;
 		//ys *= viewScale.mY;
