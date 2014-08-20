@@ -177,9 +177,13 @@ ZLMatrix4x4 MOAICamera::GetProjMtx ( const MOAIViewport& viewport ) const {
 		mtx.Ortho ( xs, ys, this->mNearPlane, this->mFarPlane );
 	}
 	else {
-		
-		float ys = Cot (( this->mFieldOfView * ( float )D2R ) / 2.0f );
-		float xs = ys / viewport.GetAspect ();
+		// dont use x or y as a base for camera scale - use an average between the two
+		float viewX = viewport.Width() / viewScale.mX;
+		float viewY = viewport.Height() / viewScale.mY;
+		float mix = (viewX + viewY)/2.0f;
+		float scaleBase = Cot (( this->mFieldOfView * ( float )D2R ) / 2.0f );
+		float xs = scaleBase * viewY / mix;
+		float ys = scaleBase * viewX / mix;
 		
 		//xs *= viewScale.mX;
 		//ys *= viewScale.mY;
