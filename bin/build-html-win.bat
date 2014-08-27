@@ -12,8 +12,10 @@ goto ERROR
 
 cd %~dp0/..
 cd cmake
+IF "%1"=="--incremental" GOTO INCREMENTAL
 rmdir /s /q build-html
 mkdir build-html
+:INCREMENTAL
 cd build-html
 cmake ^
 -DEMSCRIPTEN_ROOT_PATH=%EMSCRIPTEN_HOME% ^
@@ -38,7 +40,7 @@ cmake ^
 -DMOAI_HTTP_CLIENT=FALSE ^
 -DMOAI_UNTZ=TRUE ^
 -DPLUGIN_SKYTURNS-GEOMETRY-GENERATOR=1 ^
--DPLUGIN_DIR=E:\dev\projekt\skyturns\moai-plugins ^
+-DPLUGIN_DIR=E:\\dev\\projekt\\skyturns\\moai-plugins ^
 -G "MinGW Makefiles" ^
 ..\
 
