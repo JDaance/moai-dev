@@ -229,6 +229,7 @@ xcodebuild -target moai -sdk ${SDK} -arch ${ARCH}
 echo "Build Directory : ${build_dir}"
 
 # Copy libs
+echo "Copying libs to release/ios/${ARCH}/${buildtype_flags}"
 cd ../..
 if [ -d "release/ios/${ARCH}/${buildtype_flags}" ]; then
     rm -fr release/ios/${ARCH}/${buildtype_flags}
