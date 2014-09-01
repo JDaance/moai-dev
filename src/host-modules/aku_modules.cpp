@@ -179,8 +179,6 @@ void AKUModulesContextInitialize () {
 
 //----------------------------------------------------------------//
 void AKUModulesParseArgs ( int argc, char** argv ) {
-	
-	AKURunString("MOAISim.setTraceback(function() end)");
 
 	#if AKU_WITH_TEST
 
