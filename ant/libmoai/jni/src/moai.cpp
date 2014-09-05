@@ -94,6 +94,7 @@
 			INPUTEVENT_COMPASS,
 			INPUTEVENT_LOCATION,
 			INPUTEVENT_TOUCH,
+			INPUTEVENT_TOUCH_CANCEL,
 		};
 
 		// all
@@ -233,6 +234,18 @@
 		inputQueue->Push ( ievent );
 	}
 
+	//----------------------------------------------------------------//
+	extern "C" void Java_com_ziplinegames_moai_Moai_AKUEnqueueTouchEventCancel ( JNIEnv* env, jclass obj, jint deviceId, jint sensorId ) {
+
+		InputEvent ievent;
+
+		ievent.m_type = InputEvent::INPUTEVENT_TOUCH_CANCEL;
+
+		ievent.m_deviceId = deviceId;
+		ievent.m_sensorId = sensorId;
+
+		inputQueue->Push ( ievent );
+	}
 
 
 	//----------------------------------------------------------------//
@@ -240,7 +253,6 @@
         AKUModulesAppFinalize();
         AKUAppFinalize ();
 	}
-
 
 
 	//----------------------------------------------------------------//
@@ -571,6 +583,9 @@
 
 			case InputEvent::INPUTEVENT_TOUCH:
 				AKUEnqueueTouchEvent ( ievent.m_deviceId, ievent.m_sensorId, ievent.m_touchId, ievent.m_down, ievent.m_x, ievent.m_y );
+				break;
+			case InputEvent::INPUTEVENT_TOUCH_CANCEL:
+				AKUEnqueueTouchEventCancel ( ievent.m_deviceId, ievent.m_sensorId );
 				break;
 			case InputEvent::INPUTEVENT_LEVEL:
 				AKUEnqueueLevelEvent ( ievent.m_deviceId, ievent.m_sensorId, ievent.m_x, ievent.m_y, ievent.m_z );
