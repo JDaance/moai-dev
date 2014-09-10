@@ -219,6 +219,7 @@ cmake -DDISABLED_EXT="$disabled_ext" -DMOAI_BOX2D=0 \
 "${windows_flags}" "${make_flags}" \
 -DPLUGIN_SKYTURNS-GEOMETRY-GENERATOR=1 \
 -DPLUGIN_MOAI-HOCKEYAPP-ANDROID=1 \
+-DPLUGIN_MOAI-GETTOUCHES-ANDROID=1 \
 -DPLUGIN_DIR=E:/dev/projekt/skyturns/moai-plugins \
 ../
 #build them    

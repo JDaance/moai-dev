@@ -271,12 +271,12 @@ void AKUModulesUpdate () {
 		AKUHarnessUpdate ()
 	#endif
 
-	#if AKU_WITH_SIM
-		AKUUpdate ();
-	#endif
-
 	#if AKU_WITH_PLUGINS
 		AKUPluginsUpdate ();
+	#endif
+
+	#if AKU_WITH_SIM
+		AKUUpdate ();
 	#endif
 }
 
