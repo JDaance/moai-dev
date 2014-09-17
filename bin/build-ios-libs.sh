@@ -8,15 +8,16 @@
 
 # Set this to a name which will be valid for "codesign -s", or the build
 # will fail.
-SIGN_IDENTITY='iPhone Developer'
 
-codesign_msg=$(codesign -s "$SIGN_IDENTITY" 2>&1)
-case $codesign_msg in
-*": no identity found"*)
-    echo >&2 "Code-signing identity ($SIGN_IDENTITY) is invalid."
-    exit 1
-    ;;
-esac
+#SIGN_IDENTITY='iPhone Developer'
+
+#codesign_msg=$(codesign -s "$SIGN_IDENTITY" 2>&1)
+#case $codesign_msg in
+#*": no identity found"*)
+#    echo >&2 "Code-signing identity ($SIGN_IDENTITY) is invalid."
+#    exit 1
+#    ;;
+#esac
 
 set -e
 
@@ -32,9 +33,9 @@ report_error() {
 
 trap 'report_error' 0
 
-APP_NAME='Moai App'
-APP_ID='com.getmoai.moaiapp'
-APP_VERSION='1.0'
+#APP_NAME='Moai App'
+#APP_ID='com.getmoai.moaiapp'
+#APP_VERSION='1.0'
 
 usage() {
     cat >&2 <<EOF
@@ -44,7 +45,6 @@ usage: $0
     [--disable-gamecenter] [--disable-mobileapptracker] [--disable-push] 
     [--disable-tapjoy] [--disable-twitter] [--simulator] [--release]
     [--incremental]
-    <lua-src-path>
 EOF
     exit 1
 }
@@ -87,22 +87,22 @@ while [ $# -gt 0 ];	do
     shift
 done
 
-if [ $# != 1 ]; then
-    usage
-fi
+#if [ $# != 1 ]; then
+#    usage
+#fi
 
-LUASRC=$(ruby -e 'puts File.expand_path(ARGV.first)' "$1")
+#LUASRC=$(ruby -e 'puts File.expand_path(ARGV.first)' "$1")
 
-if [ ! -f "${LUASRC}/main.lua" ]; then
-    echo -n "Please enter the directory path of the Lua source. > "
-    read LUASRC
-    LUASRC=$(ruby -e 'puts File.expand_path(ARGV.first)' "$LUASRC")
+#if [ ! -f "${LUASRC}/main.lua" ]; then
+#    echo -n "Please enter the directory path of the Lua source. > "
+#    read LUASRC
+#    LUASRC=$(ruby -e 'puts File.expand_path(ARGV.first)' "$LUASRC")
 
-    if [ ! -f "${LUASRC}/main.lua" ]; then
-        echo "Could not find main.lua in specified lua source directory [${LUASRC}]"
-        exit 1
-    fi
-fi
+#    if [ ! -f "${LUASRC}/main.lua" ]; then
+#        echo "Could not find main.lua in specified lua source directory [${LUASRC}]"
+#        exit 1
+#    fi
+#fi
 
 if [ x"$use_untz" != xtrue ] && [ x"$use_untz" != xfalse ]; then
     usage
@@ -112,7 +112,7 @@ fi
 XCODEPATH=$(xcode-select --print-path)
 
 if [ x"$simulator" == xtrue ]; then
-echo "RUNNING SIMULATOR $simulator"
+#echo "RUNNING SIMULATOR $simulator"
 PLATFORM_PATH=${XCODEPATH}/Platforms/iPhoneSimulator.platform/Developer
 PLATFORM=SIMULATOR
 SDK=iphonesimulator
@@ -125,7 +125,7 @@ ARCH=armv7
 fi
 
 # echo message about what we are doing
-echo "Building moai.app via CMAKE"
+#echo "Building moai.app via CMAKE"
 
 disabled_ext=
     
@@ -198,8 +198,8 @@ fi
 
 cd build
 
-echo "Building resource list from ${LUASRC}"
-ruby ../host-ios/build_resources.rb "${LUASRC}"
+#echo "Building resource list from ${LUASRC}"
+#ruby ../host-ios/build_resources.rb "${LUASRC}"
 
 echo "Creating xcode project"
 
@@ -211,21 +211,13 @@ cmake -DDISABLED_EXT="$disabled_ext" -DMOAI_BOX2D=0 \
 -DMOAI_TINYXML=1 -DMOAI_PNG=1 -DMOAI_SFMT=1 -DMOAI_VORBIS=1 $untz_param \
 -DMOAI_LUAJIT=1 \
 -DBUILD_IOS=true \
--DBUILD_IOS_HOST=true \
--DSIGN_IDENTITY="${SIGN_IDENTITY}" \
--DAPP_NAME="${APP_NAME}" \
--DAPP_ID="${APP_ID}" \
--DAPP_VERSION="${APP_VERSION}" \
 -DCMAKE_BUILD_TYPE=$buildtype_flags \
 -DPLUGIN_SKYTURNS-GEOMETRY-GENERATOR=1 \
 -DPLUGIN_DIR=/Users/jr/dev/projekt/skyturns/moai-plugins \
 -G "Xcode" \
 ../
 
-#-DCMAKE_TOOLCHAIN_FILE="${PWD}/../host-ios/iOS.cmake" \
-#-DCMAKE_IOS_DEVELOPER_ROOT="${PLATFORM_PATH}" \
-      #build them
-xcodebuild -target moai -sdk ${SDK} -arch ${ARCH}
+xcodebuild -target host-modules -target moai-iphone -target moai-audiosampler -target moai-sim -target moai-util -target moai-core -target zlcore -sdk ${SDK} -arch ${ARCH}
 
 echo "Build Directory : ${build_dir}"
 
@@ -236,8 +228,6 @@ if [ -d "release/ios/${ARCH}/${buildtype_flags}" ]; then
     rm -fr release/ios/${ARCH}/${buildtype_flags}
 fi
 
-mkdir -p release/ios/${ARCH}/${buildtype_flags}/app
 mkdir -p release/ios/${ARCH}/${buildtype_flags}/lib
 
-find cmake/build -name "*.app" | xargs -J % cp -fRp % release/ios/${ARCH}/${buildtype_flags}/app
 find cmake/build -name "*.a" | xargs -J % cp -fp % release/ios/${ARCH}/${buildtype_flags}/lib

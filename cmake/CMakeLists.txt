@@ -312,14 +312,17 @@ endif ( BUILD_HTML )
 
 if ( BUILD_ANDROID )
   add_subdirectory ( moai-android )
-    add_subdirectory ( host-android )
+  add_subdirectory ( host-android )
 endif ( BUILD_ANDROID )
 
 if ( BUILD_IOS )
   add_subdirectory ( moai-iphone )
   add_subdirectory ( moai-audiosampler )
-     add_subdirectory ( host-ios )
 endif ( BUILD_IOS )
+
+if ( BUILD_IOS_HOST )
+  add_subdirectory ( host-ios )
+endif ( BUILD_IOS_HOST )
 
 if ( BUILD_SERVER )
   add_subdirectory ( moaiext-server )
