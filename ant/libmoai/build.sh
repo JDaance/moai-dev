@@ -18,7 +18,8 @@ fi
 usage="usage: $0  \
     [--use-untz true | false] [--use-luajit true | false] [--disable-adcolony] [--disable-billing] \
     [--disable-chartboost] [--disable-crittercism] [--disable-facebook] [--disable-push] [--disable-tapjoy] \
-    [--disable-twitter] [--disable-playservices] [--windows] [--release] [--incremental]"
+    [--disable-twitter] [--disable-playservices] [--windows] [--release] [--incremental] \
+    [--architecture <arch as in android.toolchain.cmake>]"
 
 use_untz="true"
 use_luajit="false"
@@ -35,6 +36,7 @@ buildtype_flags="Debug"
 windows_flags=
 playservices_flags=
 incremental="false"
+architecture="armeabi-v7a"
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -52,6 +54,7 @@ while [ $# -gt 0 ]; do
         --release) buildtype_flags="Release";;
         --windows) windows_flags=-G"MinGW Makefiles";; 
         --incremental) incremental="true";;
+        --architecture) architecture="$2"; shift;;
         -*)
             echo >&2 \
                 $usage
@@ -73,65 +76,6 @@ fi
 if [ x"$use_luajit" != xtrue ] && [ x"$use_luajit" != xfalse ]; then
     echo $usage
     exit 1      
-fi
-
-should_clean=false
-
-# if libmoai already exists, find out which package it was build for
-if [ -f libs/package.txt ]; then
-    existing_use_untz=$( sed -n '1p' libs/package.txt )
-    existing_use_luajit=$( sed -n '2p' libs/package.txt )
-    existing_adcolony_flags=$( sed -n '3p' libs/package.txt )
-    existing_billing_flags=$( sed -n '4p' libs/package.txt )
-    existing_chartboost_flags=$( sed -n '5p' libs/package.txt )
-    existing_crittercism_flags=$( sed -n '6p' libs/package.txt )
-    existing_facebook_flags=$( sed -n '7p' libs/package.txt )
-    existing_push_flags=$( sed -n '8p' libs/package.txt )
-    existing_tapjoy_flags=$( sed -n '9p' libs/package.txt )
-    existing_twitter_flags=$( sed -n '10p' libs/package.txt )
-
-
-
-    if [ x"$existing_use_untz" != x"$use_untz" ]; then
-        should_clean=true
-    fi
-
-
-    if [ x"$existing_adcolony_flags" != x"$adcolony_flags" ]; then
-        should_clean=true
-    fi
-
-    if [ x"$existing_billing_flags" != x"$billing_flags" ]; then
-        should_clean=true
-    fi
-
-    if [ x"$existing_chartboost_flags" != x"$chartboost_flags" ]; then
-        should_clean=true
-    fi
-
-    if [ x"$existing_crittercism_flags" != x"$crittercism_flags" ]; then
-        should_clean=true
-    fi
-
-    if [ x"$existing_facebook_flags" != x"$facebook_flags" ]; then
-        should_clean=true
-    fi
-
-    if [ x"$existing_push_flags" != x"$push_flags" ]; then
-        should_clean=true
-    fi
-
-    if [ x"$existing_tapjoy_flags" != x"$tapjoy_flags" ]; then
-        should_clean=true
-    fi
-    if [ x"$existing_twitter_flags" != x"$twitter_flags" ]; then
-        should_clean=true
-    fi
-
-fi
-
-if [ x"$should_clean" = xtrue ]; then
-    ./clean.sh
 fi
 
 # echo message about what we are doing
@@ -195,15 +139,16 @@ if [ x"$twitter_flags" != x ]; then
     disabled_ext="$disabled_extTWITTER;"
 fi 
 
-build_dir=${PWD}
 cd ../../cmake
 
+build_dir_name="build-android-${architecture}"
+
 if [ x"$incremental" == xfalse ]; then
-    rm -rf build
-    mkdir build
+    rm -rf $build_dir_name
 fi
 
-cd build
+mkdir -p $build_dir_name
+cd $build_dir_name
  
 #create our makefiles
 cmake -DDISABLED_EXT="$disabled_ext" -DMOAI_BOX2D=0 \
@@ -214,11 +159,14 @@ cmake -DDISABLED_EXT="$disabled_ext" -DMOAI_BOX2D=0 \
 -DBUILD_ANDROID=true \
 -DCMAKE_TOOLCHAIN_FILE="../host-android/android.toolchain.cmake" \
 -DLIBRARY_OUTPUT_PATH_ROOT="../../ant/libmoai" \
--DANDROID_NDK=${ANDROID_NDK}  \
+-DANDROID_NDK=${ANDROID_NDK} \
+-DANDROID_ABI="${architecture}" \
 -DCMAKE_BUILD_TYPE=$buildtype_flags \
 "${windows_flags}" "${make_flags}" \
 -DPLUGIN_SKYTURNS-GEOMETRY-GENERATOR=1 \
 -DPLUGIN_MOAI-HOCKEYAPP-ANDROID=1 \
+-DPLUGIN_MOAI-GETTOUCHES-ANDROID=1 \
+-DPLUGIN_SKYTURNS-INFO=1 \
 -DPLUGIN_DIR=E:/dev/projekt/skyturns/moai-plugins \
 ../
 #build them    
@@ -227,20 +175,3 @@ if [ x"$windows_flags" != x ]; then
 else
   cmake --build . --target moai -- -j4
 fi  
-
-
-cd ${build_dir}
-
-# create text file that shows the settings libmoai.so was built with (this time)
-rm -f libs/package.txt
-echo "$use_untz" >> libs/package.txt
-echo "$use_luajit" >> libs/package.txt
-echo "$adcolony_flags" >> libs/package.txt
-echo "$billing_flags" >> libs/package.txt
-echo "$chartboost_flags" >> libs/package.txt
-echo "$crittercism_flags" >> libs/package.txt
-echo "$facebook_flags" >> libs/package.txt
-echo "$push_flags" >> libs/package.txt
-echo "$tapjoy_flags" >> libs/package.txt
-echo "$twitter_flags" >> libs/package.txt
-echo "$playservices_flags" >> libs/package.txt
