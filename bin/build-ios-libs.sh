@@ -191,12 +191,14 @@ build_dir=${PWD}
 cd `dirname $0`/..
 cd cmake
 
+build_dir_name="build-ios-${ARCH}-${buildtype_flags}"
+
 if [ x"$incremental" == xfalse ]; then
-    rm -rf build
-    mkdir build
+    rm -rf $build_dir_name
 fi
 
-cd build
+mkdir -p $build_dir_name
+cd $build_dir_name
 
 #echo "Building resource list from ${LUASRC}"
 #ruby ../host-ios/build_resources.rb "${LUASRC}"
@@ -231,4 +233,4 @@ fi
 
 mkdir -p release/ios/${ARCH}/${buildtype_flags}/lib
 
-find cmake/build -name "*.a" | xargs -J % cp -fp % release/ios/${ARCH}/${buildtype_flags}/lib
+find cmake/${build_dir_name} -name "*.a" | xargs -J % cp -fp % release/ios/${ARCH}/${buildtype_flags}/lib
