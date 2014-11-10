@@ -214,6 +214,7 @@ cmake -DDISABLED_EXT="$disabled_ext" -DMOAI_BOX2D=0 \
 -DMOAI_LUAJIT=1 \
 -DBUILD_IOS=true \
 -DCMAKE_BUILD_TYPE=$buildtype_flags \
+-DPLUGIN_MOAI-FMOD-STUDIO=1 \
 -DPLUGIN_SKYTURNS-GEOMETRY-GENERATOR=1 \
 -DPLUGIN_SKYTURNS-INFO=1 \
 -DPLUGIN_DIR=/Users/jr/dev/projekt/skyturns/moai-plugins \
