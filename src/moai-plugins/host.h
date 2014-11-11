@@ -12,6 +12,7 @@
 AKU_API void	AKUPluginsAppFinalize				();
 AKU_API void	AKUPluginsAppInitialize				();
 AKU_API void	AKUPluginsContextInitialize			();
+AKU_API void	AKUPluginsPause						( bool pause );
 AKU_API void    AKUPluginsUpdate 					();
 
 #endif

@@ -289,6 +289,9 @@ void AKUModulesPause () {
 		AKUPause ( true );
 	#endif
 
+	#if AKU_WITH_PLUGINS
+		AKUPluginsPause ( true );
+	#endif
 }
 
 void AKUModulesResume () {
@@ -298,5 +301,9 @@ void AKUModulesResume () {
 
 	#if AKU_WITH_SIM
 		AKUPause ( false );
+	#endif
+
+	#if AKU_WITH_PLUGINS
+		AKUPluginsPause ( false );
 	#endif
 }

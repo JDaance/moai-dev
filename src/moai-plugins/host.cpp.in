@@ -22,6 +22,12 @@ void AKUPluginsContextInitialize () {
   	@PLUGIN_CONTEXTINITIALIZE@
 }
 
+//----------------------------------------------------------------//
+void AKUPluginsPause ( bool pause ) {
+  	@PLUGIN_PAUSE@
+}
+
+//----------------------------------------------------------------//
 void AKUPluginsUpdate () {
   	@PLUGIN_UPDATE@
 }
