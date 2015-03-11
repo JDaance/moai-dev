@@ -11,10 +11,8 @@ class MOAIColor;
 class MOAITransformBase;
 class MOAITransformList;
 	
-#define		OPENGL_PREPROC		"#define LOWP\n #define MEDP\n"
+#define		OPENGL_PREPROC		"#define LOWP\n #define MEDP\n #define lowp\n #define mediump\n #define highp\n"
 #define		OPENGL_ES_PREPROC	"#define LOWP lowp\n #define MEDP mediump\n precision mediump int; precision mediump float;"
-
-#define		WEBGL_PREPROC "precision mediump int;\n precision mediump float;\n"
 
 //================================================================//
 // MOAIShaderUniform
@@ -131,7 +129,7 @@ protected:
 	u32				CompileShader				( u32 type, cc8* source );
 	bool			IsRenewable					();
 	void			PrintProgramLog				( u32 program );
-	void			PrintShaderLog				( u32 shader );
+	void			PrintShaderLog				( u32 shader, cc8* preproc, cc8* source );
 	void			OnBind						();
 	void			OnClear						();
 	void			OnCreate					();

@@ -751,25 +751,20 @@ u32 MOAIShader::CompileShader ( u32 type, cc8* source ) {
 
 	u32 shader = zglCreateShader ( type );
 
-	cc8* sources [ 3 ];
+	cc8* preproc = gfxDevice.IsOpenGLES () ? OPENGL_ES_PREPROC : OPENGL_PREPROC;
 
-	sources [ 0 ] = gfxDevice.IsOpenGLES () ? OPENGL_ES_PREPROC : OPENGL_PREPROC;
-	if ((type == ZGL_SHADER_TYPE_FRAGMENT) && gfxDevice.IsOpenGLES() ) {
-		sources [ 1 ] = WEBGL_PREPROC;
-	} else {
-		sources [ 1 ] = " ";
-	}
+	cc8* sources [ 2 ];
+	sources [ 0 ] = preproc;
+	sources [ 1 ] = source;
 
-	sources [ 2 ] = source;
-
-	zglShaderSource ( shader, 3, sources, NULL );
+	zglShaderSource ( shader, 2, sources, NULL );
 	zglCompileShader ( shader );
 
 	s32 status;
 	zglGetShaderiv ( shader, ZGL_SHADER_INFO_COMPILE_STATUS, &status );
 
 	if ( status == 0 ) {
-		this->PrintShaderLog ( shader );
+		this->PrintShaderLog ( shader, preproc, source );
 		zglDeleteShader ( shader );
 		return 0;
 	}
@@ -954,7 +949,7 @@ void MOAIShader::OnUnbind () {
 }
 
 //----------------------------------------------------------------//
-void MOAIShader::PrintShaderLog ( u32 shader ) {
+void MOAIShader::PrintShaderLog ( u32 shader, cc8* preproc, cc8* source ) {
 	
 	s32 logLength;
 	zglGetShaderiv ( shader, ZGL_SHADER_INFO_LOG_LENGTH, &logLength );
@@ -962,7 +957,7 @@ void MOAIShader::PrintShaderLog ( u32 shader ) {
 	if ( logLength > 1 ) {
 		char* log = ( char* )malloc ( logLength );
 		zglGetShaderInfoLog ( shader, logLength, ( u32* )&logLength, log );
-		MOAILog ( 0, MOAILogMessages::MOAIShader_ShaderInfoLog_S, log );
+		MOAILog ( 0, MOAILogMessages::MOAIShader_ShaderInfoLog_S, log, preproc, source );
 		free ( log );
 	}
 }

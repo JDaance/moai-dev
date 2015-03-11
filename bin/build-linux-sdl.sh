@@ -12,8 +12,8 @@
 
 cd `dirname $0`/..
 cd cmake
-rm -rf build
-mkdir build
+#rm -rf build
+mkdir -p build
 cd build
 cmake \
 -DBUILD_LINUX=TRUE \
@@ -36,8 +36,12 @@ cmake \
 -DMOAI_SFMT=TRUE \
 -DMOAI_VORBIS=TRUE \
 -DMOAI_UNTZ=TRUE \
--DMOAI_LUAJIT=TRUE \
+-DMOAI_LUAJIT=FALSE \
 -DMOAI_HTTP_CLIENT=TRUE \
+-DPLUGIN_MOAI-FMOD-STUDIO=1 \
+-DPLUGIN_SKYTURNS-GEOMETRY-GENERATOR=1 \
+-DPLUGIN_SKYTURNS-INFO=1 \
+-DPLUGIN_DIR=/home/tall/dev/projekt/skyturns/moai-plugins \
 -DCMAKE_BUILD_TYPE=Release \
 ../
 

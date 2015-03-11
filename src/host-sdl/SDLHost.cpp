@@ -117,8 +117,6 @@ void Init ( int argc, char** argv ) {
 	AKUSetFunc_ExitFullscreenMode ( _AKUExitFullscreenModeFunc );
 	AKUSetFunc_OpenWindow ( _AKUOpenWindowFunc );
 	
-	AKURunString("MOAIEnvironment.isWindows = true");
-	
 	AKUModulesParseArgs ( argc, argv );
 	
 	atexit ( Finalize ); // do this *after* SDL_Init
