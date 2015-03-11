@@ -10,3 +10,4 @@
 [submodule "3rdparty/TouchControlOverlay"]
 	path = 3rdparty/TouchControlOverlay
 	url = git://github.com/blackberry/TouchControlOverlay.git
+	ignore = dirty
