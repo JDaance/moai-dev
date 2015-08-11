@@ -44,7 +44,7 @@ usage: $0
     [--disable-chartboost] [--disable-crittercism] [--disable-facebook]
     [--disable-gamecenter] [--disable-mobileapptracker] [--disable-push] 
     [--disable-tapjoy] [--disable-twitter] [--simulator] [--release]
-    [--incremental]
+    [--incremental] [--arm64]
 EOF
     exit 1
 }
@@ -64,6 +64,7 @@ buildtype_flags="Debug"
 windows_flags=
 simulator="false"
 incremental="false"
+arm64="false"
 
 while [ $# -gt 0 ];	do
     case "$1" in
@@ -81,6 +82,7 @@ while [ $# -gt 0 ];	do
         --release) buildtype_flags="Release";;
         --simulator) simulator="true";;
         --incremental) incremental="true";;
+        --arm64) arm64="true";;
         -*) usage;;
         *)  break;;	# terminate while loop
     esac
@@ -116,14 +118,16 @@ if [ x"$simulator" == xtrue ]; then
 PLATFORM_PATH=${XCODEPATH}/Platforms/iPhoneSimulator.platform/Developer
 PLATFORM=SIMULATOR
 SDK=iphonesimulator
-DIR=simulator
-ARCHS=i386
+ARCH=i386
 else
 PLATFORM_PATH=${XCODEPATH}/Platforms/iPhone.platform/Developer
 PLATFORM=OS
 SDK=iphoneos
-DIR=phone
-ARCHS="armv7 arm64 i386"
+ARCH=armv7
+fi
+
+if [ x"$arm64" == xtrue ]; then
+ARCH=arm64
 fi
 
 # echo message about what we are doing
@@ -193,7 +197,7 @@ build_dir=${PWD}
 cd `dirname $0`/..
 cd cmake
 
-build_dir_name="build-ios-${DIR}-${buildtype_flags}"
+build_dir_name="build-ios-${ARCH}-${buildtype_flags}"
 
 if [ x"$incremental" == xfalse ]; then
     rm -rf $build_dir_name
@@ -223,17 +227,17 @@ cmake -DDISABLED_EXT="$disabled_ext" -DMOAI_BOX2D=0 \
 -G "Xcode" \
 ../
 
-xcodebuild ONLY_ACTIVE_ARCH=NO ARCHS="${ARCHS}" -target host-modules -target moai-iphone -target moai-audiosampler -target moai-sim -target moai-util -target moai-core -target zlcore -sdk ${SDK}
+xcodebuild -target host-modules -target moai-iphone -target moai-audiosampler -target moai-sim -target moai-util -target moai-core -target zlcore -sdk ${SDK} -arch ${ARCH}
 
 echo "Build Directory : ${build_dir}"
 
 # Copy libs
-echo "Copying libs to release/ios/${DIR}/${buildtype_flags}"
+echo "Copying libs to release/ios/${ARCH}/${buildtype_flags}"
 cd ../..
-if [ -d "release/ios/${DIR}/${buildtype_flags}" ]; then
-    rm -fr release/ios/${DIR}/${buildtype_flags}
+if [ -d "release/ios/${ARCH}/${buildtype_flags}" ]; then
+    rm -fr release/ios/${ARCH}/${buildtype_flags}
 fi
 
-mkdir -p release/ios/${DIR}/${buildtype_flags}/lib
+mkdir -p release/ios/${ARCH}/${buildtype_flags}/lib
 
-find cmake/${build_dir_name} -name "*.a" | xargs -J % cp -fp % release/ios/${DIR}/${buildtype_flags}/lib
+find cmake/${build_dir_name} -name "*.a" | xargs -J % cp -fp % release/ios/${ARCH}/${buildtype_flags}/lib
