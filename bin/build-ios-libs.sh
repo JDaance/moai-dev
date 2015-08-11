@@ -116,12 +116,14 @@ if [ x"$simulator" == xtrue ]; then
 PLATFORM_PATH=${XCODEPATH}/Platforms/iPhoneSimulator.platform/Developer
 PLATFORM=SIMULATOR
 SDK=iphonesimulator
-ARCH=i386
+DIR=simulator
+ARCHS=i386
 else
 PLATFORM_PATH=${XCODEPATH}/Platforms/iPhone.platform/Developer
 PLATFORM=OS
 SDK=iphoneos
-ARCH=armv7
+DIR=phone
+ARCHS="armv7 arm64 i386"
 fi
 
 # echo message about what we are doing
@@ -191,7 +193,7 @@ build_dir=${PWD}
 cd `dirname $0`/..
 cd cmake
 
-build_dir_name="build-ios-${ARCH}-${buildtype_flags}"
+build_dir_name="build-ios-${DIR}-${buildtype_flags}"
 
 if [ x"$incremental" == xfalse ]; then
     rm -rf $build_dir_name
@@ -207,7 +209,7 @@ echo "Creating xcode project"
 
 #create our makefiles
 cmake -DDISABLED_EXT="$disabled_ext" -DMOAI_BOX2D=0 \
--DMOAI_CHIPMUNK=0 -DMOAI_CURL=1 -DMOAI_CRYPTO=0 -DMOAI_EXPAT=1 -DMOAI_FREETYPE=1 \
+-DMOAI_CHIPMUNK=0 -DMOAI_CURL=0 -DMOAI_CRYPTO=0 -DMOAI_EXPAT=1 -DMOAI_FREETYPE=1 \
 -DMOAI_HTTP_CLIENT=1 -DMOAI_JSON=1 -DMOAI_JPG=1 -DMOAI_LUAEXT=1 \
 -DMOAI_MONGOOSE=1 -DMOAI_OGG=1 -DMOAI_OPENSSL=0 -DMOAI_SQLITE3=1 \
 -DMOAI_TINYXML=1 -DMOAI_PNG=1 -DMOAI_SFMT=1 -DMOAI_VORBIS=1 $untz_param \
@@ -221,17 +223,17 @@ cmake -DDISABLED_EXT="$disabled_ext" -DMOAI_BOX2D=0 \
 -G "Xcode" \
 ../
 
-xcodebuild -target host-modules -target moai-iphone -target moai-audiosampler -target moai-sim -target moai-util -target moai-core -target zlcore -sdk ${SDK} -arch ${ARCH}
+xcodebuild ONLY_ACTIVE_ARCH=NO ARCHS="${ARCHS}" -target host-modules -target moai-iphone -target moai-audiosampler -target moai-sim -target moai-util -target moai-core -target zlcore -sdk ${SDK}
 
 echo "Build Directory : ${build_dir}"
 
 # Copy libs
-echo "Copying libs to release/ios/${ARCH}/${buildtype_flags}"
+echo "Copying libs to release/ios/${DIR}/${buildtype_flags}"
 cd ../..
-if [ -d "release/ios/${ARCH}/${buildtype_flags}" ]; then
-    rm -fr release/ios/${ARCH}/${buildtype_flags}
+if [ -d "release/ios/${DIR}/${buildtype_flags}" ]; then
+    rm -fr release/ios/${DIR}/${buildtype_flags}
 fi
 
-mkdir -p release/ios/${ARCH}/${buildtype_flags}/lib
+mkdir -p release/ios/${DIR}/${buildtype_flags}/lib
 
-find cmake/${build_dir_name} -name "*.a" | xargs -J % cp -fp % release/ios/${ARCH}/${buildtype_flags}/lib
+find cmake/${build_dir_name} -name "*.a" | xargs -J % cp -fp % release/ios/${DIR}/${buildtype_flags}/lib
