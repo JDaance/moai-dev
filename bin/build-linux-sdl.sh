@@ -13,8 +13,8 @@
 cd `dirname $0`/..
 cd cmake
 #rm -rf build
-mkdir -p build
-cd build
+mkdir -p build-linux
+cd build-linux
 cmake \
 -DBUILD_LINUX=TRUE \
 -DSDL_HOST=TRUE \
