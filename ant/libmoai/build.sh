@@ -169,7 +169,7 @@ cmake -DDISABLED_EXT="$disabled_ext" -DMOAI_BOX2D=0 \
 -DPLUGIN_MOAI-GETTOUCHES-ANDROID=1 \
 -DPLUGIN_MOAI-SOUND-ANDROID=1 \
 -DPLUGIN_SKYTURNS-INFO=1 \
--DPLUGIN_DIR=/home/tall/dev/projekt/skyturns/moai-plugins \
+-DPLUGIN_DIR=/home/joakim/dev/projekt/skyturns/moai-plugins \
 ../
 #build them    
 if [ x"$windows_flags" != x ]; then

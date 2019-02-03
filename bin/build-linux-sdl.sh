@@ -41,7 +41,7 @@ cmake \
 -DPLUGIN_MOAI-FMOD-STUDIO=1 \
 -DPLUGIN_SKYTURNS-GEOMETRY-GENERATOR=1 \
 -DPLUGIN_SKYTURNS-INFO=1 \
--DPLUGIN_DIR=/home/tall/dev/projekt/skyturns/moai-plugins \
+-DPLUGIN_DIR=/home/joakim/dev/projects/skyturns/moai-plugins \
 -DCMAKE_BUILD_TYPE=Release \
 ../
 
