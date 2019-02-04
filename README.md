@@ -1,5 +1,7 @@
 # Welcome to Moai!
 
+This is an old version, like 1.6, modified for Skyturns
+
 Thanks for checking out the Moai source code. Here's the scoop.
 
 Linux CI: [![Build Status](https://travis-ci.org/moaiforge/moai-sdk.png?branch=master)](https://travis-ci.org/moaiforge/moai-sdk)
