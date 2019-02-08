@@ -1,4 +1,4 @@
-// Copyright (c) 2010-2011 Zipline Games, Inc. All Rights Reserved.
+// Copyright (c) 2010-2017 Zipline Games, Inc. All Rights Reserved.
 // http://getmoai.com
 
 #ifndef	HTMLHOST
@@ -6,29 +6,42 @@
 
 //----------------------------------------------------------------//
 extern "C" {
-	void RefreshContext			();
-	void Cleanup				();
-
-	void onKeyDown 				( unsigned char key);
-	void onKeyUp 				( unsigned char key );
-	void onMouseButton 			( int button, int state  );
-	void onMouseDrag 			( int x, int y );
-	void onMouseMove 			( int x, int y );
-	void onMouseWheel 			( int scroll );
-	void onPaint 				();
-	void onReshape				( int w, int h );
-	void onTimer 				();
-	void onMessageFromJs 		( const char* jsonString );
-}
+  void RefreshContext();
+  void Cleanup();
 
 //----------------------------------------------------------------//
-extern "C" {
-	//js callbacks
-	void EnterFullScreen		();
-	void ExitFullScreen			();
-	void OpenWindowFunc			( const char* title, int width, int height );
-	void RestoreFile			( const char* path, int data );
-	void PushMessageToJs		( const char* jsonString );
+void onKeyDown ( int key);
+
+//----------------------------------------------------------------//
+void onKeyUp ( int key );
+
+//----------------------------------------------------------------//
+void onMouseButton ( int button, int state  );
+
+//----------------------------------------------------------------//
+void onMouseDrag ( int x, int y )             ;
+//----------------------------------------------------------------//
+void onMouseMove ( int x, int y )              ;
+
+//----------------------------------------------------------------//
+void onPaint () ;
+//----------------------------------------------------------------//
+void onReshape( int w, int h );
+
+//----------------------------------------------------------------//
+void onTimer ( )               ;
+void onMessageFromJs 		( const char* jsonString );
+
+
+  //js callbacks
+  void EnterFullScreen();
+  void ExitFullScreen();
+  void OpenWindowFunc(const char* title, int width, int height);
+  void RestoreFile(const char* path, int data);
+  const char *CallStringFunc(char *func);
+  void PushMessageToJs		( const char* jsonString );
 }
+
+
 
 #endif

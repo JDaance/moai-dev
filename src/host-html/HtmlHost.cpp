@@ -1,4 +1,4 @@
-// Copyright (c) 2010-2011 Zipline Games, Inc. All Rights Reserved.
+// Copyright (c) 2010-2017 Zipline Games, Inc. All Rights Reserved.
 // http://getmoai.com
 
 #include <stdio.h>
@@ -9,7 +9,9 @@
 #include <host-html/MOAIApp.h>
 #include <string.h>
 #include <host-modules/aku_modules.h>
+#include <moai-core/headers.h>
 
+#include <emscripten.h>
 #define UNUSED(p) (( void )p)
 
 
@@ -25,7 +27,6 @@ namespace HtmlInputDeviceSensorID {
 	enum {
 		KEYBOARD,
 		POINTER,
-		WHEEL,
 		MOUSE_LEFT,
 		MOUSE_MIDDLE,
 		MOUSE_RIGHT,
@@ -60,14 +61,15 @@ static int sModifiers;
 //================================================================//
 
 //----------------------------------------------------------------//
-void onKeyDown ( unsigned char key) {
+void onKeyDown ( int key) {
 	AKUEnqueueKeyboardEvent ( HtmlInputDeviceID::DEVICE, HtmlInputDeviceSensorID::KEYBOARD, key, true );
 }
 
 //----------------------------------------------------------------//
-void onKeyUp ( unsigned char key ) {
+void onKeyUp ( int key ) {
 	AKUEnqueueKeyboardEvent ( HtmlInputDeviceID::DEVICE, HtmlInputDeviceSensorID::KEYBOARD, key, false );
 }
+
 
 
 //----------------------------------------------------------------//
@@ -90,11 +92,6 @@ void onMouseDrag ( int x, int y ) {
 //----------------------------------------------------------------//
 void onMouseMove ( int x, int y ) {
 	AKUEnqueuePointerEvent ( HtmlInputDeviceID::DEVICE, HtmlInputDeviceSensorID::POINTER, x, y );
-}
-
-//----------------------------------------------------------------//
-void onMouseWheel ( int scroll ) {
-	AKUEnqueueWheelEvent ( HtmlInputDeviceID::DEVICE, HtmlInputDeviceSensorID::WHEEL, scroll );
 }
 
 //----------------------------------------------------------------//
@@ -178,14 +175,16 @@ void Dummy() {
 	RestoreFile("dummy",0);
 }
 
+void dummy_async(void*) {
+	printf("Browser Keepalive");
+}
+
 void RefreshContext () {
 
 	AKUAppInitialize ();
 	AKUModulesAppInitialize ();
 
 	AKUCreateContext ();
-	
-	REGISTER_LUA_CLASS ( MOAIApp )	
 
     AKUModulesContextInitialize ();
 	AKUModulesRunLuaAPIWrapper ();
@@ -201,11 +200,43 @@ void RefreshContext () {
 	AKUSetInputDeviceButton			( HtmlInputDeviceID::DEVICE, HtmlInputDeviceSensorID::MOUSE_LEFT,	"mouseLeft" );
 	AKUSetInputDeviceButton			( HtmlInputDeviceID::DEVICE, HtmlInputDeviceSensorID::MOUSE_MIDDLE,	"mouseMiddle" );
 	AKUSetInputDeviceButton			( HtmlInputDeviceID::DEVICE, HtmlInputDeviceSensorID::MOUSE_RIGHT,	"mouseRight" );
-	AKUSetInputDeviceWheel			( HtmlInputDeviceID::DEVICE, HtmlInputDeviceSensorID::WHEEL,		"wheel" );
 
 	AKUSetFunc_EnterFullscreenMode ( _AKUEnterFullscreenModeFunc );
 	AKUSetFunc_ExitFullscreenMode ( _AKUExitFullscreenModeFunc );
 	AKUSetFunc_OpenWindow ( _AKUOpenWindowFunc );
 
-	//AKUModulesParseArgs ( argc, argv );
+	emscripten_async_call(&dummy_async, 0, 0 ); //this call ensures that Browser library is imported to workaround https://github.com/kripken/emscripten/issues/4291
+}
+
+const char *CallStringFunc(char *func) {
+
+	MOAIScopedLuaState state = MOAILuaRuntime::Get ().State ();
+
+	lua_getglobal ( state, "loadstring" );
+	if ( !state.IsType ( -1, LUA_TFUNCTION )) {
+		ZLLog::Print ( "Missing global Lua function 'loadstring'\n" );
+	}
+
+	state.Push ( func, strlen(func) );
+
+	int status = state.DebugCall ( state.GetTop () - 1, 2 );
+	if ( state.PrintErrors ( ZLLog::CONSOLE, status )) return NULL;
+
+	if ( state.IsType ( -1, LUA_TSTRING )) {
+
+		ZLLog::Print ( "Error loading script:\n" );
+		ZLLog::Print ( "%s\n", state.GetValue < cc8* >( -1, "" ));
+		return NULL;
+		
+	}
+	state.Pop(1); //leaving function at top of stack
+	status = state.DebugCall(0, 1);
+	if (state.PrintErrors( ZLLog::CONSOLE, status)) return NULL;
+
+	cc8* result = state.GetValue<cc8*>(-1,"null");
+	//assign to stlstring to get a copy before pop
+  char * res = strdup(result);
+	state.Pop(1);
+
+	return res;
 }

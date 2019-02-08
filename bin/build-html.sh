@@ -24,7 +24,9 @@ mkdir build
 cd build
 cmake \
 -DEMSCRIPTEN_ROOT_PATH=${EMSCRIPTEN_HOME} \
--DCMAKE_TOOLCHAIN_FILE=${EMSCRIPTEN_HOME}/cmake/Platform/Emscripten.cmake \
+-DCMAKE_TOOLCHAIN_FILE=${EMSCRIPTEN_HOME}/cmake/Modules/Platform/Emscripten.cmake \
+-DCMAKE_BUILD_TYPE=Debug \
+-G "Unix Makefiles" \
 -DBUILD_HTML=TRUE \
 -DMOAI_BOX2D=TRUE \
 -DMOAI_CHIPMUNK=FALSE \
