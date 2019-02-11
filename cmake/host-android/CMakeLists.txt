@@ -38,7 +38,6 @@ target_link_libraries ( moai
 #emulate the android ndk build script to help with debugging
 set(LIBRARY_NAME moai)
 
-
 # 2. generate gdb.setup
 get_directory_property(INCLUDE_DIRECTORIES DIRECTORY . INCLUDE_DIRECTORIES)
 string(REGEX REPLACE ";" " " INCLUDE_DIRECTORIES "${INCLUDE_DIRECTORIES}")
@@ -47,6 +46,9 @@ file(APPEND ${LIBRARY_OUTPUT_PATH_ROOT}/libs/${ANDROID_NDK_ABI_NAME}/gdb.setup "
 
 # 3. copy gdbserver executable
 file(COPY ${ANDROID_NDK}/prebuilt/android-${ANDROID_ARCH_NAME}/gdbserver/gdbserver DESTINATION ${LIBRARY_OUTPUT_PATH_ROOT}/libs/${ANDROID_NDK_ABI_NAME}/)
+
+# 3.5 copy lib to lib :)
+add_custom_command(TARGET ${LIBRARY_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/lib${LIBRARY_NAME}.so ${LIBRARY_OUTPUT_PATH_ROOT}/libs/${ANDROID_NDK_ABI_NAME}/)
 
 # 4. copy lib to obj
 add_custom_command(TARGET ${LIBRARY_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${LIBRARY_OUTPUT_PATH_ROOT}/obj/local/${ANDROID_NDK_ABI_NAME}/)

@@ -158,7 +158,8 @@ cmake -DDISABLED_EXT="$disabled_ext" -DMOAI_BOX2D=0 \
 -DMOAI_TINYXML=1 -DMOAI_PNG=1 -DMOAI_SFMT=1 -DMOAI_VORBIS=1 $untz_param $luajit_param \
 -DBUILD_ANDROID=true \
 -DCMAKE_TOOLCHAIN_FILE="../host-android/android.toolchain.cmake" \
--DLIBRARY_OUTPUT_PATH_ROOT="../../ant/libmoai" \
+-DLIBRARY_OUTPUT_PATH_ROOT="../../../ant/libmoai" \
+-DANDROID_PLATFORM="android-20" \
 -DANDROID_NDK=${ANDROID_NDK} \
 -DANDROID_ABI="${architecture}" \
 -DCMAKE_BUILD_TYPE=$buildtype_flags \

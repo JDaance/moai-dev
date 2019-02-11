@@ -98,8 +98,8 @@ if ( BUILD_LINUX )
 endif ( BUILD_LINUX )
 
 if ( BUILD_ANDROID )
-  set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99  -DHAVE_MEMMOVE " )
-  set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} " )
+  set ( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99 -DHAVE_MEMMOVE -Wno-error=format-security" )
+  set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=format-security" )
 endif ( BUILD_ANDROID )
 
 if ( BUILD_IOS )
