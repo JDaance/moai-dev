@@ -23,16 +23,6 @@ var LibraryMOAI = {
     Module.canvas = canvas;
   },
 
-  //replace fclose to notify us on file change to help with save game handling
-  fclose: function(stream) {
-    var fileinfo = FS.streams[stream];
-    if(fileinfo && fileinfo.isWrite && Module.SaveCallback) {
-      Module.SaveCallback(FS.absolutePath(fileinfo.path), fileinfo.object.contents);
-    };
-    _fsync(stream);
-    return _close(stream);
-  },
-
   //savegame support
   RestoreFile__deps: ['$FS'],
   RestoreFile: function(path, data) {
@@ -49,6 +39,12 @@ var LibraryMOAI = {
     
       FS.createPath('/',dir,true,true);
       FS.createDataFile(dir,name,data,true,true);
+    }
+  },
+
+  PushMessageToJs: function(jsonString) {
+    if (window.RecieveLuaMessage) {
+      window.RecieveLuaMessage(Module.Pointer_stringify(jsonString));
     }
   }
 }

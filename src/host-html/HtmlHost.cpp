@@ -27,6 +27,7 @@ namespace HtmlInputDeviceSensorID {
 	enum {
 		KEYBOARD,
 		POINTER,
+		WHEEL,
 		MOUSE_LEFT,
 		MOUSE_MIDDLE,
 		MOUSE_RIGHT,
@@ -185,6 +186,8 @@ void RefreshContext () {
 	AKUModulesAppInitialize ();
 
 	AKUCreateContext ();
+	
+	REGISTER_LUA_CLASS ( MOAIApp )	
 
     AKUModulesContextInitialize ();
 	AKUModulesRunLuaAPIWrapper ();
@@ -200,6 +203,7 @@ void RefreshContext () {
 	AKUSetInputDeviceButton			( HtmlInputDeviceID::DEVICE, HtmlInputDeviceSensorID::MOUSE_LEFT,	"mouseLeft" );
 	AKUSetInputDeviceButton			( HtmlInputDeviceID::DEVICE, HtmlInputDeviceSensorID::MOUSE_MIDDLE,	"mouseMiddle" );
 	AKUSetInputDeviceButton			( HtmlInputDeviceID::DEVICE, HtmlInputDeviceSensorID::MOUSE_RIGHT,	"mouseRight" );
+	AKUSetInputDeviceWheel			( HtmlInputDeviceID::DEVICE, HtmlInputDeviceSensorID::WHEEL,		"wheel" );
 
 	AKUSetFunc_EnterFullscreenMode ( _AKUEnterFullscreenModeFunc );
 	AKUSetFunc_ExitFullscreenMode ( _AKUExitFullscreenModeFunc );

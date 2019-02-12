@@ -28,7 +28,7 @@ set(EXPORTED_FUNCTIONS "['_CallStringFunc','_malloc','_RefreshContext','_Cleanup
 
 #--closure 0 --minify 0
 add_custom_target( moaijs
-                    COMMAND ${EMSCRIPTEN_ROOT_PATH}/emcc${EMCC_SUFFIX}
+                    COMMAND ${EMSCRIPTEN_ROOT_PATH}/emcc${EMCC_SUFFIX} -O2
                     --js-library "${CMAKE_CURRENT_LIST_DIR}/../../src/host-html/moaicallbacks.js" 
                     --js-library "${CMAKE_CURRENT_LIST_DIR}/../../src/host-html/library_webuntz.js" 
                     --post-js "${CMAKE_CURRENT_LIST_DIR}/../../src/host-html/libmoai-post.js" 
@@ -41,7 +41,7 @@ add_custom_target( moaijs
                     -s LINKABLE=1
                     -s EXPORT_NAME="'CreateMoaiRuntime'"
                     -s EXPORTED_FUNCTIONS="${EXPORTED_FUNCTIONS}" 
-                    -s EXTRA_EXPORTED_RUNTIME_METHODS="['FS_mount','FS_unmount','FS_mkdir','FS_filesystems','FS_chdir','FS_root','FS_lookupPath','FS_createPath','FS_createPreloadedFile','ccall','cwrap','Pointer_stringify']" 
+                    -s EXTRA_EXPORTED_RUNTIME_METHODS="['FS_createPath','FS_createPreloadedFile','ccall','cwrap','Pointer_stringify']" 
                     -s INVOKE_RUN=0 
                     ${MOAIHTMLOUTPUT} -o moaijs.js
                   )
