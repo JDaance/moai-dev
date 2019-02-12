@@ -37,7 +37,6 @@ void onMessageFromJs 		( const char* jsonString );
   void EnterFullScreen();
   void ExitFullScreen();
   void OpenWindowFunc(const char* title, int width, int height);
-  void RestoreFile(const char* path, int data);
   const char *CallStringFunc(char *func);
   void PushMessageToJs		( const char* jsonString );
 }

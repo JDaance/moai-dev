@@ -23,29 +23,8 @@ var LibraryMOAI = {
     Module.canvas = canvas;
   },
 
-  //savegame support
-  RestoreFile__deps: ['$FS'],
-  RestoreFile: function(path, data) {
-    //normalize the path
-    var path = FS.absolutePath(path);
-
-    var existing = FS.findObject(path);
-    if (existing) {
-      existing.contents = data;
-    } else {
-      var parts = path.split('/');
-      var name = parts.pop();
-      var dir = parts.join('/') || '/';
-    
-      FS.createPath('/',dir,true,true);
-      FS.createDataFile(dir,name,data,true,true);
-    }
-  },
-
   PushMessageToJs: function(jsonString) {
-    if (window.RecieveLuaMessage) {
-      window.RecieveLuaMessage(Module.Pointer_stringify(jsonString));
-    }
+    window.RecieveLuaMessage(Module.Pointer_stringify(jsonString));
   }
 }
 

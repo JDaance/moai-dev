@@ -172,10 +172,6 @@ void Cleanup () {
 	
 }
 
-void Dummy() {
-	RestoreFile("dummy",0);
-}
-
 void dummy_async(void*) {
 	printf("Browser Keepalive");
 }
