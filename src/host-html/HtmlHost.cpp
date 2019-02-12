@@ -173,7 +173,7 @@ void Cleanup () {
 }
 
 void dummy_async(void*) {
-	printf("Browser Keepalive");
+	printf("dummy emscripten_async_call done\n");
 }
 
 void RefreshContext () {
@@ -208,6 +208,7 @@ void RefreshContext () {
 	emscripten_async_call(&dummy_async, 0, 0 ); //this call ensures that Browser library is imported to workaround https://github.com/kripken/emscripten/issues/4291
 }
 
+// TODO I suspect this can be removed, I have no idea what it does or where it would be used // Joakim
 const char *CallStringFunc(char *func) {
 
 	MOAIScopedLuaState state = MOAILuaRuntime::Get ().State ();
